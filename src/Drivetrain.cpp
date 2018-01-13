@@ -8,7 +8,7 @@
 #include <Drivetrain.h>
 
 
-Drivetrain::Drivetrain(OperatorInputs *operatorinputs)
+Drivetrain::Drivetrain(OperatorInputs *operatorinputs, WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack)
 {
 	m_operatorinputs = operatorinputs;
 	//input = new XboxController(1);
@@ -16,10 +16,10 @@ Drivetrain::Drivetrain(OperatorInputs *operatorinputs)
 	xBoxY = 0;
 	xBoxX = 0;
 
-	rightFrontTalon = new WPI_TalonSRX(1);
-	rightBackTalon = new WPI_TalonSRX(3);
-	leftFrontTalon = new WPI_TalonSRX(0);
-	leftBackTalon = new WPI_TalonSRX(2);
+	rightFrontTalon = rightFront;
+	rightBackTalon = rightBack;
+	leftFrontTalon = leftFront;
+	leftBackTalon = leftBack;
 
 	leftSide = new frc::SpeedControllerGroup(*leftFrontTalon, *leftBackTalon);
 	rightSide = new frc::SpeedControllerGroup(*rightFrontTalon, *rightBackTalon);

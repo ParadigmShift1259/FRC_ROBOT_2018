@@ -29,7 +29,7 @@ public:
 	virtual ~Drivetrain();
 	double getXboxX() const { return xBoxX; }
 
-	Drivetrain(OperatorInputs *operatorinputs);
+	Drivetrain(OperatorInputs *operatorinputs, WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack);
 
 	void Init();
 	void Loop();
@@ -38,7 +38,6 @@ public:
 
 private:
 	OperatorInputs *m_operatorinputs;
-	XboxController *input;
 
 	//Stores the current x and y values of the joystick multiplied by -1
 	double xBoxX;

@@ -21,8 +21,13 @@ void Robot::RobotInit()
 	m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
+	rightFrontTalon = new WPI_TalonSRX(1);
+	rightBackTalon = new WPI_TalonSRX(3);
+	leftFrontTalon = new WPI_TalonSRX(0);
+	leftBackTalon = new WPI_TalonSRX(2);
+
 	m_operatorinputs = new OperatorInputs();
-	m_drivetrain = new Drivetrain(m_operatorinputs);
+	m_drivetrain = new Drivetrain(m_operatorinputs, rightFrontTalon, rightBackTalon, leftFrontTalon, leftBackTalon);
 	m_compressor = new Compressor(0);
 }
 

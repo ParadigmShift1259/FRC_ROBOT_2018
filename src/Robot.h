@@ -32,6 +32,11 @@ protected:
 	Drivetrain *m_drivetrain;
 	Compressor *m_compressor;
 
+	WPI_TalonSRX *rightFrontTalon;
+	WPI_TalonSRX *rightBackTalon;
+	WPI_TalonSRX *leftFrontTalon;
+	WPI_TalonSRX *leftBackTalon;
+
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
 	frc::SendableChooser<std::string> m_chooser;
