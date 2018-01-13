@@ -23,11 +23,18 @@
 class Drivetrain
 {
 public:
+	Drivetrain();
+
+	//Checks the controller and if necessary shifts the drivetrain
+	virtual ~Drivetrain();
+	double getXboxX() const { return xBoxX; }
+
 	Drivetrain(OperatorInputs *operatorinputs);
-	~Drivetrain();
+
 	void Init();
 	void Loop();
 	void Shift();
+
 
 private:
 	OperatorInputs *m_operatorinputs;

@@ -11,7 +11,7 @@
 Drivetrain::Drivetrain(OperatorInputs *operatorinputs)
 {
 	m_operatorinputs = operatorinputs;
-	input = new XboxController(0);
+	//input = new XboxController(1);
 
 	xBoxY = 0;
 	xBoxX = 0;
@@ -46,8 +46,8 @@ void Drivetrain::Init()
 
 void Drivetrain::Loop()
 {
-	xBoxX = -input->GetX(GenericHID::kLeftHand);
-	xBoxY = -input->GetY(GenericHID::kLeftHand);
+	xBoxX = -m_operatorinputs->xBoxLeftX();
+	xBoxY = -m_operatorinputs->xBoxLeftY();
 
 	drive->ArcadeDrive(xBoxY, xBoxX, false);
 
@@ -57,7 +57,7 @@ void Drivetrain::Loop()
 
 void Drivetrain::Shift()
 {
-	if (input->GetBumperPressed(GenericHID::kLeftHand))
+	if (m_operatorinputs->xBoxLeftBumper())
 	{
 		shifter->Set(!shifter->Get());
 	}

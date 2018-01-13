@@ -71,6 +71,20 @@ void Robot::AutonomousPeriodic()
 }
 
 
+void Robot::TestInit()
+{
+	//compressor->Start();
+	m_drivetrain->Init();
+}
+
+void Robot::TestPeriodic()
+{
+	m_drivetrain->Loop();
+	cout << "test periodic called" << std::endl;
+	frc::SmartDashboard::PutNumber("Auto 1", m_drivetrain->getXboxX()); //test value
+}
+
+
 void Robot::TeleopInit()
 {
 	DriverStation::ReportError("TeleopInit");
@@ -79,19 +93,10 @@ void Robot::TeleopInit()
 }
 
 
+
 void Robot::TeleopPeriodic()
 {
 	m_drivetrain->Loop();
-}
-
-
-void Robot::TestInit()
-{
-}
-
-
-void Robot::TestPeriodic()
-{
 }
 
 
