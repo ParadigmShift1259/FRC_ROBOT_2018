@@ -48,9 +48,9 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define AXIS1_FORWARD_MIN 0.75
 #define AXIS1_FORWARD_MAX 1.0
 //	Controller Dead Zones
-#define DEADZONE_Y  0.17
-#define DEADZONE_X  0.17
-#define DEADZONE_Z  0.17
+#define DEADZONE_Y  0.18
+#define DEADZONE_X  0.18
+#define DEADZONE_Z  0.18
 
 
 // Drivetrain
