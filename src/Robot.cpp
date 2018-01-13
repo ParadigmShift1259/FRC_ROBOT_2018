@@ -12,6 +12,7 @@
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
+#include "Robot.h"
 
 
 class Robot : public frc::IterativeRobot {
@@ -20,6 +21,8 @@ public:
 		m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
 		m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
 		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+		drivetrain = new Drivetrain();
+		compressor = new Compressor();
 	}
 
 	/*
@@ -36,7 +39,8 @@ public:
 	 * SendableChooser make sure to add them to the chooser code above as
 	 * well.
 	 */
-	void AutonomousInit() override {
+	void AutonomousInit()
+	{
 		m_autoSelected = m_chooser.GetSelected();
 		// m_autoSelected = SmartDashboard::GetString(
 		// 		"Auto Selector", kAutoNameDefault);
@@ -49,7 +53,8 @@ public:
 		}
 	}
 
-	void AutonomousPeriodic() {
+	void AutonomousPeriodic()
+	{
 		if (m_autoSelected == kAutoNameCustom) {
 			// Custom Auto goes here
 		} else {
@@ -57,11 +62,21 @@ public:
 		}
 	}
 
-	void TeleopInit() {}
+	void TeleopInit()
+	{
+		compressor->Start();
+		drivetrain->init();
+	}
 
-	void TeleopPeriodic() {}
+	void TeleopPeriodic()
+	{
+		drivetrain->loop();
+	}
 
-	void TestPeriodic() {}
+	void TestPeriodic()
+	{
+
+	}
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
