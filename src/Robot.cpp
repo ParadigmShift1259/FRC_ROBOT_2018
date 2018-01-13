@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+
 #include <iostream>
 #include <string>
-
 #include <IterativeRobot.h>
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -15,84 +15,94 @@
 #include "Robot.h"
 
 
-class Robot : public frc::IterativeRobot {
-public:
-	void RobotInit() {
-		m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
-		m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
-		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
-		drivetrain = new Drivetrain();
-		compressor = new Compressor();
-	}
+void Robot::RobotInit()
+{
+	m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+	m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
+	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
-	/*
-	 * This autonomous (along with the chooser code above) shows how to
-	 * select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * GetString line to get the auto name from the text box below the Gyro.
-	 *
-	 * You can add additional auto modes by adding additional comparisons to
-	 * the
-	 * if-else structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as
-	 * well.
-	 */
-	void AutonomousInit()
+	m_operatorinputs = new OperatorInputs();
+	m_drivetrain = new Drivetrain(m_operatorinputs);
+	m_compressor = new Compressor(0);
+}
+
+/*
+ * This autonomous (along with the chooser code above) shows how to
+ * select
+ * between different autonomous modes using the dashboard. The sendable
+ * chooser code works with the Java SmartDashboard. If you prefer the
+ * LabVIEW Dashboard, remove all of the chooser code and uncomment the
+ * GetString line to get the auto name from the text box below the Gyro.
+ *
+ * You can add additional auto modes by adding additional comparisons to
+ * the
+ * if-else structure below with additional strings. If using the
+ * SendableChooser make sure to add them to the chooser code above as
+ * well.
+ */
+void Robot::AutonomousInit()
+{
+	m_autoSelected = m_chooser.GetSelected();
+	// m_autoSelected = SmartDashboard::GetString(
+	// 		"Auto Selector", kAutoNameDefault);
+	std::cout << "Auto selected: " << m_autoSelected << std::endl;
+
+	if (m_autoSelected == kAutoNameCustom)
 	{
-		m_autoSelected = m_chooser.GetSelected();
-		// m_autoSelected = SmartDashboard::GetString(
-		// 		"Auto Selector", kAutoNameDefault);
-		std::cout << "Auto selected: " << m_autoSelected << std::endl;
-
-		if (m_autoSelected == kAutoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
-		//m_lw.SetEnabled(true);
+		// Custom Auto goes here
 	}
-
-	void AutonomousPeriodic()
+	else
 	{
-		if (m_autoSelected == kAutoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
+		// Default Auto goes here
 	}
+}
 
-	void TeleopInit()
+
+void Robot::AutonomousPeriodic()
+{
+	if (m_autoSelected == kAutoNameCustom)
 	{
-		compressor->Start();
-		drivetrain->init();
+		// Custom Auto goes here
 	}
-
-	void TeleopPeriodic()
+	else
 	{
-		drivetrain->loop();
+		// Default Auto goes here
 	}
+}
 
-	void TestInit()
-	{
-		//compressor->Start();
-		drivetrain->init();
-	}
 
-	void TestPeriodic()
-	{
-		drivetrain->loop();
-		cout << "test periodic called" << std::endl;
-		frc::SmartDashboard::PutNumber("Auto 1", drivetrain->getXboxX()); //test value
-	}
+void Robot::TestInit()
+{
+	//compressor->Start();
+	m_drivetrain->Init();
+}
 
-private:
-	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
-	frc::SendableChooser<std::string> m_chooser;
-	const std::string kAutoNameDefault = "Default";
-	const std::string kAutoNameCustom = "My Auto";
-	std::string m_autoSelected;
-};
+void Robot::TestPeriodic()
+{
+	m_drivetrain->Loop();
+	cout << "test periodic called" << std::endl;
+	frc::SmartDashboard::PutNumber("Auto 1", m_drivetrain->getXboxX()); //test value
+}
+
+
+void Robot::TeleopInit()
+{
+	DriverStation::ReportError("TeleopInit");
+	m_compressor->Start();
+	m_drivetrain->Init();
+}
+
+
+
+void Robot::TeleopPeriodic()
+{
+	m_drivetrain->Loop();
+}
+
+
+void Robot::DisabledInit()
+{
+}
+
 
 START_ROBOT_CLASS(Robot)

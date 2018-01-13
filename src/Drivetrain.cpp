@@ -7,10 +7,11 @@
 
 #include <Drivetrain.h>
 
-Drivetrain::Drivetrain()
+
+Drivetrain::Drivetrain(OperatorInputs *operatorinputs)
 {
-	oi = new OperatorInputs();
-	input = new XboxController(1);
+	m_operatorinputs = operatorinputs;
+	//input = new XboxController(1);
 
 	xBoxY = 0;
 	xBoxX = 0;
@@ -26,10 +27,15 @@ Drivetrain::Drivetrain()
 	drive = new frc::DifferentialDrive(*leftSide, *rightSide);
 
 	shifter = new Solenoid(0);
-
 }
 
-void Drivetrain::init()
+
+Drivetrain::~Drivetrain()
+{
+}
+
+
+void Drivetrain::Init()
 {
 	xBoxX = 0;
 	xBoxY = 0;
@@ -37,27 +43,22 @@ void Drivetrain::init()
 	shifter->Set(false);
 }
 
-void Drivetrain::loop()
+
+void Drivetrain::Loop()
 {
-	xBoxX = -input->GetX(GenericHID::kLeftHand);
-	xBoxY = -input->GetY(GenericHID::kLeftHand);
+	xBoxX = -m_operatorinputs->xBoxLeftX();
+	xBoxY = -m_operatorinputs->xBoxLeftY();
 
 	drive->ArcadeDrive(xBoxY, xBoxX, false);
 
-	shift();
+	Shift();
 }
 
-void Drivetrain::shift()
+
+void Drivetrain::Shift()
 {
-	if (input->GetBumperPressed(GenericHID::kLeftHand))
+	if (m_operatorinputs->xBoxLeftBumper())
 	{
 		shifter->Set(!shifter->Get());
 	}
 }
-
-
-Drivetrain::~Drivetrain()
-{
-
-}
-
