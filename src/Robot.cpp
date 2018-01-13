@@ -22,7 +22,8 @@ void Robot::RobotInit()
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_operatorinputs = new OperatorInputs();
-	m_drivetrain = new OldDriveTrain(m_operatorinputs);
+	m_driverstation = &DriverStation::GetInstance();
+	m_drivetrain = new OldDriveTrain(m_operatorinputs,m_driverstation);
 	m_compressor = new Compressor(0);
 }
 
@@ -81,7 +82,7 @@ void Robot::TestPeriodic()
 {
 	m_drivetrain->Loop();
 	cout << "test periodic called" << std::endl;
-	frc::SmartDashboard::PutNumber("Auto 1", m_drivetrain->getXboxX()); //test value
+	//frc::SmartDashboard::PutNumber("Auto 1", m_drivetrain->getXboxX()); //test value
 }
 
 

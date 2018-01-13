@@ -31,6 +31,7 @@ protected:
 	OperatorInputs *m_operatorinputs;
 	OldDriveTrain *m_drivetrain;
 	Compressor *m_compressor;
+	DriverStation *m_driverstation;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

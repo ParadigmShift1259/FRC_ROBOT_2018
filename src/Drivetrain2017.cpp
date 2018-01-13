@@ -28,31 +28,31 @@ OldDriveTrain::OldDriveTrain(OperatorInputs *inputs, DriverStation *ds)
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
 
-	m_lefttalonlead->Set(ControlMode::PercentOutput);
+	m_lefttalonlead->Set(ControlMode::PercentOutput,0);
 	m_lefttalonlead->Set(0);
-	m_lefttalonfollow->Set(ControlMode::Follower);
+	m_lefttalonfollow->Set(ControlMode::Follower,CAN_LEFT_PORT);
 	m_lefttalonfollow->Set(CAN_LEFT_PORT);
 
-	m_righttalonlead->Set(ControlMode::PercentOutput);
+	m_righttalonlead->Set(ControlMode::PercentOutput,0);
 	m_righttalonlead->Set(0);
-	m_righttalonfollow->Set(ControlMode::Follower);
+	m_righttalonfollow->Set(ControlMode::Follower,CAN_RIGHT_PORT);
 	m_righttalonfollow->Set(CAN_RIGHT_PORT);
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
-	m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_lefttalonlead->SetSensorDirection(false);
-	m_lefttalonlead->SetPosition(0);
-	m_lefttalonlead->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
+	m_lefttalonlead->SetSensorPhase(false);
+	m_lefttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
-	m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_righttalonlead->SetSensorDirection(false);
-	m_righttalonlead->SetPosition(0);
-	m_righttalonlead->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
+	m_righttalonlead->SetSensorPhase(false);
+	m_righttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
-	m_lefttalonfollow->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
-	m_righttalonfollow->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	m_righttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
 	//Setup Encoders
 	//m_leftEncoder = new Encoder(3, 4);
@@ -117,31 +117,31 @@ void OldDriveTrain::Init()
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
 
-	m_lefttalonlead->Set(ControlMode::PercentOutput);
+	m_lefttalonlead->Set(ControlMode::PercentOutput,0);
 	m_lefttalonlead->Set(0);
-	m_lefttalonfollow->Set(ControlMode::Follower);
+	m_lefttalonfollow->Set(ControlMode::Follower,CAN_LEFT_PORT);
 	m_lefttalonfollow->Set(CAN_LEFT_PORT);
 
-	m_righttalonlead->Set(ControlMode::PercentOutput);
+	m_righttalonlead->Set(ControlMode::PercentOutput,0);
 	m_righttalonlead->Set(0);
-	m_righttalonfollow->Set(ControlMode::Follower);
+	m_righttalonfollow->Set(ControlMode::Follower,CAN_RIGHT_PORT);
 	m_righttalonfollow->Set(CAN_RIGHT_PORT);
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
-	m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_lefttalonlead->SetSensorDirection(false);
-	m_lefttalonlead->SetPosition(0);
-	m_lefttalonlead->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
+	m_lefttalonlead->SetSensorPhase(false);
+	m_lefttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
-	m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_righttalonlead->SetSensorDirection(false);
-	m_righttalonlead->SetPosition(0);
-	m_righttalonlead->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
+	m_righttalonlead->SetSensorPhase(false);
+	m_righttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
-	m_lefttalonfollow->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
-	m_righttalonfollow->ConfigNeutralMode(WPI_TalonSRX::kNeutralMode_Brake);
+	m_righttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
 	m_leftpow = 0;
 	m_rightpow = 0;
@@ -311,10 +311,10 @@ void OldDriveTrain::Drive(double x, double y, bool ramp)
 		m_leftpow = m_previousy * Y_SCALING - (m_previousx * X_SCALING);
 		m_rightpow = m_previousy * Y_SCALING + (m_previousx * X_SCALING);
 	}
-	m_leftspeed = m_lefttalonlead->GetSpeed();
-	m_rightspeed = m_righttalonlead->GetSpeed();
-	m_leftposition = m_lefttalonlead->GetPosition();
-	m_rightposition = m_righttalonlead->GetPosition();
+	m_leftspeed = m_lefttalonlead->GetSelectedSensorVelocity(0);
+	m_rightspeed = m_righttalonlead->GetSelectedSensorVelocity(0);
+	m_leftposition = m_lefttalonlead->GetSelectedSensorPosition(0);
+	m_rightposition = m_righttalonlead->GetSelectedSensorPosition(0);
 
 	m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
 	//m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
@@ -335,16 +335,16 @@ void OldDriveTrain::Drive(double x, double y, bool ramp)
 // sets the motors to coasting mode, shifts, and then sets them back to break mode
 void OldDriveTrain::Shift()
 {
-	//m_lefttalonlead->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_lefttalonfollow->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_righttalonlead->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_righttalonfollow->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
+	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
+	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
+	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
+	//m_righttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
 	m_ishighgear = !m_ishighgear;
 	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
-	//m_lefttalonlead->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_lefttalonfollow->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_righttalonlead->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_righttalonfollow->ConfigNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
+	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
+	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
+	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
+	//m_righttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
 	m_shift = false;
 }
 
@@ -503,8 +503,8 @@ void OldDriveTrain::outputData()
 	if (leftMotorFile.is_open())
 	{
 		leftMotorFile << dataTimer->Get() << ",";
-		leftMotorFile << LeftTalon()->GetPosition() << ",";
-		leftMotorFile << LeftTalon()->GetSpeed() << ",";
+		leftMotorFile << LeftTalon()->GetSelectedSensorPosition(0) << ",";
+		leftMotorFile << LeftTalon()->GetSelectedSensorVelocity(0) << ",";
 		leftMotorFile << m_driverstation->GetInstance().GetBatteryVoltage() << ",";
 		leftMotorFile << LeftTalon()->Get() << "\n";
 	}
@@ -515,8 +515,8 @@ void OldDriveTrain::outputData()
 	if (rightMotorFile.is_open())
 	{
 		rightMotorFile << dataTimer->Get() << ",";
-		rightMotorFile << RightTalon()->GetPosition() << ",";
-		rightMotorFile << RightTalon()->GetSpeed() << ",";
+		rightMotorFile << RightTalon()->GetSelectedSensorPosition(0) << ",";
+		rightMotorFile << RightTalon()->GetSelectedSensorVelocity(0) << ",";
 		rightMotorFile << m_driverstation->GetInstance().GetBatteryVoltage() << ",";
 		rightMotorFile << RightTalon()->Get() << "\n";
 	}
