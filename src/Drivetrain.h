@@ -5,33 +5,32 @@
  *      Author: Matt Wildman
  */
 
+
 #ifndef SRC_DRIVETRAIN_H_
 #define SRC_DRIVETRAIN_H_
+
+
 #include <RobotDrive.h>
 #include <Drive\DifferentialDrive.h>
-#include <ctre\Phoenix.h> //Includes all ctre classes. Do not include the individual header files, it won't work
 #include <SpeedControllerGroup.h>
-#include "OperatorInputs.h"
+#include <ctre\Phoenix.h>
 #include <DriverStation.h>
 #include <XboxController.h>
 #include <Solenoid.h>
+#include "OperatorInputs.h"
+
 
 class Drivetrain
 {
 public:
-	Drivetrain();
-
-	void init();
-
-	//To be called every time the loop runs
-	void loop();
-
-	//Checks the controller and if necessary shifts the drivetrain
-	void shift();
-	virtual ~Drivetrain();
+	Drivetrain(OperatorInputs *operatorinputs);
+	~Drivetrain();
+	void Init();
+	void Loop();
+	void Shift();
 
 private:
-	OperatorInputs *oi;
+	OperatorInputs *m_operatorinputs;
 	XboxController *input;
 
 	//Stores the current x and y values of the joystick multiplied by -1
@@ -45,13 +44,14 @@ private:
 	WPI_TalonSRX *leftBackTalon;
 
 	//SpeedControllerGroup basically nests multiple speedcontroller classes into one side
-	frc::SpeedControllerGroup *leftSide;
-	frc::SpeedControllerGroup *rightSide;
+	SpeedControllerGroup *leftSide;
+	SpeedControllerGroup *rightSide;
 
 	//A class that has functions for curvature drive, arcade drive and tank drive.
-	frc::DifferentialDrive *drive;
+	DifferentialDrive *drive;
 
 	Solenoid *shifter;
 };
+
 
 #endif /* SRC_DRIVETRAIN_H_ */
