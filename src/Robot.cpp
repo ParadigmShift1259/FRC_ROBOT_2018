@@ -22,7 +22,7 @@ void Robot::RobotInit()
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_operatorinputs = new OperatorInputs();
-	m_drivetrain = new Drivetrain(m_operatorinputs);
+	m_drivetrain = new OldDriveTrain(m_operatorinputs);
 	m_compressor = new Compressor(0);
 }
 
