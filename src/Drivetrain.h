@@ -29,6 +29,7 @@ public:
 	//Checks the controller and if necessary shifts the drivetrain
 	void shift();
 	virtual ~Drivetrain();
+	double getXboxX() const { return xBoxX; }
 
 private:
 	OperatorInputs *oi;

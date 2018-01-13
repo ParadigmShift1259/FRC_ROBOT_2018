@@ -51,6 +51,7 @@ public:
 		} else {
 			// Default Auto goes here
 		}
+		//m_lw.SetEnabled(true);
 	}
 
 	void AutonomousPeriodic()
@@ -73,9 +74,17 @@ public:
 		drivetrain->loop();
 	}
 
+	void TestInit()
+	{
+		//compressor->Start();
+		drivetrain->init();
+	}
+
 	void TestPeriodic()
 	{
-
+		drivetrain->loop();
+		cout << "test periodic called" << std::endl;
+		frc::SmartDashboard::PutNumber("Auto 1", drivetrain->getXboxX()); //test value
 	}
 
 private:

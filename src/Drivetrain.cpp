@@ -10,7 +10,7 @@
 Drivetrain::Drivetrain()
 {
 	oi = new OperatorInputs();
-	input = new XboxController(0);
+	input = new XboxController(1);
 
 	xBoxY = 0;
 	xBoxX = 0;
