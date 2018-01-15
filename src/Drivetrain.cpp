@@ -3,6 +3,7 @@
  *
  *  Created on: Jan 11, 2018
  *      Author: Matt Wildman
+ *  Last edited by: Eric Ertl
  */
 
 #include <Drivetrain.h>
@@ -11,7 +12,8 @@
 Drivetrain::Drivetrain(OperatorInputs *operatorinputs)
 {
 	m_operatorinputs = operatorinputs;
-	//input = new XboxController(1);
+	//input = new XboxController(1); //hi
+
 
 	xBoxY = 0;
 	xBoxX = 0;
