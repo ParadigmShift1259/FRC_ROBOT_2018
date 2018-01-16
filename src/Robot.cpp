@@ -23,9 +23,10 @@ void Robot::RobotInit()
 
 	m_operatorinputs = new OperatorInputs();
 	m_driverstation = &DriverStation::GetInstance();
-	m_drivetrain = new OldDriveTrain(m_operatorinputs,m_driverstation);
-	m_compressor = new Compressor(0);
+	m_drivetrain = new OldDriveTrain(m_operatorinputs, m_driverstation);
+	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 }
+
 
 /*
  * This autonomous (along with the chooser code above) shows how to

@@ -28,41 +28,28 @@ OldDriveTrain::OldDriveTrain(OperatorInputs *inputs, DriverStation *ds)
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
 
-	m_lefttalonlead->Set(ControlMode::PercentOutput,0);
-	m_lefttalonlead->Set(0);
-	m_lefttalonfollow->Set(ControlMode::Follower,CAN_LEFT_PORT);
-	m_lefttalonfollow->Set(CAN_LEFT_PORT);
+	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+	m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
 
-	m_righttalonlead->Set(ControlMode::PercentOutput,0);
-	m_righttalonlead->Set(0);
-	m_righttalonfollow->Set(ControlMode::Follower,CAN_RIGHT_PORT);
-	m_righttalonfollow->Set(CAN_RIGHT_PORT);
+	m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+	m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
 
-	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_lefttalonlead->SetSensorPhase(false);
-	m_lefttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
-	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_righttalonlead->SetSensorPhase(false);
-	m_righttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
-	//Setup Encoders
-	//m_leftEncoder = new Encoder(3, 4);
-	//m_rightEncoder = new Encoder(5, 6);
-	//m_leftEncoder->SetDistancePerPulse(-CAN_DISTANCE_PER_PULSE);
-	//m_rightEncoder->SetDistancePerPulse(CAN_DISTANCE_PER_PULSE);
-	m_leftencoderfix = 0;
-	m_rightencoderfix = 0;
-	m_leftencodermax = 0;
-	m_rightencodermax = 0;
 	m_leftspeed = 0;
 	m_rightspeed = 0;
 	m_leftposition = 0;
@@ -79,8 +66,6 @@ OldDriveTrain::OldDriveTrain(OperatorInputs *inputs, DriverStation *ds)
 
 	m_leftpow = 0;
 	m_rightpow = 0;
-	m_ratiolr = 1;
-	m_isleftfaster = true;
 	m_previousx = 0;
 	m_previousy = 0;
 	m_coasting = 1;
@@ -88,11 +73,8 @@ OldDriveTrain::OldDriveTrain(OperatorInputs *inputs, DriverStation *ds)
 	m_invertright = INVERT_RIGHT;
 	m_direction = DT_DEFAULT_DIRECTION;
 
-	m_timerencoder = new Timer();
 	m_timerramp = new Timer();
 	m_rampmax = RAMPING_RATE_MAX;
-
-	dataTimer = new Timer();
 }
 
 
@@ -102,41 +84,29 @@ OldDriveTrain::~OldDriveTrain()
 	delete m_lefttalonfollow;
 	delete m_righttalonlead;
 	delete m_righttalonfollow;
-	//delete m_leftEncoder;
-	//delete m_rightEncoder;
 	delete m_shifter;
-	delete m_timerencoder;
 	delete m_timerramp;
 }
 
 
 void OldDriveTrain::Init()
 {
-	m_lefttalonlead = new WPI_TalonSRX(CAN_LEFT_PORT);
-	m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
-	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
-	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
+	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+	m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
 
-	m_lefttalonlead->Set(ControlMode::PercentOutput,0);
-	m_lefttalonlead->Set(0);
-	m_lefttalonfollow->Set(ControlMode::Follower,CAN_LEFT_PORT);
-	m_lefttalonfollow->Set(CAN_LEFT_PORT);
+	m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+	m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
 
-	m_righttalonlead->Set(ControlMode::PercentOutput,0);
-	m_righttalonlead->Set(0);
-	m_righttalonfollow->Set(ControlMode::Follower,CAN_RIGHT_PORT);
-	m_righttalonfollow->Set(CAN_RIGHT_PORT);
-
-	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_lefttalonlead->SetSensorPhase(false);
-	m_lefttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
-	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_righttalonlead->SetSensorPhase(false);
-	m_righttalonlead->SetSelectedSensorPosition(0,0,0);
+	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
@@ -145,10 +115,6 @@ void OldDriveTrain::Init()
 
 	m_leftpow = 0;
 	m_rightpow = 0;
-	m_leftencodermax = 0;
-	m_rightencodermax = 0;
-	m_ratiolr = 1;
-	m_isleftfaster = true;
 	m_leftspeed = 0;
 	m_rightspeed = 0;
 	m_leftposition = 0;
@@ -160,7 +126,6 @@ void OldDriveTrain::Init()
 	//m_lefttalonfollow->Set(0);
 	m_righttalonlead->Set(0);
 	//m_righttalonfollow->Set(0);
-	m_timerencoder->Reset();
 	m_timerramp->Reset();
 	m_timerramp->Start();
 	m_ishighgear = true;
@@ -171,28 +136,6 @@ void OldDriveTrain::Init()
 	m_shift = false;
 	m_direction = DT_DEFAULT_DIRECTION;
 	SmartDashboard::PutString("DT10_Direction", "Gear Forward");
-
-	leftMotorFile.open("leftmotor.txt");
-	rightMotorFile.open("rightmotor.txt");
-
-	if (leftMotorFile.is_open())
-	{
-		leftMotorFile << "***\n\n";
-	}
-	else
-	{
-		DriverStation::ReportError("Left Not Open");
-	}
-	if (rightMotorFile.is_open())
-	{
-		rightMotorFile << "***\n\n";
-	}
-	else
-	{
-		DriverStation::ReportError("Right Not Open");
-	}
-	dataTimer->Reset();
-	dataTimer->Start();
 }
 
 
@@ -270,10 +213,6 @@ void OldDriveTrain::Stop()
 {
 	m_ishighgear = true;
 	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
-	rightMotorFile << "\n";
-	leftMotorFile << "\n";
-	rightMotorFile.close();
-	leftMotorFile.close();
 }
 
 
@@ -315,11 +254,17 @@ void OldDriveTrain::Drive(double x, double y, bool ramp)
 	m_rightspeed = m_righttalonlead->GetSelectedSensorVelocity(0);
 	m_leftposition = m_lefttalonlead->GetSelectedSensorPosition(0);
 	m_rightposition = m_righttalonlead->GetSelectedSensorPosition(0);
+	//m_leftposition = m_lefttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
+	//m_rightposition = m_righttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
+
+
+	//m_lefttalonlead->Set(0);
+	//m_lefttalonfollow->Set(0);
+	//m_righttalonlead->Set(0);
+	//m_righttalonfollow->Set(0);
 
 	m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-	//m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
 	m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
-	//m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
 
 	SmartDashboard::PutNumber("DT11_turningramp", m_previousx); 			//Left Motors are forward=negative
 	SmartDashboard::PutNumber("DT12_drivingramp", m_previousy); 			//Right Motors are forward=positive
@@ -331,6 +276,7 @@ void OldDriveTrain::Drive(double x, double y, bool ramp)
 	SmartDashboard::PutNumber("DT18_leftposition", m_leftposition);
 	SmartDashboard::PutNumber("DT19_rightposition", m_rightposition);
 }
+
 
 // sets the motors to coasting mode, shifts, and then sets them back to break mode
 void OldDriveTrain::Shift()
@@ -454,74 +400,4 @@ double OldDriveTrain::RightMotor(double &maxpower)
 			rightpow = m_ratiolr * rightpow;
 	}*/
 	return rightpow;
-}
-
-
-void OldDriveTrain::SetRatioLR()
-{
-	//If left motor speed is bigger than the right motor speed return true, else false
-
-	if (m_rightencodermax > m_leftencodermax)
-	{
-		m_ratiolr = m_leftencodermax / m_rightencodermax;
-		m_isleftfaster = false;
-	}
-	else
-	if (m_leftencodermax > m_rightencodermax)
-	{
-		m_ratiolr = m_rightencodermax / m_leftencodermax;
-		m_isleftfaster = true;
-	}
-	else
-	{
-		m_ratiolr = 1;
-	}
-}
-
-
-void OldDriveTrain::ResetEncoders()
-{
-	//leftEncoder->Reset();
-	//rightEncoder->Reset();
-}
-
-
-void OldDriveTrain::CheckEncoderTimer()
-{
-	//SmartDashboard::PutNumber("Ratio", m_ratiolr);
-	//SmartDashboard::PutBoolean("Left > Right", m_isleftfaster);
-	//SmartDashboard::PutNumber("Timer time", m_timerencoder->Get());
-	if (m_timerencoder->Get() > ENCODER_WAIT_TIME)
-	{
-		SetRatioLR();
-		m_timerencoder->Reset();
-	}
-}
-
-void OldDriveTrain::outputData()
-{
-	if (leftMotorFile.is_open())
-	{
-		leftMotorFile << dataTimer->Get() << ",";
-		leftMotorFile << LeftTalon()->GetSelectedSensorPosition(0) << ",";
-		leftMotorFile << LeftTalon()->GetSelectedSensorVelocity(0) << ",";
-		leftMotorFile << m_driverstation->GetInstance().GetBatteryVoltage() << ",";
-		leftMotorFile << LeftTalon()->Get() << "\n";
-	}
-	else
-	{
-		DriverStation::ReportError("Left Not Open");
-	}
-	if (rightMotorFile.is_open())
-	{
-		rightMotorFile << dataTimer->Get() << ",";
-		rightMotorFile << RightTalon()->GetSelectedSensorPosition(0) << ",";
-		rightMotorFile << RightTalon()->GetSelectedSensorVelocity(0) << ",";
-		rightMotorFile << m_driverstation->GetInstance().GetBatteryVoltage() << ",";
-		rightMotorFile << RightTalon()->Get() << "\n";
-	}
-	else
-	{
-		DriverStation::ReportError("Right Not Open");
-	}
 }
