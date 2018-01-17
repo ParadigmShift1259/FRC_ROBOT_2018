@@ -213,6 +213,7 @@ void OldDriveTrain::Stop()
 {
 	m_ishighgear = true;
 	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+	//Drive(0, 0, false);
 }
 
 
