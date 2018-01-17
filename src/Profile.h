@@ -10,12 +10,13 @@
 
 /*
  * Example of what will be in there
- * const double kMotionProfile[][3] = {
+ */
+const double ProfileSize = 4;
+const double mMotionProfile[][3] = {
 {0,	0	,10},
 {0.00004761904762,	0.5714285714	,10},
 {0.0002142857143,	1.428571429	,10},
-{0.0005476190476,	2.571428571	,10
- ...*/
+{0.0005476190476,	2.571428571	,10}};
 
 
 

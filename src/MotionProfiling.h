@@ -9,18 +9,22 @@
 #define SRC_MOTIONPROFILING_H_
 #include <ctre\Phoenix.h>
 #include <Notifier.h>
+#include "Profile.h"
 
 class MotionProfiling {
 public:
 	MotionProfiling(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack);
 	void Init();
+	static void PeriodicFeed(MotionProfiling *arg);
 	virtual ~MotionProfiling();
 
 protected:
 
-	void PeriodicFeed();
+
+
+	void feedTopBuffer();
 	//For feeding points into the buffer
-	Notifier m_notifier;
+	Notifier *m_notifier;
 
 
 
