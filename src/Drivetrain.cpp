@@ -21,6 +21,11 @@ Drivetrain::Drivetrain(OperatorInputs *operatorinputs, WPI_TalonSRX *rightFront,
 	leftFrontTalon = leftFront;
 	leftBackTalon = leftBack;
 
+	rightFrontTalon->Set(ControlMode::PercentOutput,0);
+	rightBackTalon->Set(ControlMode::PercentOutput,0);
+	leftFrontTalon->Set(ControlMode::PercentOutput,0);
+	leftBackTalon->Set(ControlMode::PercentOutput,0);
+
 	leftSide = new frc::SpeedControllerGroup(*leftFrontTalon, *leftBackTalon);
 	rightSide = new frc::SpeedControllerGroup(*rightFrontTalon, *rightBackTalon);
 
@@ -41,6 +46,11 @@ void Drivetrain::Init()
 	xBoxY = 0;
 
 	shifter->Set(false);
+
+	rightFrontTalon->Set(ControlMode::PercentOutput,0);
+	rightBackTalon->Set(ControlMode::PercentOutput,0);
+	leftFrontTalon->Set(ControlMode::PercentOutput,0);
+	leftBackTalon->Set(ControlMode::PercentOutput,0);
 }
 
 
