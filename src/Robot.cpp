@@ -23,7 +23,7 @@ void Robot::RobotInit()
 
 	m_operatorinputs = new OperatorInputs();
 	m_driverstation = &DriverStation::GetInstance();
-	m_drivetrain = new DriveTrain(m_operatorinputs, m_driverstation);
+	m_drivetrain = new DriveTrainWPI(m_operatorinputs, m_driverstation);
 	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 }
 

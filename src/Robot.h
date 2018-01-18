@@ -12,7 +12,7 @@
 #include "Const.h"
 #include "OperatorInputs.h"
 #include <Compressor.h>
-#include <Drivetrain.h>
+#include <DrivetrainWPI.h>
 
 
 class Robot : public IterativeRobot
@@ -29,7 +29,7 @@ public:
 
 protected:
 	OperatorInputs *m_operatorinputs;
-	DriveTrain *m_drivetrain;
+	DriveTrainWPI *m_drivetrain;
 	Compressor *m_compressor;
 	DriverStation *m_driverstation;
 
