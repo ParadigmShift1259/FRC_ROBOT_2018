@@ -176,7 +176,7 @@ void DriveTrainWPI::Loop()
 	}
 
 	//Drive(x, y, true);
-	m_differentialdrive->CurvatureDrive(y * m_direction, x, false);
+	m_differentialdrive->CurvatureDrive(y * Y_SCALING * m_direction, x * X_SCALING, false);
 
 	if (m_shift)
 	{
