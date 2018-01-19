@@ -13,6 +13,7 @@
 #include "OperatorInputs.h"
 #include "Drivetrain.h"
 #include <Compressor.h>
+#include "MotionProfiling.h"
 
 
 class Robot : public IterativeRobot
@@ -31,18 +32,12 @@ protected:
 	OperatorInputs *m_operatorinputs;
 	Drivetrain *m_drivetrain;
 	Compressor *m_compressor;
+	MotionProfiling *m_motionprofiling;
 
-	WPI_TalonSRX *rightFrontTalon;
-	WPI_TalonSRX *rightBackTalon;
-	WPI_TalonSRX *leftFrontTalon;
-	WPI_TalonSRX *leftBackTalon;
-
-private:
-	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
-	frc::SendableChooser<std::string> m_chooser;
-	const std::string kAutoNameDefault = "Default";
-	const std::string kAutoNameCustom = "My Auto";
-	std::string m_autoSelected;
+	WPI_TalonSRX *m_rightFrontTalon;
+	WPI_TalonSRX *m_rightBackTalon;
+	WPI_TalonSRX *m_leftFrontTalon;
+	WPI_TalonSRX *m_leftBackTalon;
 };
 
 
