@@ -5,8 +5,8 @@
  */
 
 
-#ifndef SRC_DRIVETRAIN_H_
-#define SRC_DRIVETRAIN_H_
+#ifndef SRC_DRIVETRAIN2017_H_
+#define SRC_DRIVETRAIN2017_H_
 
 
 #include "WPILib.h"
@@ -17,11 +17,11 @@
 #include <ctre\Phoenix.h>
 
 
-class DriveTrain
+class OldDriveTrain
 {
 public:
-	DriveTrain(OperatorInputs *inputs, DriverStation *ds);
-	~DriveTrain();
+	OldDriveTrain(OperatorInputs *inputs, DriverStation *ds);
+	~OldDriveTrain();
 	void Init();
 	void Loop();
 	void Stop();
@@ -76,4 +76,4 @@ protected:
 };
 
 
-#endif /* SRC_DRIVETRAIN_H_ */
+#endif /* SRC_DRIVETRAIN2017_H_ */

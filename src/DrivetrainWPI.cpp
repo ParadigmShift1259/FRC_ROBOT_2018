@@ -1,5 +1,5 @@
 /**
- *  Drivetrain.cpp
+ *  DriveTrainWPI.cpp
  *  Date:
  *  Last Edited By:
  */
@@ -9,7 +9,7 @@
 #include "smartdashboard/smartdashboard.h"
 #include <Timer.h>
 #include <Talon.h>
-#include <Drivetrain.h>
+#include <DriveTrainWPI.h>
 #include <Encoder.h>
 #include <cmath>
 #include <String>
@@ -18,7 +18,7 @@
 using namespace std;
 
 
-DriveTrain::DriveTrain(OperatorInputs *inputs, DriverStation *ds)
+DriveTrainWPI::DriveTrainWPI(OperatorInputs *inputs, DriverStation *ds)
 {
 	m_inputs = inputs;
 	m_driverstation = ds;
@@ -27,6 +27,11 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, DriverStation *ds)
 	m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
+
+	m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
+	m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
+
+	m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup);
 
 	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 	m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
@@ -78,7 +83,7 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, DriverStation *ds)
 }
 
 
-DriveTrain::~DriveTrain()
+DriveTrainWPI::~DriveTrainWPI()
 {
 	delete m_lefttalonlead;
 	delete m_lefttalonfollow;
@@ -89,7 +94,7 @@ DriveTrain::~DriveTrain()
 }
 
 
-void DriveTrain::Init()
+void DriveTrainWPI::Init()
 {
 	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 	m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
@@ -139,7 +144,7 @@ void DriveTrain::Init()
 }
 
 
-void DriveTrain::Loop()
+void DriveTrainWPI::Loop()
 {
 	static unsigned int loopcnt = 0;
 	static unsigned int shiftcnt = 0;
@@ -170,7 +175,8 @@ void DriveTrain::Loop()
 		y = y * LOWSPEED_MODIFIER_Y;
 	}
 
-	Drive(x, y, true);
+	//Drive(x, y, true);
+	m_differentialdrive->CurvatureDrive(y * Y_SCALING * m_direction, x * X_SCALING, false);
 
 	if (m_shift)
 	{
@@ -209,7 +215,7 @@ void DriveTrain::Loop()
 }
 
 
-void DriveTrain::Stop()
+void DriveTrainWPI::Stop()
 {
 	m_ishighgear = true;
 	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
@@ -217,7 +223,7 @@ void DriveTrain::Stop()
 }
 
 
-void DriveTrain::Drive(double x, double y, bool ramp)
+void DriveTrainWPI::Drive(double x, double y, bool ramp)
 {
 	double yd = y * m_direction;
 	double maxpower;
@@ -258,10 +264,12 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 	//m_leftposition = m_lefttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
 	//m_rightposition = m_righttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
 
-	m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-	m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-	m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
-	m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
+	//m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+	//m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+	//m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
+	//m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
+
+	//m_differentialdrive->TankDrive(m_invertleft * m_coasting * LeftMotor(maxpower), m_invertright * m_coasting * RightMotor(maxpower), false);
 
 	SmartDashboard::PutNumber("DT11_turningramp", m_previousx); 			//Left Motors are forward=negative
 	SmartDashboard::PutNumber("DT12_drivingramp", m_previousy); 			//Right Motors are forward=positive
@@ -276,7 +284,7 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 
 
 // sets the motors to coasting mode, shifts, and then sets them back to break mode
-void DriveTrain::Shift()
+void DriveTrainWPI::Shift()
 {
 	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
 	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
@@ -293,14 +301,14 @@ void DriveTrain::Shift()
 
 
 // change direction and return true if going forward
-bool DriveTrain::ChangeDirection()
+bool DriveTrainWPI::ChangeDirection()
 {
 	m_direction *= -1.0;
 	return (m_direction == DT_DEFAULT_DIRECTION);
 }
 
 
-void DriveTrain::LowSpeedDriving()
+void DriveTrainWPI::LowSpeedDriving()
 {
 	SmartDashboard::PutNumber("DT16_lowspeed", m_lowspeedmode);
 	if (m_inputs->button10())
@@ -315,7 +323,7 @@ void DriveTrain::LowSpeedDriving()
 
 
 // ramp the power
-double DriveTrain::Ramp(double previous, double desired, double rampmin, double rampmax)
+double DriveTrainWPI::Ramp(double previous, double desired, double rampmin, double rampmax)
 {
 	double newpow = previous;
 
@@ -341,7 +349,7 @@ double DriveTrain::Ramp(double previous, double desired, double rampmin, double 
 
 
 /*
-void Drivetrain::rampRightPower(double desiredPow, double rampSpeedMin, double rampSpeedMax)
+void DriveTrainWPI::rampRightPower(double desiredPow, double rampSpeedMin, double rampSpeedMax)
 {
 	//Makes it so that robot can't go stop to full
 	if (abs(desiredPow - previousRightPow) < rampSpeedMin)
@@ -364,7 +372,7 @@ void Drivetrain::rampRightPower(double desiredPow, double rampSpeedMin, double r
 */
 
 
-double DriveTrain::LeftMotor(double &maxpower)
+double DriveTrainWPI::LeftMotor(double &maxpower)
 {
 	//moved rightSpeed to class scope, it is being set in setPower()
 
@@ -382,7 +390,7 @@ double DriveTrain::LeftMotor(double &maxpower)
 }
 
 
-double DriveTrain::RightMotor(double &maxpower)
+double DriveTrainWPI::RightMotor(double &maxpower)
 {
 	//moved rightSpeed to class scope, it is being set in setPower()
 

@@ -1,12 +1,12 @@
 /**
- *  Drivetrain.h
+ *  DriveTrainWPI.h
  *  Date:
  *  Last Edited By:
  */
 
 
-#ifndef SRC_DRIVETRAIN_H_
-#define SRC_DRIVETRAIN_H_
+#ifndef SRC_DriveTrainWPI_H_
+#define SRC_DriveTrainWPI_H_
 
 
 #include "WPILib.h"
@@ -17,17 +17,17 @@
 #include <ctre\Phoenix.h>
 
 
-class DriveTrain
+class DriveTrainWPI
 {
 public:
-	DriveTrain(OperatorInputs *inputs, DriverStation *ds);
-	~DriveTrain();
+	DriveTrainWPI(OperatorInputs *inputs, DriverStation *ds);
+	~DriveTrainWPI();
 	void Init();
 	void Loop();
 	void Stop();
 	void Drive(double x, double y, bool ramp = false);
 	void Shift();
-		// change drivetrain direction and return true if going forward
+		// change DriveTrainWPI direction and return true if going forward
 	bool ChangeDirection();
 	void LowSpeedDriving();
 
@@ -51,6 +51,9 @@ protected:
 	WPI_TalonSRX *m_lefttalonfollow;
 	WPI_TalonSRX *m_righttalonlead;
 	WPI_TalonSRX *m_righttalonfollow;
+	SpeedControllerGroup *m_leftscgroup;
+	SpeedControllerGroup *m_rightscgroup;
+	DifferentialDrive *m_differentialdrive;
 	Solenoid *m_shifter;
 	Timer *m_timerramp;
 
@@ -76,4 +79,4 @@ protected:
 };
 
 
-#endif /* SRC_DRIVETRAIN_H_ */
+#endif /* SRC_DriveTrainWPI_H_ */

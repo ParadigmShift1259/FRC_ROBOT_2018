@@ -11,8 +11,8 @@
 
 #include "Const.h"
 #include "OperatorInputs.h"
-#include "Drivetrain.h"
 #include <Compressor.h>
+#include <DrivetrainWPI.h>
 
 
 class Robot : public IterativeRobot
@@ -29,8 +29,9 @@ public:
 
 protected:
 	OperatorInputs *m_operatorinputs;
-	Drivetrain *m_drivetrain;
+	DriveTrainWPI *m_drivetrain;
 	Compressor *m_compressor;
+	DriverStation *m_driverstation;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
