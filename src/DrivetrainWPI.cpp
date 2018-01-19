@@ -175,8 +175,7 @@ void DriveTrainWPI::Loop()
 		y = y * LOWSPEED_MODIFIER_Y;
 	}
 
-	//Drive(x, y, true);
-	m_differentialdrive->CurvatureDrive(y * Y_SCALING * m_direction, x * X_SCALING, false);
+	Drive(x, y, true);
 
 	if (m_shift)
 	{
@@ -269,7 +268,13 @@ void DriveTrainWPI::Drive(double x, double y, bool ramp)
 	//m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
 	//m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
 
-	//m_differentialdrive->TankDrive(m_invertleft * m_coasting * LeftMotor(maxpower), m_invertright * m_coasting * RightMotor(maxpower), false);
+	double templeft = m_invertleft * m_coasting * LeftMotor(maxpower);
+	double tempright = m_invertright * m_coasting * RightMotor(maxpower);
+	m_differentialdrive->TankDrive(templeft, tempright, false);
+	//double tempforward = (templeft + tempright) / 2.0;
+	//double tempclockwise = (templeft - tempright) / 2.0;
+	//bool tempspin = abs(tempforward) < DEADZONE_Y;
+	//m_differentialdrive->CurvatureDrive(tempforward, tempclockwise, tempspin);
 
 	SmartDashboard::PutNumber("DT11_turningramp", m_previousx); 			//Left Motors are forward=negative
 	SmartDashboard::PutNumber("DT12_drivingramp", m_previousy); 			//Right Motors are forward=positive
