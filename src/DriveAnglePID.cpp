@@ -1,15 +1,15 @@
 /**
- *  DriveAnglePID2018.cpp
+ *  DriveAnglePID.cpp
  *  Date:
  *  Last Edited By:
  */
 
 
-#include <DriveAnglePID2018.h>
+#include <DriveAnglePID.h>
 #include <math.h>
 
 
-DriveAnglePID2018::DriveAnglePID2018(DriveTrainWPI *drive) : PIDSubsystem("DriveAngle2018", 0.075 , 0.008, 0.03)
+DriveAnglePID::DriveAnglePID(DriveTrainWPI *drive) : PIDSubsystem("DriveAngle", 0.075 , 0.008, 0.03)
 {
 	m_P = 0.075;
 	m_I = 0.007;
@@ -27,22 +27,24 @@ DriveAnglePID2018::DriveAnglePID2018(DriveTrainWPI *drive) : PIDSubsystem("Drive
 }
 
 
-DriveAnglePID2018::~DriveAnglePID2018()
+DriveAnglePID::~DriveAnglePID()
 {
 }
 
-bool DriveAnglePID2018::IsEnabled()
+
+bool DriveAnglePID::IsEnabled()
 {
 	return GetPIDController()->IsEnabled();
 }
 
-double DriveAnglePID2018::ReturnPIDInput()
+
+double DriveAnglePID::ReturnPIDInput()
 {
 	return ReturnCurrentPosition();
 }
 
 
-void DriveAnglePID2018::ChangeActive(bool newState)
+void DriveAnglePID::ChangeActive(bool newState)
 {
 	if (newState)
 	{
@@ -58,13 +60,13 @@ void DriveAnglePID2018::ChangeActive(bool newState)
 }
 
 
-bool DriveAnglePID2018::IsDone()
+bool DriveAnglePID::IsDone()
 {
 	return GetPIDController()->OnTarget();
 }
 
 
-void DriveAnglePID2018::SetSetpointRelativeToError(double newSetPoint)
+void DriveAnglePID::SetSetpointRelativeToError(double newSetPoint)
 {
 	if (!isInitialized)
 	{
@@ -82,7 +84,8 @@ void DriveAnglePID2018::SetSetpointRelativeToError(double newSetPoint)
 	}
 }
 
-void DriveAnglePID2018::SetRelativeSetpoint(double newSetPoint) {
+
+void DriveAnglePID::SetRelativeSetpoint(double newSetPoint) {
 	if (!isInitialized)
 	{
 		GetPIDController()->Reset();
@@ -95,7 +98,8 @@ void DriveAnglePID2018::SetRelativeSetpoint(double newSetPoint) {
 		SetSetpointRelative(newSetPoint);
 }
 
-void DriveAnglePID2018::UsePIDOutput(double output)
+
+void DriveAnglePID::UsePIDOutput(double output)
 {
 	SmartDashboard::PutNumber("DP01_output", output);
 	SmartDashboard::PutBoolean("DP01_IS_ACTIVE",isActive);
@@ -107,7 +111,7 @@ void DriveAnglePID2018::UsePIDOutput(double output)
 }
 
 
-void DriveAnglePID2018::CheckPIDValues()
+void DriveAnglePID::CheckPIDValues()
 {
 	 m_P = SmartDashboard::GetNumber("DP00_P", m_P);
 	 m_I = SmartDashboard::GetNumber("DP00_I", m_I);
@@ -125,34 +129,34 @@ void DriveAnglePID2018::CheckPIDValues()
 }
 
 
-double DriveAnglePID2018::ReturnCurrentPosition()
+double DriveAnglePID::ReturnCurrentPosition()
 {
-	double retval = ((360/(2*3.1415926535))*((m_DriveTrainWPI->LeftTalon()->GetQuadrature()+m_DriveTrainWPI->RightTalon()->GetQuadrature())*WHEEL_CIRCUMFERENCE*3.1415926535)/(WHEEL_BASE));
+	double retval = ((360/(2*3.1415926535))*((m_DriveTrainWPI->LeftTalon()->GetSelectedSensorPosition(0)+m_DriveTrainWPI->RightTalon()->GetSelectedSensorPosition(0))*WHEEL_CIRCUMFERENCE*3.1415926535)/(WHEEL_BASE));
 	SmartDashboard::PutNumber("DP02_ontarget", IsDone());
 	SmartDashboard::PutNumber("DP03_angle", retval);
 	return retval;
 }
 
 
-void DriveAnglePID2018::SetY(double y)
+void DriveAnglePID::SetY(double y)
 {
 	m_y = (y >= -1.0) ? ((y <= 1.0) ? y : 1.0) : -1.0;
 }
 
 
-double DriveAnglePID2018::GetY()
+double DriveAnglePID::GetY()
 {
 	return m_y;
 }
 
 
-void DriveAnglePID2018::SetRamp(bool ramp)
+void DriveAnglePID::SetRamp(bool ramp)
 {
 	m_ramp = ramp;
 }
 
 
-bool DriveAnglePID2018::GetRamp()
+bool DriveAnglePID::GetRamp()
 {
 	return m_ramp;
 }

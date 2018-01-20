@@ -1,12 +1,12 @@
 /**
- *  DriveAnglePID2018.h
+ *  DriveAnglePID.h
  *  Date:
  *  Last Edited By:
  */
 
 
-#ifndef SRC_DriveAnglePID2018_H_
-#define SRC_DriveAnglePID2018_H_
+#ifndef SRC_DriveAnglePID_H_
+#define SRC_DriveAnglePID_H_
 
 
 #include "WPILib.h"
@@ -18,11 +18,11 @@
 //#include <nt_Value.h>
 
 
-class DriveAnglePID2018: public PIDSubsystem
+class DriveAnglePID: public PIDSubsystem
 {
 public:
-	DriveAnglePID2018(DriveTrainWPI *drive);
-	virtual ~DriveAnglePID2018();
+	DriveAnglePID(DriveTrainWPI *drive);
+	virtual ~DriveAnglePID();
 	double ReturnPIDInput();
 	void ChangeActive(bool newState);
 	bool IsDone();
@@ -53,4 +53,4 @@ protected:
 };
 
 
-#endif /* SRC_DriveAnglePID2018_H_ */
+#endif /* SRC_DriveAnglePID_H_ */
