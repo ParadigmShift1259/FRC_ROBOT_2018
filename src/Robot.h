@@ -9,10 +9,13 @@
 #define SRC_ROBOT_H_
 
 
+#include <WPILib.h>
 #include "Const.h"
 #include "OperatorInputs.h"
-#include <Compressor.h>
-#include <Drivetrain.h>
+#include "Drivetrain.h"
+#include "Lifter.h"
+#include "Grabber.h"
+#include "Climber.h"
 
 
 class Robot : public IterativeRobot
@@ -32,6 +35,9 @@ protected:
 	DriveTrain *m_drivetrain;
 	Compressor *m_compressor;
 	DriverStation *m_driverstation;
+	Lifter *m_lifter;
+	Grabber *m_grabber;
+	Climber *m_climber;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

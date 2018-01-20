@@ -9,13 +9,8 @@
 #define SRC_DriveAnglePID_H_
 
 
-#include "WPILib.h"
-#include <Smartdashboard/Smartdashboard.h>
-#include <Commands/PIDSubsystem.h>
-#include <Const.h>
+#include <WPILib.h>
 #include "DriveTrain.h"
-//#include <ntCore.h>
-//#include <nt_Value.h>
 
 
 class DriveAnglePID: public PIDSubsystem
@@ -42,7 +37,6 @@ public:
 
 protected:
 	DriveTrain* m_drivetrain;
-	//OperatorInputs *m_inputs;
 	bool isInitialized;
 	bool isActive;
 	double m_y;
