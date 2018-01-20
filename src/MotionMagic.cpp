@@ -7,6 +7,10 @@
 
 #include <MotionMagic.h>
 
+/*!
+ * Constructor for MotionMagic, takes four pointers for each of the Talons, the state of the
+ * Talons does not matter
+ */
 MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack)
 {
 	rightFrontTalon = rightFront;
@@ -20,6 +24,9 @@ MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_
 
 }
 
+/*!
+ * Init's the MotionMagic, must be called at least once before loop
+ */
 void MotionMagic::Init()
 {
 	rightFrontTalon->Set(ControlMode::MotionMagic, 0);
@@ -49,6 +56,10 @@ void MotionMagic::Init()
 	leftFrontTalon->Config_kF(0,0.0,0);
 }
 
+/*!
+ * Needs to be called every time the roborio cycles.
+ * TargetRotation is the target to approach in native units
+ */
 void MotionMagic::Loop(double targetRotation)
 {
 	rightFrontTalon->Set(targetRotation);
