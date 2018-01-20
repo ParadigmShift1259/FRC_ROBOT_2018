@@ -9,12 +9,12 @@
 #include <math.h>
 
 
-DriveAnglePID::DriveAnglePID(DriveTrainWPI *drive) : PIDSubsystem("DriveAngle", 0.075 , 0.008, 0.03)
+DriveAnglePID::DriveAnglePID(DriveTrain *drive) : PIDSubsystem("DriveAngle", 0.075 , 0.008, 0.03)
 {
 	m_P = 0.075;
 	m_I = 0.007;
 	m_D = 0.03;
-	m_DriveTrainWPI = drive;
+	m_drivetrain = drive;
 	isInitialized = false;
 	isActive = false;
 	m_y = 0;
@@ -106,7 +106,7 @@ void DriveAnglePID::UsePIDOutput(double output)
 	if (isActive)
 	{
 		//output = std::abs(output) > 0.25 ? output : 0.25 * output / std::abs(output);
-		m_DriveTrainWPI->Drive(output, m_y, true);
+		m_drivetrain->Drive(output, m_y, true);
 	}
 }
 
@@ -131,7 +131,7 @@ void DriveAnglePID::CheckPIDValues()
 
 double DriveAnglePID::ReturnCurrentPosition()
 {
-	double retval = ((360/(2*3.1415926535))*((m_DriveTrainWPI->LeftTalon()->GetSelectedSensorPosition(0)+m_DriveTrainWPI->RightTalon()->GetSelectedSensorPosition(0))*WHEEL_CIRCUMFERENCE*3.1415926535)/(WHEEL_BASE));
+	double retval = ((360/(2*3.1415926535))*((m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0)+m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0))*WHEEL_CIRCUMFERENCE*3.1415926535)/(WHEEL_BASE));
 	SmartDashboard::PutNumber("DP02_ontarget", IsDone());
 	SmartDashboard::PutNumber("DP03_angle", retval);
 	return retval;

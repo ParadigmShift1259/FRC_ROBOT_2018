@@ -13,7 +13,7 @@
 #include <Smartdashboard/Smartdashboard.h>
 #include <Commands/PIDSubsystem.h>
 #include <Const.h>
-#include "DriveTrainWPI.h"
+#include "DriveTrain.h"
 //#include <ntCore.h>
 //#include <nt_Value.h>
 
@@ -21,7 +21,7 @@
 class DriveAnglePID: public PIDSubsystem
 {
 public:
-	DriveAnglePID(DriveTrainWPI *drive);
+	DriveAnglePID(DriveTrain *drive);
 	virtual ~DriveAnglePID();
 	double ReturnPIDInput();
 	void ChangeActive(bool newState);
@@ -41,7 +41,7 @@ public:
 	void SetD(double d) {m_D = d; SmartDashboard::PutNumber("DP00_D",m_D); CheckPIDValues();}
 
 protected:
-	DriveTrainWPI* m_DriveTrainWPI;
+	DriveTrain* m_drivetrain;
 	//OperatorInputs *m_inputs;
 	bool isInitialized;
 	bool isActive;

@@ -1,5 +1,5 @@
 /**
- *  Drivetrain.cpp
+ *  DriveTrain.cpp
  *  Date:
  *  Last Edited By:
  */
@@ -9,7 +9,7 @@
 #include "smartdashboard/smartdashboard.h"
 #include <Timer.h>
 #include <Talon.h>
-#include <Drivetrain.h>
+#include <DriveTrain.h>
 #include <Encoder.h>
 #include <cmath>
 #include <String>
@@ -18,8 +18,9 @@
 using namespace std;
 
 
-DriveTrain::DriveTrain(OperatorInputs *inputs, DriverStation *ds)
+DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs, DriverStation *ds)
 {
+	m_mode = mode;
 	m_inputs = inputs;
 	m_driverstation = ds;
 
@@ -27,6 +28,31 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, DriverStation *ds)
 	m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
+
+	m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
+	m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
+
+	m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup);
+
+	switch (m_mode)
+	{
+	case DriveMode::kFollower:
+		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
+		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
+		break;
+
+	case DriveMode::kDiscrete:
+	case DriveMode::kTank:
+	case DriveMode::kArcade:
+	case DriveMode::kCurvature:
+		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
+		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
+		break;
+	}
 
 	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 	m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
@@ -91,11 +117,25 @@ DriveTrain::~DriveTrain()
 
 void DriveTrain::Init()
 {
-	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-	m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
+	switch (m_mode)
+	{
+	case DriveMode::kFollower:
+		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
+		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
+		break;
 
-	m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-	m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
+	case DriveMode::kDiscrete:
+	case DriveMode::kTank:
+	case DriveMode::kArcade:
+	case DriveMode::kCurvature:
+		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
+		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
+		m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
+		break;
+	}
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
@@ -221,6 +261,8 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 {
 	double yd = y * m_direction;
 	double maxpower;
+	double templeft, tempright, tempforward, temprotate;
+	bool tempspin;
 
 	if (x == 0 || yd == 0)
 	{
@@ -255,13 +297,49 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 	m_rightspeed = m_righttalonlead->GetSelectedSensorVelocity(0);
 	m_leftposition = m_lefttalonlead->GetSelectedSensorPosition(0);
 	m_rightposition = m_righttalonlead->GetSelectedSensorPosition(0);
-	//m_leftposition = m_lefttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
-	//m_rightposition = m_righttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
 
-	m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-	m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-	m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
-	m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
+	switch (m_mode)
+	{
+	case DriveMode::kFollower:
+		// can talon follower mode
+		m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		break;
+
+	case DriveMode::kDiscrete:
+		// can talon discrete mode
+		m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		break;
+
+	case DriveMode::kTank:
+		// differentialdrive tank drive
+		templeft = m_invertleft * m_coasting * LeftMotor(maxpower);
+		tempright = m_invertright * m_coasting * RightMotor(maxpower) * -1;		// -1 added to adjust for DifferentialDrive
+		m_differentialdrive->TankDrive(templeft, tempright, false);
+		break;
+
+	case DriveMode::kArcade:
+		// differentialdrive arcade drive
+		templeft = m_invertleft * m_coasting * LeftMotor(maxpower);
+		tempright = m_invertright * m_coasting * RightMotor(maxpower) * -1;		// -1 added to adjust for DifferentialDrive
+		tempforward = (templeft + tempright) / 2.0;
+		temprotate = (templeft - tempright) / 2.0;
+		m_differentialdrive->ArcadeDrive(tempforward, temprotate, false);
+		break;
+
+	case DriveMode::kCurvature:
+		// differentialdrive curvature drive
+		templeft = m_invertleft * m_coasting * LeftMotor(maxpower);
+		tempright = m_invertright * m_coasting * RightMotor(maxpower) * -1;		// -1 added to adjust for DifferentialDrive
+		tempforward = (templeft + tempright) / 2.0;
+		temprotate = (templeft - tempright) / 2.0;
+		tempspin = abs(tempforward) < DEADZONE_Y;
+		m_differentialdrive->CurvatureDrive(tempforward, temprotate, tempspin);
+		break;
+	}
 
 	SmartDashboard::PutNumber("DT11_turningramp", m_previousx); 			//Left Motors are forward=negative
 	SmartDashboard::PutNumber("DT12_drivingramp", m_previousy); 			//Right Motors are forward=positive
@@ -338,30 +416,6 @@ double DriveTrain::Ramp(double previous, double desired, double rampmin, double 
 	}
 	return newpow;
 }
-
-
-/*
-void Drivetrain::rampRightPower(double desiredPow, double rampSpeedMin, double rampSpeedMax)
-{
-	//Makes it so that robot can't go stop to full
-	if (abs(desiredPow - previousRightPow) < rampSpeedMin)
-	{
-		previousRightPow = desiredPow;
-	}
-	else
-	if (previousRightPow < desiredPow)
-	{
-		previousRightPow += rampSpeedMin;
-	}
-	else
-	if (previousRightPow > desiredPow)
-	{
-		previousRightPow -= rampSpeedMin;
-	}
-	rightTalons->Set(previousRightPow);
-	//rightTalons1->Set(previousRightPow);
-}
-*/
 
 
 double DriveTrain::LeftMotor(double &maxpower)

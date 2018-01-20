@@ -10,7 +10,7 @@
 
 
 #include <DriveAnglePID.h>
-#include "DriveTrainWPI.h"
+#include "DriveTrain.h"
 #include "OperatorInputs.h"
 #include <SmartDashboard/SmartDashboard.h>
 
@@ -18,7 +18,7 @@
 class DriveAngle
 {
 public:
-	DriveAngle(DriveTrainWPI *DriveTrainWPI, OperatorInputs *inputs);
+	DriveAngle(DriveTrain *drivetrain, OperatorInputs *inputs);
 	virtual ~DriveAngle();
 	void EnableAnglePID();
 	void DisableAnglePID();
@@ -37,7 +37,7 @@ public:
 	void SetD(double d) {m_driveAnglePID->SetD(d);};
 
 protected:
-	DriveTrainWPI *m_DriveTrainWPI;
+	DriveTrain *m_drivetrain;
 	OperatorInputs *m_inputs;
 	DriveAnglePID *m_driveAnglePID;
 	double m_angle;
