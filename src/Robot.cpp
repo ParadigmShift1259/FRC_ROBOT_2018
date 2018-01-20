@@ -22,9 +22,11 @@ void Robot::RobotInit()
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_operatorinputs = new OperatorInputs();
-	m_drivetrain = new Drivetrain(m_operatorinputs);
-	m_compressor = new Compressor(0);
+	m_driverstation = &DriverStation::GetInstance();
+	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kTank, m_operatorinputs, m_driverstation);
+	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 }
+
 
 /*
  * This autonomous (along with the chooser code above) shows how to
@@ -73,15 +75,15 @@ void Robot::AutonomousPeriodic()
 
 void Robot::TestInit()
 {
-	//compressor->Start();
+	DriverStation::ReportError("TestInit");
+	m_compressor->Start();
 	m_drivetrain->Init();
 }
+
 
 void Robot::TestPeriodic()
 {
 	m_drivetrain->Loop();
-	cout << "test periodic called" << std::endl;
-	frc::SmartDashboard::PutNumber("Auto 1", m_drivetrain->getXboxX()); //test value
 }
 
 
@@ -93,7 +95,6 @@ void Robot::TeleopInit()
 }
 
 
-
 void Robot::TeleopPeriodic()
 {
 	m_drivetrain->Loop();
@@ -102,6 +103,7 @@ void Robot::TeleopPeriodic()
 
 void Robot::DisabledInit()
 {
+	m_drivetrain->Stop();
 }
 
 
