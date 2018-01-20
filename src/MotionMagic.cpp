@@ -37,10 +37,10 @@ void MotionMagic::Init()
 	rightFrontTalon->ConfigPeakOutputReverse(-12,0);
 	rightFrontTalon->ConfigMotionCruiseVelocity(100,0); //Completely Arbitrary
 	rightFrontTalon->ConfigMotionAcceleration(5,0);//Also Completely Arbitrary
-	rightFrontTalon->Config_kP(0,0.0,0);
-	rightFrontTalon->Config_kI(0,0.0,0);
-	rightFrontTalon->Config_kD(0,0.0,0);
-	rightFrontTalon->Config_kF(0,0.0,0);
+	rightFrontTalon->Config_kP(0,KP,0);
+	rightFrontTalon->Config_kI(0,KI,0);
+	rightFrontTalon->Config_kD(0,KD,0);
+	rightFrontTalon->Config_kF(0,KF,0);
 
 	leftFrontTalon->Set(ControlMode::MotionMagic, 0);
 	leftFrontTalon->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
@@ -54,6 +54,10 @@ void MotionMagic::Init()
 	leftFrontTalon->Config_kI(0,0.0,0);
 	leftFrontTalon->Config_kD(0,0.0,0);
 	leftFrontTalon->Config_kF(0,0.0,0);
+
+	frc::SmartDashboard::PutNumber("P",KP);
+	frc::SmartDashboard::PutNumber("I",KI);
+	frc::SmartDashboard::PutNumber("D",KD);
 }
 
 /*!
@@ -63,7 +67,54 @@ void MotionMagic::Init()
 void MotionMagic::Loop(double targetRotation)
 {
 	rightFrontTalon->Set(targetRotation);
-	leftFrontTalon->Set(targetRotation);
+	leftFrontTalon->Set(-targetRotation);
+}
+
+/*!
+ * Must be called before running testDrive
+ */
+void MotionMagic::testDriveInit()
+{
+	oi = new OperatorInputs();
+
+	rightFrontTalon->Set(ControlMode::PercentOutput,0);
+	rightBackTalon->Set(ControlMode::PercentOutput,0);
+	leftFrontTalon->Set(ControlMode::PercentOutput,0);
+	leftBackTalon->Set(ControlMode::PercentOutput,0);
+
+	leftSide = new frc::SpeedControllerGroup(*leftFrontTalon, *leftBackTalon);
+	rightSide = new frc::SpeedControllerGroup(*rightFrontTalon, *rightBackTalon);
+
+	drive = new frc::DifferentialDrive(*leftSide, *rightSide);
+}
+
+/*!
+ * Runs a basic Arcade Drive and outputs velocity and position to the SmartDashboard for recording purposes
+ */
+void MotionMagic::testDrive()
+{
+
+	drive->ArcadeDrive(-oi->xBoxLeftY(), -oi->xBoxLeftX(), false);
+	frc::SmartDashboard::PutNumber("rightTalonVelocity", rightFrontTalon->GetSelectedSensorVelocity(0));
+	frc::SmartDashboard::PutNumber("leftTalonVelocity", leftFrontTalon->GetSelectedSensorVelocity(0));
+
+	frc::SmartDashboard::PutNumber("rightTalonPosition", rightFrontTalon->GetSelectedSensorPosition(0));
+	frc::SmartDashboard::PutNumber("leftTalonPosition", leftFrontTalon->GetSelectedSensorPosition(0));
+}
+
+/*!
+ * For testing PID values, sets the target to the xBoxLeftY * 5000 in native units
+ */
+void MotionMagic::testTarget()
+{
+	rightFrontTalon->Set(-oi->xBoxLeftY()*5000);
+	leftFrontTalon->Set(oi->xBoxLeftY()*5000);
+
+	frc::SmartDashboard::PutNumber("rightTalonVelocity", rightFrontTalon->GetSelectedSensorVelocity(0));
+	frc::SmartDashboard::PutNumber("leftTalonVelocity", leftFrontTalon->GetSelectedSensorVelocity(0));
+
+	frc::SmartDashboard::PutNumber("rightTalonPosition", rightFrontTalon->GetSelectedSensorPosition(0));
+	frc::SmartDashboard::PutNumber("leftTalonPosition", leftFrontTalon->GetSelectedSensorPosition(0));
 }
 
 MotionMagic::~MotionMagic() {
