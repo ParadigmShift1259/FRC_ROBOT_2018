@@ -13,7 +13,7 @@
 #include "OperatorInputs.h"
 #include "Drivetrain.h"
 #include <Compressor.h>
-#include "MotionProfiling.h"
+#include "MotionMagic.h"
 
 
 class Robot : public IterativeRobot
@@ -32,7 +32,7 @@ protected:
 	OperatorInputs *m_operatorinputs;
 	Drivetrain *m_drivetrain;
 	Compressor *m_compressor;
-	MotionProfiling *m_motionprofiling;
+	MotionMagic *m_motionmagic;
 
 	WPI_TalonSRX *m_rightFrontTalon;
 	WPI_TalonSRX *m_rightBackTalon;

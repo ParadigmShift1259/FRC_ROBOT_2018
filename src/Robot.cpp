@@ -17,9 +17,6 @@
 
 void Robot::RobotInit()
 {
-	m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
-	m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
-	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_rightFrontTalon = new WPI_TalonSRX(1);
 	m_rightBackTalon = new WPI_TalonSRX(3);
@@ -29,31 +26,20 @@ void Robot::RobotInit()
 	m_operatorinputs = new OperatorInputs();
 	m_drivetrain = new Drivetrain(m_operatorinputs, m_rightFrontTalon, m_rightBackTalon, m_leftFrontTalon, m_leftBackTalon);
 	m_compressor = new Compressor(0);
+
+	m_motionmagic = new MotionMagic(m_rightFrontTalon, m_rightBackTalon, m_leftFrontTalon, m_leftBackTalon);
 }
 
-/*
- * This autonomous (along with the chooser code above) shows how to
- * select
- * between different autonomous modes using the dashboard. The sendable
- * chooser code works with the Java SmartDashboard. If you prefer the
- * LabVIEW Dashboard, remove all of the chooser code and uncomment the
- * GetString line to get the auto name from the text box below the Gyro.
- *
- * You can add additional auto modes by adding additional comparisons to
- * the
- * if-else structure below with additional strings. If using the
- * SendableChooser make sure to add them to the chooser code above as
- * well.
- */
+
 void Robot::AutonomousInit()
 {
-	m_motionprofiling->Init();
+	m_motionmagic->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	m_motionprofiling->Loop();
+	m_motionmagic->Loop(10000);//Arbitrary
 }
 
 

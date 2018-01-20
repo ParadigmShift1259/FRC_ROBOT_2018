@@ -23,12 +23,30 @@ MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_
 void MotionMagic::Init()
 {
 	rightFrontTalon->Set(ControlMode::MotionMagic, 0);
-	//Not Sure what this needs to be
-	//rightFrontTalon->SetFeedBackDevice(FeedbackDevice::QuadEncoder);
-	//rightFrontTalon->configEncoderCodesPerRev(XXX);
-	//rightFrontTalon->SetPIDProfile(0);
-	//rightFrontTalon->SetF(0);
+	rightFrontTalon->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	rightFrontTalon->ConfigNominalOutputForward(0,0);
+	rightFrontTalon->ConfigNominalOutputReverse(-0,0);
+	rightFrontTalon->ConfigPeakOutputForward(12,0);
+	rightFrontTalon->ConfigPeakOutputReverse(-12,0);
+	rightFrontTalon->ConfigMotionCruiseVelocity(100,0); //Completely Arbitrary
+	rightFrontTalon->ConfigMotionAcceleration(5,0);//Also Completely Arbitrary
+	rightFrontTalon->Config_kP(0,0.0,0);
+	rightFrontTalon->Config_kI(0,0.0,0);
+	rightFrontTalon->Config_kD(0,0.0,0);
+	rightFrontTalon->Config_kF(0,0.0,0);
+
 	leftFrontTalon->Set(ControlMode::MotionMagic, 0);
+	leftFrontTalon->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder,0,0);
+	leftFrontTalon->ConfigNominalOutputForward(0,0);
+	leftFrontTalon->ConfigNominalOutputReverse(-0,0);
+	leftFrontTalon->ConfigPeakOutputForward(12,0);
+	leftFrontTalon->ConfigPeakOutputReverse(-12,0);
+	leftFrontTalon->ConfigMotionCruiseVelocity(100,0); //Completely Arbitrary
+	leftFrontTalon->ConfigMotionAcceleration(5,0);//Also Completely Arbitrary
+	leftFrontTalon->Config_kP(0,0.0,0);
+	leftFrontTalon->Config_kI(0,0.0,0);
+	leftFrontTalon->Config_kD(0,0.0,0);
+	leftFrontTalon->Config_kF(0,0.0,0);
 }
 
 void MotionMagic::Loop(double targetRotation)
