@@ -9,14 +9,17 @@
 
 /*!
  * Constructor for MotionMagic, takes four pointers for each of the Talons, the state of the
- * Talons does not matter
+ * Talons does not matter. Does not initialize anything for testDrive or testTarget besides
+ * OperatorInputs.
  */
-MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack)
+MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack, OperatorInputs *input)
 {
 	rightFrontTalon = rightFront;
 	rightBackTalon = rightBack;
 	leftFrontTalon = leftFront;
 	leftBackTalon = leftBack;
+
+	oi = input;
 
 	//////////////////Not positive this works for motion magic trajectories//////////////////
 	rightBackTalon->Follow(*rightFrontTalon);
@@ -25,7 +28,9 @@ MotionMagic::MotionMagic(WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_
 }
 
 /*!
- * Init's the MotionMagic, must be called at least once before loop
+ * Init's the MotionMagic, must be called at least once before loop and after any
+ * Init's that tinker with Talon's with the exception of testDriveInit if you
+ * are testing.
  */
 void MotionMagic::Init()
 {
@@ -50,10 +55,10 @@ void MotionMagic::Init()
 	leftFrontTalon->ConfigPeakOutputReverse(-12,0);
 	leftFrontTalon->ConfigMotionCruiseVelocity(100,0); //Completely Arbitrary
 	leftFrontTalon->ConfigMotionAcceleration(5,0);//Also Completely Arbitrary
-	leftFrontTalon->Config_kP(0,0.0,0);
-	leftFrontTalon->Config_kI(0,0.0,0);
-	leftFrontTalon->Config_kD(0,0.0,0);
-	leftFrontTalon->Config_kF(0,0.0,0);
+	leftFrontTalon->Config_kP(0,KP,0);
+	leftFrontTalon->Config_kI(0,KI,0);
+	leftFrontTalon->Config_kD(0,KD,0);
+	leftFrontTalon->Config_kF(0,KF,0);
 
 	frc::SmartDashboard::PutNumber("P",KP);
 	frc::SmartDashboard::PutNumber("I",KI);
@@ -62,7 +67,7 @@ void MotionMagic::Init()
 
 /*!
  * Needs to be called every time the roborio cycles.
- * TargetRotation is the target to approach in native units
+ * TargetRotation is the target to approach in native units.
  */
 void MotionMagic::Loop(double targetRotation)
 {
@@ -71,12 +76,13 @@ void MotionMagic::Loop(double targetRotation)
 }
 
 /*!
- * Must be called before running testDrive
+ * Must be called before running testDrive but after any other Init's that tinker with the talon's
  */
 void MotionMagic::testDriveInit()
 {
-	oi = new OperatorInputs();
-
+	p=KP;
+	i=KI;
+	d=KD;
 	rightFrontTalon->Set(ControlMode::PercentOutput,0);
 	rightBackTalon->Set(ControlMode::PercentOutput,0);
 	leftFrontTalon->Set(ControlMode::PercentOutput,0);
@@ -86,6 +92,7 @@ void MotionMagic::testDriveInit()
 	rightSide = new frc::SpeedControllerGroup(*rightFrontTalon, *rightBackTalon);
 
 	drive = new frc::DifferentialDrive(*leftSide, *rightSide);
+	maxVel = 0;
 }
 
 /*!
@@ -95,6 +102,9 @@ void MotionMagic::testDrive()
 {
 
 	drive->ArcadeDrive(-oi->xBoxLeftY(), -oi->xBoxLeftX(), false);
+	if (rightFrontTalon->GetSelectedSensorVelocity(0) > maxVel)
+		maxVel = rightFrontTalon->GetSelectedSensorVelocity(0);
+	frc::SmartDashboard::PutNumber("MaxVelocity", maxVel);
 	frc::SmartDashboard::PutNumber("rightTalonVelocity", rightFrontTalon->GetSelectedSensorVelocity(0));
 	frc::SmartDashboard::PutNumber("leftTalonVelocity", leftFrontTalon->GetSelectedSensorVelocity(0));
 
@@ -103,10 +113,28 @@ void MotionMagic::testDrive()
 }
 
 /*!
- * For testing PID values, sets the target to the xBoxLeftY * 5000 in native units
+ * For testing PID values, sets the target to the xBoxLeftY * 5000 in native units.
+ * Also allows for PID Tuning through the SmartDashboard. Don't forget to put the PID
+ * values into Const.h once done.
  */
 void MotionMagic::testTarget()
 {
+	if(frc::SmartDashboard::GetNumber("P",0) != p)
+	{
+		p = frc::SmartDashboard::GetNumber("P",0);
+		frc::SmartDashboard::PutNumber("P",p);
+	}
+	if(frc::SmartDashboard::GetNumber("I", 0) != i)
+	{
+		i = frc::SmartDashboard::GetNumber("I",0);
+		frc::SmartDashboard::PutNumber("I",i);
+	}
+	if(frc::SmartDashboard::GetNumber("D", 0) != d)
+	{
+		i = frc::SmartDashboard::GetNumber("D",0);
+		frc::SmartDashboard::PutNumber("D",d);
+	}
+
 	rightFrontTalon->Set(-oi->xBoxLeftY()*5000);
 	leftFrontTalon->Set(oi->xBoxLeftY()*5000);
 

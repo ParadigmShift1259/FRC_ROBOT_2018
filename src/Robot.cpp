@@ -18,16 +18,15 @@
 void Robot::RobotInit()
 {
 
-	m_rightFrontTalon = new WPI_TalonSRX(1);
-	m_rightBackTalon = new WPI_TalonSRX(3);
-	m_leftFrontTalon = new WPI_TalonSRX(0);
-	m_leftBackTalon = new WPI_TalonSRX(2);
 
 	m_operatorinputs = new OperatorInputs();
 
-	m_motionmagic = new MotionMagic(m_rightFrontTalon, m_rightBackTalon, m_leftFrontTalon, m_leftBackTalon);
 	m_driverstation = &DriverStation::GetInstance();
 	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kTank, m_operatorinputs, m_driverstation);
+
+	m_motionmagic = new MotionMagic(m_drivetrain->RightTalonLead(), m_drivetrain->RightTalonFollow(),
+			m_drivetrain->LeftTalonLead(), m_drivetrain->LeftTalonFollow(), m_operatorinputs);
+
 	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 }
 
@@ -35,12 +34,14 @@ void Robot::RobotInit()
 void Robot::AutonomousInit()
 {
 	m_motionmagic->Init();
+	m_motionmagic->testDriveInit();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	m_motionmagic->Loop(10000);//Arbitrary
+	m_motionmagic->testDrive();
+	//m_motionmagic->Loop(10000);//Arbitrary
 }
 
 
