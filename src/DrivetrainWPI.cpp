@@ -260,19 +260,26 @@ void DriveTrainWPI::Drive(double x, double y, bool ramp)
 	m_rightspeed = m_righttalonlead->GetSelectedSensorVelocity(0);
 	m_leftposition = m_lefttalonlead->GetSelectedSensorPosition(0);
 	m_rightposition = m_righttalonlead->GetSelectedSensorPosition(0);
-	//m_leftposition = m_lefttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
-	//m_rightposition = m_righttalonlead->GetSensorCollection().GetQuadraturePosition() / CODES_PER_REV;
 
+	// can talon follower mode
 	//m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
 	//m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+
+	// can talon discrete mode
 	//m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
 	//m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
 
+	// differentialdrive tank drive
 	double templeft = m_invertleft * m_coasting * LeftMotor(maxpower);
 	double tempright = m_invertright * m_coasting * RightMotor(maxpower);
 	m_differentialdrive->TankDrive(templeft, tempright, false);
+
+	// differentialdrive arcade drive
 	//double tempforward = (templeft + tempright) / 2.0;
 	//double tempclockwise = (templeft - tempright) / 2.0;
+	//m_differentialdrive->ArcadeDrive(tempforward, tempclockwise, false);
+
+	// differentialdrive curvature drive
 	//bool tempspin = abs(tempforward) < DEADZONE_Y;
 	//m_differentialdrive->CurvatureDrive(tempforward, tempclockwise, tempspin);
 
