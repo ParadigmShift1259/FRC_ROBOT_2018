@@ -59,7 +59,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define WHEEL_BASE 28.825
 // Inverts
 #define INVERT_LEFT -1.0
-#define INVERT_RIGHT 1.0
+#define INVERT_RIGHT 1.0		// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
 // Talons ports
 #define CAN_LEFT_PORT 2
 #define CAN_SECOND_LEFT_PORT 0

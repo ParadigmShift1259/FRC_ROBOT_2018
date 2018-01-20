@@ -11,9 +11,9 @@
 
 #include "Const.h"
 #include "OperatorInputs.h"
-#include "Drivetrain.h"
 #include <Compressor.h>
 #include "MotionMagic.h"
+#include <Drivetrain.h>
 
 
 class Robot : public IterativeRobot
@@ -30,9 +30,10 @@ public:
 
 protected:
 	OperatorInputs *m_operatorinputs;
-	Drivetrain *m_drivetrain;
+	DriveTrain *m_drivetrain;
 	Compressor *m_compressor;
 	MotionMagic *m_motionmagic;
+	DriverStation *m_driverstation;
 
 	WPI_TalonSRX *m_rightFrontTalon;
 	WPI_TalonSRX *m_rightBackTalon;

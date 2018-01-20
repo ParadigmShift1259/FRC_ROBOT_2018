@@ -1,63 +1,84 @@
-/*
- * Drivetrain.h
- *
- *  Created on: Jan 11, 2018
- *      Author: Matt Wildman
+/**
+ *  DriveTrain.h
+ *  Date:
+ *  Last Edited By:
  */
 
 
-#ifndef SRC_DRIVETRAIN_H_
-#define SRC_DRIVETRAIN_H_
+#ifndef SRC_DriveTrain_H_
+#define SRC_DriveTrain_H_
 
 
-#include <RobotDrive.h>
-#include <Drive\DifferentialDrive.h>
-#include <SpeedControllerGroup.h>
-#include <ctre\Phoenix.h>
-#include <DriverStation.h>
-#include <XboxController.h>
-#include <Solenoid.h>
+#include "WPILib.h"
 #include "OperatorInputs.h"
+#include <driverstation.h>
+#include <SpeedController.h>
+#include <timer.h>
+#include <ctre\Phoenix.h>
 
 
-class Drivetrain
+class DriveTrain
 {
 public:
-	Drivetrain();
+	// Drivetrain modes
+	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kCurvature };
 
-	//Checks the controller and if necessary shifts the drivetrain
-	virtual ~Drivetrain();
-	double getXboxX() const { return xBoxX; }
-
-	Drivetrain(OperatorInputs *operatorinputs, WPI_TalonSRX *rightFront, WPI_TalonSRX *rightBack, WPI_TalonSRX *leftFront, WPI_TalonSRX *leftBack);
-
+	DriveTrain(DriveMode mode, OperatorInputs *inputs, DriverStation *ds);
+	~DriveTrain();
 	void Init();
 	void Loop();
+	void Stop();
+	void Drive(double x, double y, bool ramp = false);
 	void Shift();
+		// change DriveTrain direction and return true if going forward
+	bool ChangeDirection();
+	void LowSpeedDriving();
+	double Ramp(double previousPow, double desiredPow, double rampSpeedMin, double rampSpeedMax);
+	double LeftMotor(double &invMaxValueXPlusY);
+	double RightMotor(double &invMaxValueXPlusY);
 
+	void setCoasting(double newCoasting) {m_coasting = newCoasting;}
+	void setRamp(double newValue) {m_rampmax = newValue;}
+	bool getIsHighGear() {return m_ishighgear;}
+	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
+	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
+	WPI_TalonSRX *LeftTalonFollow() {return m_lefttalonfollow;}
+	WPI_TalonSRX *RightTalonFollow() {return m_righttalonfollow;}
 
-private:
-	OperatorInputs *m_operatorinputs;
+protected:
+	DriveMode m_mode;
+	OperatorInputs *m_inputs;
+	DriverStation *m_driverstation;
+	WPI_TalonSRX *m_lefttalonlead;
+	WPI_TalonSRX *m_lefttalonfollow;
+	WPI_TalonSRX *m_righttalonlead;
+	WPI_TalonSRX *m_righttalonfollow;
+	SpeedControllerGroup *m_leftscgroup;
+	SpeedControllerGroup *m_rightscgroup;
+	DifferentialDrive *m_differentialdrive;
+	Solenoid *m_shifter;
+	Timer *m_timerramp;
 
-	//Stores the current x and y values of the joystick multiplied by -1
-	double xBoxX;
-	double xBoxY;
+	double m_leftpow;
+	double m_rightpow;
+	double m_leftspeed;
+	double m_rightspeed;
+	double m_leftposition;
+	double m_rightposition;
+	double m_coasting;
+	double m_rampmax;
 
-	//WPI_TalonSRX is a CTRE class that inherits from speedcontroller and works over the can bus
-	WPI_TalonSRX *rightFrontTalon;
-	WPI_TalonSRX *rightBackTalon;
-	WPI_TalonSRX *leftFrontTalon;
-	WPI_TalonSRX *leftBackTalon;
+	double m_invertleft;
+	double m_invertright;
+	double m_direction;
 
-	//SpeedControllerGroup basically nests multiple speedcontroller classes into one side
-	SpeedControllerGroup *leftSide;
-	SpeedControllerGroup *rightSide;
-
-	//A class that has functions for curvature drive, arcade drive and tank drive.
-	DifferentialDrive *drive;
-
-	Solenoid *shifter;
+	bool m_ishighgear;
+	double m_previousx;
+	double m_previousy;
+	bool m_isdownshifting;
+	bool m_lowspeedmode;
+	bool m_shift;
 };
 
 
-#endif /* SRC_DRIVETRAIN_H_ */
+#endif /* SRC_DriveTrain_H_ */
