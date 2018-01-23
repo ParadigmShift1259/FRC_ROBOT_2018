@@ -5,8 +5,12 @@
  */
 
 
-#include <DriveAnglePID.h>
+#include "DriveAnglePID.h"
+#include "Const.h"
 #include <math.h>
+
+
+using namespace std;
 
 
 DriveAnglePID::DriveAnglePID(DriveTrain *drive) : PIDSubsystem("DriveAngle", 0.075 , 0.008, 0.03)
@@ -105,7 +109,7 @@ void DriveAnglePID::UsePIDOutput(double output)
 	SmartDashboard::PutBoolean("DP01_IS_ACTIVE",isActive);
 	if (isActive)
 	{
-		//output = std::abs(output) > 0.25 ? output : 0.25 * output / std::abs(output);
+		//output = abs(output) > 0.25 ? output : 0.25 * output / abs(output);
 		m_drivetrain->Drive(output, m_y, true);
 	}
 }

@@ -9,10 +9,10 @@
 #define SRC_DRIVE_ANGLE_H_
 
 
-#include <DriveAnglePID.h>
+#include <WPILib.h>
+#include "DriveAnglePID.h"
 #include "DriveTrain.h"
 #include "OperatorInputs.h"
-#include <SmartDashboard/SmartDashboard.h>
 
 
 class DriveAngle
