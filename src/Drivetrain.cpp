@@ -5,25 +5,17 @@
  */
 
 
+#include "DriveTrain.h"
 #include "Const.h"
-#include "smartdashboard/smartdashboard.h"
-#include <Timer.h>
-#include <Talon.h>
-#include <DriveTrain.h>
-#include <Encoder.h>
-#include <cmath>
-#include <String>
 
 
 using namespace std;
 
 
-DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs, DriverStation *ds)
-
+DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 {
 	m_mode = mode;
 	m_inputs = inputs;
-	m_driverstation = ds;
 
 	m_lefttalonlead = new WPI_TalonSRX(CAN_LEFT_PORT);
 	m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
@@ -287,7 +279,7 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 	}
 	else
 	{
-		double battery = m_driverstation->GetInstance().GetBatteryVoltage();
+		double battery = DriverStation::GetInstance().GetBatteryVoltage();
 		double rampmin = RAMPING_RATE_MIN / battery;
 		double rampmax = m_rampmax / battery;
 		SmartDashboard::PutNumber("DT10_battery", battery);

@@ -4,7 +4,7 @@
  *  Last Edited By:
  */
 
-#include <Joystick.h>
+#include <WPILib.h>
 #include <map>
 #include <vector>
 

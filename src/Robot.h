@@ -9,11 +9,14 @@
 #define SRC_ROBOT_H_
 
 
+#include <WPILib.h>
 #include "Const.h"
 #include "OperatorInputs.h"
-#include <Compressor.h>
 #include "MotionMagic.h"
-#include <Drivetrain.h>
+#include "Drivetrain.h"
+#include "Lifter.h"
+#include "Grabber.h"
+#include "Climber.h"
 
 
 class Robot : public IterativeRobot
@@ -31,9 +34,14 @@ public:
 protected:
 	OperatorInputs *m_operatorinputs;
 	DriveTrain *m_drivetrain;
+
 	Compressor *m_compressor;
 	MotionMagic *m_motionmagic;
 	DriverStation *m_driverstation;
+	Lifter *m_lifter;
+	Grabber *m_grabber;
+	Climber *m_climber;
+
 
 	WPI_TalonSRX *m_rightFrontTalon;
 	WPI_TalonSRX *m_rightBackTalon;

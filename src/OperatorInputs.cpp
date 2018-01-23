@@ -8,10 +8,6 @@
 #include <OperatorInputs.h>
 #include "Const.h"
 #include <cmath>
-#include "smartdashboard/smartdashboard.h"
-
-
-using namespace std;
 
 
 OperatorInputs::OperatorInputs()

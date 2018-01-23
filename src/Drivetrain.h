@@ -9,12 +9,9 @@
 #define SRC_DriveTrain_H_
 
 
-#include "WPILib.h"
-#include "OperatorInputs.h"
-#include <driverstation.h>
-#include <SpeedController.h>
-#include <timer.h>
+#include <WPILib.h>
 #include <ctre\Phoenix.h>
+#include "OperatorInputs.h"
 
 
 class DriveTrain
@@ -23,8 +20,9 @@ public:
 	// Drivetrain modes
 	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kCurvature };
 
-	DriveTrain(DriveMode mode, OperatorInputs *inputs, DriverStation *ds);
+	DriveTrain(DriveMode mode, OperatorInputs *inputs);
 	~DriveTrain();
+
 	void Init();
 	void Loop();
 	void Stop();
@@ -48,7 +46,6 @@ public:
 protected:
 	DriveMode m_mode;
 	OperatorInputs *m_inputs;
-	DriverStation *m_driverstation;
 	WPI_TalonSRX *m_lefttalonlead;
 	WPI_TalonSRX *m_lefttalonfollow;
 	WPI_TalonSRX *m_righttalonlead;
