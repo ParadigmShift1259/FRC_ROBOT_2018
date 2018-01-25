@@ -22,11 +22,11 @@ DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
 	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
 
-	m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
-	m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
 
+	m_leftscgroup = nullptr;
+	m_rightscgroup = nullptr;
+	m_differentialdrive = nullptr;
 
-	m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup);
 
 	switch (m_mode)
 
@@ -38,22 +38,20 @@ DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
 		break;
 
-	case DriveMode::kDiscrete:
 	case DriveMode::kTank:
 	case DriveMode::kArcade:
 	case DriveMode::kCurvature:
+		m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
+		m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
+		m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup); 			// @suppress("No break at end of case")
+
+	case DriveMode::kDiscrete:
 		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
 		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
 		m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
 		break;
 	}
-
-	m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-	m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
-
-	m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-	m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
@@ -304,9 +302,9 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 	case DriveMode::kDiscrete:
 		// can talon discrete mode
 		m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-		m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
-		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
 		m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
 		break;
 
 	case DriveMode::kTank:
