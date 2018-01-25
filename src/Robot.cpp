@@ -23,7 +23,7 @@ void Robot::RobotInit()
 
 	m_operatorinputs = new OperatorInputs();
 	m_driverstation = &DriverStation::GetInstance();
-	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kTank, m_operatorinputs);
+	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kCurvature, m_operatorinputs);
 	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 	m_lifter = new Lifter(m_operatorinputs);
 	m_grabber = new Grabber(m_operatorinputs);
