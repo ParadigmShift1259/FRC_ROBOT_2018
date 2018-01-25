@@ -100,11 +100,18 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define DIO_RANGEFINDER_TRIGGER_IN 2
 
 
-// Picker
-#define PWM_PICKER_MOTOR 4
-#define PWM_PICKER_SOLENOID 2
-#define CAN_PICKER_MOTOR 6
+// Lifter
+#define CAN_LIFTER_MOTOR -1
+#define LIFTER_MAX 20000
+#define LIFTER_MIN 500
 
+//Grabber
+#define CAN_GRABBER_LEFTMOTOR -1
+#define CAN_GRABBER_RIGHTMOTOR -1
+#define GRABBER_LEFTPOS_MAX 20000
+#define GRABBER_LEFTPOS_MIN 500
+#define GRABBER_RIGHTPOS_MAX 20000
+#define GRABBER_RIGHTPOS_MIN 500
 
 // Shooter
 //#define PCM_SHOOTER_SOLENOID 2

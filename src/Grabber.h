@@ -10,6 +10,7 @@
 
 
 #include <WPILib.h>
+#include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
 
 
@@ -25,6 +26,10 @@ public:
 
 protected:
 	OperatorInputs *m_inputs;
+	WPI_TalonSRX *m_leftmotor;
+	WPI_TalonSRX *m_rightmotor;
+	int m_leftposition;
+	int m_rightposition;
 };
 
 
