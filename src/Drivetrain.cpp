@@ -40,6 +40,7 @@ DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 
 	case DriveMode::kTank:
 	case DriveMode::kArcade:
+	case DriveMode::kArcade2:
 	case DriveMode::kCurvature:
 		m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
 		m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
@@ -122,6 +123,7 @@ void DriveTrain::Init()
 	case DriveMode::kDiscrete:
 	case DriveMode::kTank:
 	case DriveMode::kArcade:
+	case DriveMode::kArcade2:
 	case DriveMode::kCurvature:
 		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
@@ -321,6 +323,10 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 		tempforward = (templeft + tempright) / 2.0;
 		temprotate = (templeft - tempright) / 2.0;
 		m_differentialdrive->ArcadeDrive(tempforward, temprotate, false);
+		break;
+
+	case DriveMode::kArcade2:
+		m_differentialdrive->ArcadeDrive(y,x,false);
 		break;
 
 	case DriveMode::kCurvature:

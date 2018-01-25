@@ -18,7 +18,7 @@ class DriveTrain
 {
 public:
 	// Drivetrain modes
-	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kCurvature };
+	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kArcade2, kCurvature };
 
 	DriveTrain(DriveMode mode, OperatorInputs *inputs);
 	~DriveTrain();
