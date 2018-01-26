@@ -88,5 +88,6 @@ void Lifter::Stop()
 
 void Lifter::ResetPosition()
 {
+	m_motor->SetSelectedSensorPosition(0, 0, 0);
 	m_position = 0;
 }

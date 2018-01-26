@@ -23,6 +23,7 @@ public:
 	void Loop();
 	void TestLoop();
 	void Stop();
+	void ResetPosition();
 
 protected:
 	OperatorInputs *m_inputs;

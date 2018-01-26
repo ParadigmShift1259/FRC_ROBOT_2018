@@ -71,8 +71,27 @@ void Grabber::TestLoop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr))
 		return;
 
-	m_leftmotor->StopMotor();
-	m_rightmotor->StopMotor();
+	m_leftposition = m_leftmotor->GetSelectedSensorPosition(0);
+	m_rightposition = m_rightmotor->GetSelectedSensorPosition(0);
+
+	if (m_inputs->xBoxBButton())
+	{
+		m_leftmotor->Set(0.5);
+		m_rightmotor->Set(0.5);
+	}
+	else
+	if (m_inputs->xBoxAButton())
+	{
+			m_leftmotor->Set(-0.5);
+			m_rightmotor->Set(-0.5);
+	}
+	else
+	{
+		m_leftmotor->StopMotor();
+		m_rightmotor->StopMotor();
+	}
+	SmartDashboard::PutNumber("L1_left_position", m_leftposition);
+	SmartDashboard::PutNumber("L2_right_position", m_rightposition);
 }
 
 
@@ -82,4 +101,13 @@ void Grabber::Stop()
 		m_leftmotor->StopMotor();
 	if (m_rightmotor != nullptr)
 		m_rightmotor->StopMotor();
+}
+
+
+void Grabber::ResetPosition()
+{
+	m_leftposition = 0;
+	m_rightposition = 0;
+	m_leftmotor->SetSelectedSensorPosition(0, 0, 0);
+	m_rightmotor->SetSelectedSensorPosition(0, 0, 0);
 }
