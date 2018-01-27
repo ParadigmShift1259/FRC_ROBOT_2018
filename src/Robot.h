@@ -12,7 +12,7 @@
 #include <WPILib.h>
 #include "Const.h"
 #include "OperatorInputs.h"
-#include "MotionMagic.h"
+#include "MotionProfiling.h"
 #include "Drivetrain.h"
 #include "Lifter.h"
 #include "Grabber.h"
@@ -36,7 +36,7 @@ protected:
 	DriveTrain *m_drivetrain;
 
 	Compressor *m_compressor;
-	MotionMagic *m_motionmagic;
+	MotionProfiling *m_motionprofile;
 	DriverStation *m_driverstation;
 	Lifter *m_lifter;
 	Grabber *m_grabber;

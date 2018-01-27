@@ -25,7 +25,7 @@ void Robot::RobotInit()
 
 	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kCurvature, m_operatorinputs);
 
-	m_motionmagic = new MotionMagic(m_drivetrain->RightTalonLead(), m_drivetrain->RightTalonFollow(), m_drivetrain->LeftTalonLead(), m_drivetrain->LeftTalonFollow(), m_operatorinputs);
+	m_motionprofile = new MotionProfiling(m_drivetrain->RightTalonLead(), m_drivetrain->RightTalonFollow(), m_drivetrain->LeftTalonLead(), m_drivetrain->LeftTalonFollow());
 
 	m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 	m_lifter = new Lifter(m_operatorinputs);
