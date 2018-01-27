@@ -33,9 +33,9 @@ DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 	{
 	case DriveMode::kFollower:
 		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
+		m_lefttalonfollow->Follow(*m_lefttalonlead);
 		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
+		m_righttalonfollow->Follow(*m_righttalonlead);
 		break;
 
 	case DriveMode::kTank:

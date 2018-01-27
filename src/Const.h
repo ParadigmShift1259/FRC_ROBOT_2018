@@ -139,10 +139,10 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Autonomous
-#define KP 0
+#define KP 2.0
 #define KI 0
-#define KD 0
-#define KF 0
+#define KD 20
+#define KF .07
 
 // Auger
 #define AUGER_CHANNEL 16 //Auger

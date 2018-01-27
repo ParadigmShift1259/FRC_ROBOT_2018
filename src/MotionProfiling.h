@@ -8,8 +8,8 @@
 #ifndef SRC_MOTIONPROFILING_H_
 #define SRC_MOTIONPROFILING_H_
 #include <ctre\Phoenix.h>
+#include <WPILib.h>
 #include "Const.h"
-#include <Notifier.h>
 #include "Profile.h"
 
 class MotionProfiling {
@@ -41,10 +41,10 @@ protected:
 
 	Notifier *m_notifier;
 
-	WPI_TalonSRX *rightFrontTalon;
-	WPI_TalonSRX *rightBackTalon;
-	WPI_TalonSRX *leftFrontTalon;
-	WPI_TalonSRX *leftBackTalon;
+	WPI_TalonSRX *m_rightLeadTalon;
+	WPI_TalonSRX *m_rightFollowTalon;
+	WPI_TalonSRX *m_leftLeadTalon;
+	WPI_TalonSRX *m_leftFollowTalon;
 
 	int stage;
 

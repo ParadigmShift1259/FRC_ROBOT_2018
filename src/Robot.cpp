@@ -17,13 +17,11 @@
 
 void Robot::RobotInit()
 {
-
-
 	m_operatorinputs = new OperatorInputs();
 
 	m_driverstation = &DriverStation::GetInstance();
 
-	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kCurvature, m_operatorinputs);
+	m_drivetrain = new DriveTrain(DriveTrain::DriveMode::kFollower, m_operatorinputs);
 
 	m_motionprofile = new MotionProfiling(m_drivetrain->RightTalonLead(), m_drivetrain->RightTalonFollow(), m_drivetrain->LeftTalonLead(), m_drivetrain->LeftTalonFollow());
 
@@ -36,15 +34,13 @@ void Robot::RobotInit()
 
 void Robot::AutonomousInit()
 {
-//	m_motionmagic->Init();
-//	m_motionmagic->testDriveInit();
+	m_motionprofile->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-//	m_motionmagic->testDrive();
-	//m_motionmagic->Loop(10000);//Arbitrary
+	m_motionprofile->Loop();
 }
 
 
@@ -75,33 +71,33 @@ void Robot::TestPeriodic()
 void Robot::TeleopInit()
 {
 	DriverStation::ReportError("TeleopInit");
-/*
+
 	m_compressor->Start();
 	m_drivetrain->Init();
 	m_lifter->Init();
 	m_grabber->Init();
 	m_climber->Init();
-*/
+
 }
 
 
 void Robot::TeleopPeriodic()
 {
-/*
+
 	m_drivetrain->Loop();
 	m_lifter->Loop();
 	m_grabber->Loop();
 	m_climber->Loop();
-*/
+
 }
 
 
 void Robot::DisabledInit()
 {
-	/*m_drivetrain->Stop();
+	m_drivetrain->Stop();
 	m_lifter->Stop();
 	m_grabber->Stop();
-	m_climber->Stop();*/
+	m_climber->Stop();
 }
 
 
