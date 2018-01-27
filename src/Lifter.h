@@ -10,6 +10,7 @@
 
 
 #include <WPILib.h>
+#include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
 
 
@@ -22,9 +23,12 @@ public:
 	void Loop();
 	void TestLoop();
 	void Stop();
+	void ResetPosition();
 
 protected:
 	OperatorInputs *m_inputs;
+	WPI_TalonSRX *m_motor;
+	int m_position;
 };
 
 
