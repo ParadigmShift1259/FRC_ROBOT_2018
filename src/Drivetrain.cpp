@@ -147,10 +147,6 @@ void DriveTrain::Init(DriveMode mode)
 	m_previousx = 0;
 	m_previousy = 0;
 	m_coasting = 1;
-	m_lefttalonlead->Set(0);
-	m_lefttalonfollow->Set(0);
-	m_righttalonlead->Set(0);
-	m_righttalonfollow->Set(0);
 	m_timerramp->Reset();
 	m_timerramp->Start();
 	m_ishighgear = true;
