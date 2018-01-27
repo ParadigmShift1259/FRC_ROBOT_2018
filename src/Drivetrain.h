@@ -20,9 +20,9 @@ public:
 	// Drivetrain modes
 	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kCurvature };
 
-	DriveTrain(DriveMode mode, OperatorInputs *inputs);
+	DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead = nullptr, WPI_TalonSRX *leftfollow = nullptr, WPI_TalonSRX *rightlead = nullptr, WPI_TalonSRX *rightfollow = nullptr);
 	~DriveTrain();
-	void Init();
+	void Init(DriveMode mode = kFollower);
 	void Loop();
 	void Stop();
 	void Drive(double x, double y, bool ramp = false);
@@ -49,6 +49,10 @@ protected:
 	WPI_TalonSRX *m_lefttalonfollow;
 	WPI_TalonSRX *m_righttalonlead;
 	WPI_TalonSRX *m_righttalonfollow;
+	bool m_lefttalonleadowner;
+	bool m_lefttalonfollowowner;
+	bool m_righttalonleadowner;
+	bool m_righttalonfollowowner;
 	SpeedControllerGroup *m_leftscgroup;
 	SpeedControllerGroup *m_rightscgroup;
 	DifferentialDrive *m_differentialdrive;

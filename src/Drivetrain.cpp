@@ -12,59 +12,25 @@
 using namespace std;
 
 
-DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
+DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_TalonSRX *leftfollow, WPI_TalonSRX *rightlead, WPI_TalonSRX *rightfollow)
 {
-	m_mode = mode;
 	m_inputs = inputs;
 
-	m_lefttalonlead = new WPI_TalonSRX(CAN_LEFT_PORT);
-	m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
-	m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
-	m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
+	m_mode = kFollower;
+
+	m_lefttalonleadowner = false;
+	m_lefttalonfollowowner = false;
+	m_righttalonleadowner = false;
+	m_righttalonfollowowner = false;
+
+	m_lefttalonlead = leftlead;
+	m_lefttalonfollow = leftfollow;
+	m_righttalonlead = rightlead;
+	m_righttalonfollow = rightfollow;
 
 	m_leftscgroup = nullptr;
 	m_rightscgroup = nullptr;
 	m_differentialdrive = nullptr;
-
-	switch (m_mode)
-	{
-	case DriveMode::kFollower:
-		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
-		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
-		break;
-
-	case DriveMode::kTank:
-	case DriveMode::kArcade:
-	case DriveMode::kCurvature:
-		m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
-		m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
-		m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup); 			// @suppress("No break at end of case")
-
-	case DriveMode::kDiscrete:
-		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
-		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
-		break;
-	}
-
-	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_lefttalonlead->SetSensorPhase(false);
-	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
-	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
-
-	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
-	m_righttalonlead->SetSensorPhase(false);
-	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
-	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
-
-	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
-
-	m_righttalonfollow->SetNeutralMode(NeutralMode::Brake);
 
 	m_leftspeed = 0;
 	m_rightspeed = 0;
@@ -96,17 +62,44 @@ DriveTrain::DriveTrain(DriveMode mode, OperatorInputs *inputs)
 
 DriveTrain::~DriveTrain()
 {
-	delete m_lefttalonlead;
-	delete m_lefttalonfollow;
-	delete m_righttalonlead;
-	delete m_righttalonfollow;
+	if ((m_lefttalonlead != nullptr) && (m_lefttalonleadowner))
+		delete m_lefttalonlead;
+	if ((m_lefttalonfollow != nullptr) && (m_lefttalonfollowowner))
+		delete m_lefttalonfollow;
+	if ((m_righttalonlead != nullptr) && (m_righttalonleadowner))
+		delete m_righttalonlead;
+	if ((m_righttalonfollow != nullptr) && (m_righttalonfollowowner))
+		delete m_righttalonfollow;
 	delete m_shifter;
 	delete m_timerramp;
 }
 
 
-void DriveTrain::Init()
+void DriveTrain::Init(DriveMode mode)
 {
+	m_mode = mode;
+
+	if (m_lefttalonlead == nullptr)
+	{
+		m_lefttalonlead = new WPI_TalonSRX(CAN_LEFT_PORT);
+		m_lefttalonleadowner = true;
+	}
+	if (m_lefttalonfollow == nullptr)
+	{
+		m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
+		m_lefttalonfollowowner = true;
+	}
+	if (m_righttalonlead == nullptr)
+	{
+		m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
+		m_righttalonleadowner = true;
+	}
+	if (m_righttalonfollow == nullptr)
+	{
+		m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
+		m_righttalonfollowowner = true;
+	}
+
 	switch (m_mode)
 	{
 	case DriveMode::kFollower:
@@ -116,10 +109,14 @@ void DriveTrain::Init()
 		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
 		break;
 
-	case DriveMode::kDiscrete:
 	case DriveMode::kTank:
 	case DriveMode::kArcade:
 	case DriveMode::kCurvature:
+		m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
+		m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
+		m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup); 			// @suppress("No break at end of case")
+
+	case DriveMode::kDiscrete:
 		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
 		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
 		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
@@ -128,13 +125,11 @@ void DriveTrain::Init()
 	}
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	//m_lefttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_lefttalonlead->SetSensorPhase(false);
 	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	//m_righttalonlead->ConfigEncoderCodesPerRev(CODES_PER_REV);
 	m_righttalonlead->SetSensorPhase(false);
 	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
 	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
@@ -165,7 +160,6 @@ void DriveTrain::Init()
 	m_lowspeedmode = false;
 	m_shift = false;
 	m_direction = DT_DEFAULT_DIRECTION;
-	SmartDashboard::PutString("DT10_Direction", "Gear Forward");
 }
 
 
