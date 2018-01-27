@@ -62,13 +62,13 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 DriveTrain::~DriveTrain()
 {
-	if ((m_lefttalonlead != nullptr) && (m_lefttalonleadowner))
+	if ((m_lefttalonlead != nullptr) && m_lefttalonleadowner)
 		delete m_lefttalonlead;
-	if ((m_lefttalonfollow != nullptr) && (m_lefttalonfollowowner))
+	if ((m_lefttalonfollow != nullptr) && m_lefttalonfollowowner)
 		delete m_lefttalonfollow;
-	if ((m_righttalonlead != nullptr) && (m_righttalonleadowner))
+	if ((m_righttalonlead != nullptr) && m_righttalonleadowner)
 		delete m_righttalonlead;
-	if ((m_righttalonfollow != nullptr) && (m_righttalonfollowowner))
+	if ((m_righttalonfollow != nullptr) && m_righttalonfollowowner)
 		delete m_righttalonfollow;
 	delete m_shifter;
 	delete m_timerramp;
