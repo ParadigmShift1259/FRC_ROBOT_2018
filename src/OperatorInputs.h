@@ -4,16 +4,16 @@
  *  Last Edited By:
  */
 
+#ifndef SRC_OPERATORINPUTS_H_
+#define SRC_OPERATORINPUTS_H_
+
+
 #include <WPILib.h>
 #include <map>
 #include <vector>
 
 
 using namespace std;
-
-
-#ifndef SRC_OPERATORINPUTS_H_
-#define SRC_OPERATORINPUTS_H_
 
 
 class OperatorInputs
@@ -52,15 +52,16 @@ public:
 	bool joystickAxis0Right(ToggleChoice choice = kToggle);
 	bool joystickAxis1Back(ToggleChoice choice = kToggle);
 	bool joystickAxis1Forward(ToggleChoice choice = kToggle);
-	bool button2(ToggleChoice choice = kToggle);
-	bool button3(ToggleChoice choice = kToggle);
-	bool button5(ToggleChoice choice = kToggle);
-	bool button6(ToggleChoice choice = kToggle);
-	bool button7(ToggleChoice choice = kToggle);
-	bool button8(ToggleChoice choice = kToggle);
-	bool button9(ToggleChoice choice = kToggle);
-	bool button10(ToggleChoice choice = kToggle);
+	bool joystickButton2(ToggleChoice choice = kToggle);
+	bool joystickButton3(ToggleChoice choice = kToggle);
+	bool joystickButton5(ToggleChoice choice = kToggle);
+	bool joystickButton6(ToggleChoice choice = kToggle);
+	bool joystickButton7(ToggleChoice choice = kToggle);
+	bool joystickButton8(ToggleChoice choice = kToggle);
+	bool joystickButton9(ToggleChoice choice = kToggle);
+	bool joystickButton10(ToggleChoice choice = kToggle);
 
+protected:
 	Joystick *m_joystick;
 	vector<Joystick*> m_xbox;
 
@@ -70,8 +71,7 @@ private:
 	double deadzoneFilterX(double joyStickValue);
 	double deadzoneFilterZ(double joyStickValue);
 
-protected:
-	 map<string, bool> m_togglebuttons;
+	map<string, bool> m_togglebuttons;
 };
 
 

@@ -15,8 +15,9 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 //OperatorInputs
 //	Controllers
-#define JOYSTICK_NUMBER 0
-#define XBOX_NUMBER 1
+#define INP_JOYSTICK -1
+#define INP_XBOX_1 1
+#define INP_XBOX_2 -1
 //	Set to 1.0 or -1.0
 #define INVERT_Y_AXIS 1.0
 #define INVERT_X_AXIS -1.0
@@ -55,8 +56,6 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 // Drivetrain
 #define DT_DEFAULT_DIRECTION 1.0
-#define WHEEL_CIRCUMFERENCE 4
-#define WHEEL_BASE 28.825
 // Inverts
 #define INVERT_LEFT -1.0
 #define INVERT_RIGHT 1.0		// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
@@ -73,7 +72,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 // Ramping
 #define RAMPING_RATE_PERIOD 0.10
 #define RAMPING_RATE_MIN 0.6
-#define RAMPING_RATE_MAX 4
+#define RAMPING_RATE_MAX 4.0
 #define X_SCALING 1.0
 #define Y_SCALING 1.0
 #define LEFT_MOTOR_SCALING 1
@@ -81,10 +80,12 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
-#define CODES_PER_REV 1126
-#define ENCODER_TOP_SPEED 0.6
-#define ENCODER_WAIT_TIME 168
-#define CAN_DISTANCE_PER_PULSE 0.0006708
+#define CODES_PER_REV 4480
+#define CODES_PER_INCH 238
+#define WHEEL_DIAMETER 6
+#define WHEEL_TRACK 22.50
+
+
 // Compressor
 #define PCM_COMPRESSOR_SOLENOID 0
 
@@ -106,7 +107,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define LIFTER_MIN 500
 
 
-//Grabber
+// Grabber
 #define CAN_GRABBER_LEFTMOTOR -1
 #define CAN_GRABBER_RIGHTMOTOR -1
 
@@ -156,7 +157,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define AUGER_OFF_TIME .5
 
 
-//Flipper
+// Flipper
 #define PWM_FLIPPER_SOLENOID 1
 
 

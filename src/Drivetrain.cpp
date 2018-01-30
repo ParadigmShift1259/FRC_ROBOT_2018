@@ -208,7 +208,7 @@ void DriveTrain::Loop()
 		}
 	}
 
-	if (m_isdownshifting && (abs(m_previousx * X_SCALING) < ENCODER_TOP_SPEED) && (abs(m_previousy * Y_SCALING) < ENCODER_TOP_SPEED))
+	if (m_isdownshifting && (abs(m_previousx * X_SCALING) < CHILD_PROOF_SPEED) && (abs(m_previousy * Y_SCALING) < CHILD_PROOF_SPEED))
 	{
 		loopcnt++;
 		Shift();
@@ -219,13 +219,13 @@ void DriveTrain::Loop()
 	SmartDashboard::PutNumber("DIRECTION", m_direction);
 	SmartDashboard::PutNumber("DT01_x", x);
 	SmartDashboard::PutNumber("DT02_y", y);
-	SmartDashboard::PutNumber("DT03_top", ENCODER_TOP_SPEED);
+	SmartDashboard::PutNumber("DT03_top", CHILD_PROOF_SPEED);
 	SmartDashboard::PutNumber("DT04_loop_count", loopcnt);
 	SmartDashboard::PutNumber("DT05_shift", m_shift);
 	SmartDashboard::PutNumber("DT06_shift_count", shiftcnt);
 	SmartDashboard::PutNumber("DT07_shift_down", m_isdownshifting);
-	SmartDashboard::PutNumber("DT08_abs_x", (abs(m_previousx * X_SCALING) < ENCODER_TOP_SPEED));
-	SmartDashboard::PutNumber("DT09_abs_y", (abs(m_previousy * Y_SCALING) < ENCODER_TOP_SPEED));
+	SmartDashboard::PutNumber("DT08_abs_x", (abs(m_previousx * X_SCALING) < CHILD_PROOF_SPEED));
+	SmartDashboard::PutNumber("DT09_abs_y", (abs(m_previousy * Y_SCALING) < CHILD_PROOF_SPEED));
 }
 
 
@@ -361,7 +361,7 @@ bool DriveTrain::ChangeDirection()
 void DriveTrain::LowSpeedDriving()
 {
 	SmartDashboard::PutNumber("DT16_lowspeed", m_lowspeedmode);
-	if (m_inputs->button10())
+	if (m_inputs->xBoxLeftTrigger())
 	{
 		m_lowspeedmode = !m_lowspeedmode;
 		if (m_ishighgear && m_lowspeedmode)

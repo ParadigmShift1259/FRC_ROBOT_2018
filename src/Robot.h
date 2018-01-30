@@ -16,6 +16,7 @@
 #include "Lifter.h"
 #include "Grabber.h"
 #include "Climber.h"
+#include "DrivePID.h"
 
 
 class Robot : public IterativeRobot
@@ -38,6 +39,7 @@ protected:
 	Lifter *m_lifter;
 	Grabber *m_grabber;
 	Climber *m_climber;
+	DrivePID *m_drivepid;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

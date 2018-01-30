@@ -5,26 +5,29 @@
  */
 
 
-#include <OperatorInputs.h>
+#include "OperatorInputs.h"
 #include "Const.h"
 #include <cmath>
 
 
 OperatorInputs::OperatorInputs()
 {
-	m_joystick = new Joystick(0);
-	m_xbox.push_back(new Joystick(1));
-	m_xbox.push_back(new Joystick(2));
+	m_joystick = nullptr;
+	if (INP_JOYSTICK != -1)
+		m_joystick = new Joystick(INP_JOYSTICK);
+	if (INP_XBOX_1 != -1)
+		m_xbox.push_back(new Joystick(INP_XBOX_1));
+	if (INP_XBOX_2 != -1)
+		m_xbox.push_back(new Joystick(INP_XBOX_2));
 }
 
 
 OperatorInputs::~OperatorInputs()
 {
-	delete m_joystick;
+	if (m_joystick != nullptr)
+		delete m_joystick;
 	for (std::vector< Joystick* >::iterator it = m_xbox.begin() ; it != m_xbox.end(); it++)
-	{
 	     delete (*it);
-	}
 	m_xbox.clear();
 }
 
@@ -288,174 +291,232 @@ bool OperatorInputs::xBoxR3(ToggleChoice choice, unsigned int i)
 
 double OperatorInputs::joystickX()
 {
-	return deadzoneFilterX(INVERT_X_AXIS * m_joystick->GetX());
+	if (m_joystick != nullptr)
+		return deadzoneFilterX(INVERT_X_AXIS * m_joystick->GetX());
+	return false;
 }
 
 
 double OperatorInputs::joystickY()
 {
-	return deadzoneFilterY(INVERT_Y_AXIS * m_joystick->GetY());
+	if (m_joystick != nullptr)
+		return deadzoneFilterY(INVERT_Y_AXIS * m_joystick->GetY());
+	return false;
 }
 
 
 double OperatorInputs::joystickZ()
 {
-	return deadzoneFilterZ(m_joystick->GetZ());
+	if (m_joystick != nullptr)
+		return deadzoneFilterZ(m_joystick->GetZ());
+	return false;
 }
 
 
 bool OperatorInputs::joystickAxis0Left(ToggleChoice choice)
 {
-	double axis = m_joystick->GetRawAxis(JOYSTICK_X_AXIS);
+	if (m_joystick != nullptr)
+	{
+		double axis = m_joystick->GetRawAxis(JOYSTICK_X_AXIS);
 
-	if (choice == kToggle)
-		return toggle("joystickAxis0Left", (AXIS0_LEFT_MIN <= axis && axis <= AXIS0_LEFT_MAX));
-	if (choice == kHold)
-		return (AXIS0_LEFT_MIN <= axis && axis <= AXIS0_LEFT_MAX);
+		if (choice == kToggle)
+			return toggle("joystickAxis0Left", (AXIS0_LEFT_MIN <= axis && axis <= AXIS0_LEFT_MAX));
+		if (choice == kHold)
+			return (AXIS0_LEFT_MIN <= axis && axis <= AXIS0_LEFT_MAX);
+		return false;
+	}
 	return false;
 }
 
 
 bool OperatorInputs::joystickAxis0Right(ToggleChoice choice)
 {
-	double axis = m_joystick->GetRawAxis(JOYSTICK_X_AXIS);
+	if (m_joystick != nullptr)
+	{
+		double axis = m_joystick->GetRawAxis(JOYSTICK_X_AXIS);
 
-	if (choice == kToggle)
-		return toggle("joystickAxis0Right", (AXIS0_RIGHT_MIN <= axis && axis <= AXIS0_RIGHT_MAX));
-	if (choice == kHold)
-		return (AXIS0_RIGHT_MIN <= axis && axis <= AXIS0_RIGHT_MAX);
+		if (choice == kToggle)
+			return toggle("joystickAxis0Right", (AXIS0_RIGHT_MIN <= axis && axis <= AXIS0_RIGHT_MAX));
+		if (choice == kHold)
+			return (AXIS0_RIGHT_MIN <= axis && axis <= AXIS0_RIGHT_MAX);
+		return false;
+	}
 	return false;
 }
 
 
 bool OperatorInputs::joystickAxis1Back(ToggleChoice choice)
 {
-	double axis = m_joystick->GetRawAxis(JOYSTICK_Y_AXIS);
+	if (m_joystick != nullptr)
+	{
+		double axis = m_joystick->GetRawAxis(JOYSTICK_Y_AXIS);
 
-	if (choice == kToggle)
-		return toggle("joystickAxis1Back", (AXIS1_BACK_MIN <= axis && axis <= AXIS1_BACK_MAX));
-	if (choice == kHold)
-		return (AXIS1_BACK_MIN <= axis && axis <= AXIS1_BACK_MAX);
+		if (choice == kToggle)
+			return toggle("joystickAxis1Back", (AXIS1_BACK_MIN <= axis && axis <= AXIS1_BACK_MAX));
+		if (choice == kHold)
+			return (AXIS1_BACK_MIN <= axis && axis <= AXIS1_BACK_MAX);
+		return false;
+	}
 	return false;
 }
 
 
 bool OperatorInputs::joystickAxis1Forward(ToggleChoice choice)
 {
-	double axis = m_joystick->GetRawAxis(JOYSTICK_Y_AXIS);
+	if (m_joystick != nullptr)
+	{
+		double axis = m_joystick->GetRawAxis(JOYSTICK_Y_AXIS);
 
-	if (choice == kToggle)
-		return toggle("joystickAxis1Forward", (AXIS1_FORWARD_MIN <= axis && axis <= AXIS1_FORWARD_MAX));
-	if (choice == kHold)
-		return (AXIS1_FORWARD_MIN <= axis && axis <= AXIS1_FORWARD_MAX);
+		if (choice == kToggle)
+			return toggle("joystickAxis1Forward", (AXIS1_FORWARD_MIN <= axis && axis <= AXIS1_FORWARD_MAX));
+		if (choice == kHold)
+			return (AXIS1_FORWARD_MIN <= axis && axis <= AXIS1_FORWARD_MAX);
+		return false;
+	}
 	return false;
 }
 
 
 bool OperatorInputs::joystickTrigger(ToggleChoice choice)
 {
-	bool button = m_joystick->GetTrigger();
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetTrigger();
 
-	if (choice == kToggle)
-		return toggle("joystickTrigger", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickTrigger", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button2(ToggleChoice choice)
+bool OperatorInputs::joystickButton2(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(2);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(2);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton2", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton2", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button3(ToggleChoice choice)
+bool OperatorInputs::joystickButton3(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(3);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(3);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton3", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton3", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button5(ToggleChoice choice)
+bool OperatorInputs::joystickButton5(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(5);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(5);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton5", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton5", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button6(ToggleChoice choice)
+bool OperatorInputs::joystickButton6(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(6);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(6);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton6", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton6", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button7(ToggleChoice choice)
+bool OperatorInputs::joystickButton7(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(7);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(7);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton7", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton7", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button8(ToggleChoice choice)
+bool OperatorInputs::joystickButton8(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(8);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(8);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton8", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton8", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button9(ToggleChoice choice)
+bool OperatorInputs::joystickButton9(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(9);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(9);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton9", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton9", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
 
-bool OperatorInputs::button10(ToggleChoice choice)
+bool OperatorInputs::joystickButton10(ToggleChoice choice)
 {
-	bool button = m_joystick->GetRawButton(10);
+	if (m_joystick != nullptr)
+	{
+		bool button = m_joystick->GetRawButton(10);
 
-	if (choice == kToggle)
-		return toggle("joystickbutton10", button);
-	if (choice == kHold)
-		return button;
+		if (choice == kToggle)
+			return toggle("joystickbutton10", button);
+		if (choice == kHold)
+			return button;
+		return false;
+	}
 	return false;
 }
 
