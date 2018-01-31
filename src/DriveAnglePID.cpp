@@ -135,7 +135,7 @@ void DriveAnglePID::CheckPIDValues()
 
 double DriveAnglePID::ReturnCurrentPosition()
 {
-	double retval = ((360/(2*3.1415926535))*((m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0)+m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0))*WHEEL_CIRCUMFERENCE*3.1415926535)/(WHEEL_BASE));
+	double retval = ((360/(2*3.1415926535))*((m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0)+m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0))*WHEEL_DIAMETER*3.1415926535)/(WHEEL_TRACK));
 	SmartDashboard::PutNumber("DP02_ontarget", IsDone());
 	SmartDashboard::PutNumber("DP03_angle", retval);
 	return retval;
