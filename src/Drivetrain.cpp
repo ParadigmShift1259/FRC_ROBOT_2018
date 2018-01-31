@@ -56,7 +56,13 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 	m_direction = DT_DEFAULT_DIRECTION;
 
 	m_timerramp = new Timer();
+	m_timerstraight = new Timer();
+	m_distancetargetticks = 0;
+	m_isdrivingstraight = false;
 	m_rampmax = RAMPING_RATE_MAX;
+	m_timermod = 0;
+	m_acceldistance = 0;
+	m_straightstate = kAccel;
 }
 
 
@@ -156,6 +162,13 @@ void DriveTrain::Init(DriveMode mode)
 	m_lowspeedmode = false;
 	m_shift = false;
 	m_direction = DT_DEFAULT_DIRECTION;
+	m_timerstraight->Reset();
+	m_timerstraight->Stop();
+	m_isdrivingstraight = false;
+	m_distancetargetticks = 0;
+	m_timermod = 0;
+	m_acceldistance = 0;
+	m_straightstate = kAccel;
 }
 
 
@@ -431,4 +444,65 @@ double DriveTrain::RightMotor(double &maxpower)
 			rightpow = m_ratiolr * rightpow;
 	}*/
 	return rightpow;
+}
+
+bool DriveTrain::DriveStraight(double distance)
+{
+	double timervalue = m_timerstraight->Get();
+	double greatestdistance = (m_righttalonlead->GetSelectedSensorPosition(0) > m_lefttalonlead->GetSelectedSensorPosition(0)) ?
+			m_righttalonlead->GetSelectedSensorPosition(0) : m_lefttalonlead->GetSelectedSensorPosition(0);
+
+	switch (m_straightstate)
+	{
+	case kAccel:
+		if (timervalue < 0.00001)
+		{
+			m_timermod = 1;
+			m_timerstraight->Start();
+		}
+		if(timervalue > 1)
+		{
+			m_acceldistance = greatestdistance;
+			m_straightstate = kMaintain;
+		}
+		else
+		{
+			if(greatestdistance > distance/2)
+			{
+				m_timermod = timervalue;
+				m_straightstate = kDecel;
+			}
+			m_righttalonlead->Set(timervalue);
+			m_lefttalonlead->Set(timervalue);
+			break;
+		} // @suppress("No break at end of case")
+	case kMaintain:
+		if (distance-greatestdistance <= m_acceldistance)
+		{
+			m_straightstate = kDecel;
+			m_timerstraight->Reset();
+			m_timerstraight->Start();
+			timervalue = 0;
+		}
+		else
+		{
+			m_righttalonlead->Set(1);
+			m_lefttalonlead->Set(1);
+			break;
+		} // @suppress("No break at end of case")
+	case kDecel:
+
+		if(timervalue > m_timermod)
+		{
+			m_righttalonlead->Set(0);
+			m_lefttalonlead->Set(0);
+			return true;
+		}
+		else
+		{
+			m_righttalonlead->Set(m_timermod-timervalue);
+			m_lefttalonlead->Set(m_timermod-timervalue);
+		}
+	}
+	return false;
 }
