@@ -19,7 +19,7 @@
 #include "DrivePID.h"
 
 
-class Robot : public IterativeRobot
+class Robot : public TimedRobot
 {
 public:
 	virtual void RobotInit();

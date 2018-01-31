@@ -18,6 +18,8 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_i = 0.0;
 	m_d = 0.0;
 	m_y = 0.0;
+	m_angle = 0.0;
+	m_enabled = false;
 }
 
 
@@ -78,18 +80,29 @@ void DrivePID::SetY(double y)
 }
 
 
+void DrivePID::SetRelativeAngle(double angle)
+{
+	m_angle = angle;
+	SetSetpointRelative(m_angle);
+}
+
+
 void DrivePID::EnablePID()
 {
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	GetPIDController()->Reset();
 	Enable();
-	SetSetpointRelative(0);
+	m_enabled = true;
 }
 
 
 void DrivePID::DisablePID()
 {
-	Disable();
+	if (m_enabled)
+	{
+		Disable();
+		m_enabled = false;
+	}
 }
 
 

@@ -65,7 +65,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define CAN_RIGHT_PORT 1
 #define CAN_SECOND_RIGHT_PORT 3
 // Shifter
-#define PCM_SHIFT_PORT_LOW 0
+#define PCM_SHIFT_PORT_LOW -1
 #define PCM_SHIFT_MODULE 0
 #define CHILD_PROOF_SPEED 0.75
 #define FLIP_HIGH_GEAR true
@@ -87,7 +87,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Compressor
-#define PCM_COMPRESSOR_SOLENOID 0
+#define PCM_COMPRESSOR_SOLENOID -1
 
 
 // Camera

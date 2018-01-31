@@ -73,6 +73,7 @@ void Robot::AutonomousInit()
 	m_grabber->Init();
 	m_climber->Init();
 	m_drivepid->Init(0.0005, 0.0, 0.0, true);
+	m_drivepid->SetRelativeAngle(90);
 }
 
 
@@ -89,24 +90,7 @@ void Robot::AutonomousPeriodic()
 	}
 */
 //	DriverStation::ReportError("AutonomousPeriodic");
-/*
-	double leftposition = m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0);
-	double rightposition = m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0);
-
-	double distancepos = POSITION_PER_INCH * 12 * 2;
-	SmartDashboard::PutNumber("AU8_distancepos", distancepos);
-
-	double distancetotarget = abs(distancepos) - (abs((leftposition - rightposition) / 2));
-
-	if (distancetotarget <= 0)
-	{
-		m_driveangle->Stop();
-		m_driveangle->Drive(0);
-		m_drivetrain->Drive(0, 0);
-	}
-*/
 	m_drivepid->Drive(-0.5);
-	//m_drivetrain->Drive(0.0, 0.8, false);
 }
 
 
@@ -160,7 +144,7 @@ void Robot::DisabledInit()
 	m_lifter->Stop();
 	m_grabber->Stop();
 	m_climber->Stop();
-	//m_drivepid->Stop();
+	m_drivepid->Stop();
 }
 
 

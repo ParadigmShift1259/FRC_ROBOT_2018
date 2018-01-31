@@ -37,11 +37,15 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 	m_leftposition = 0;
 	m_rightposition = 0;
 
-	m_shifter = new Solenoid(PCM_SHIFT_MODULE, PCM_SHIFT_PORT_LOW);
+	m_shifter = nullptr;
+	if (PCM_SHIFT_PORT_LOW != -1)
+	{
+		m_shifter = new Solenoid(PCM_SHIFT_MODULE, PCM_SHIFT_PORT_LOW);
+		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+	}
 	// Robot starts in low gear
 	m_ishighgear = false;
 	// Starts in low gear
-	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
 	m_isdownshifting = false;
 	m_lowspeedmode = false;
 	m_shift = false;
@@ -70,7 +74,8 @@ DriveTrain::~DriveTrain()
 		delete m_righttalonlead;
 	if ((m_righttalonfollow != nullptr) && m_righttalonfollowowner)
 		delete m_righttalonfollow;
-	delete m_shifter;
+	if (m_shifter != nullptr)
+		delete m_shifter;
 	delete m_timerramp;
 }
 
@@ -151,7 +156,8 @@ void DriveTrain::Init(DriveMode mode)
 	m_timerramp->Start();
 	m_ishighgear = true;
 	// Starts in high gear
-	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+	if (m_shifter != nullptr)
+		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
 	m_isdownshifting = false;
 	m_lowspeedmode = false;
 	m_shift = false;
@@ -232,7 +238,8 @@ void DriveTrain::Loop()
 void DriveTrain::Stop()
 {
 	m_ishighgear = true;
-	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+	if (m_shifter != nullptr)
+		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
 	//Drive(0, 0, false);
 }
 
@@ -341,7 +348,8 @@ void DriveTrain::Shift()
 	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
 	//m_righttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
 	m_ishighgear = !m_ishighgear;
-	m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+	if (m_shifter != nullptr)
+		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
 	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
 	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
 	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);

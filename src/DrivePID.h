@@ -32,6 +32,8 @@ public:
 	void SetI(double i);
 	void SetD(double d);
 	void SetY(double y);
+	void SetRelativeAngle(double angle);
+
 	void EnablePID();
 	void DisablePID();
 	double ReturnPIDInput();
@@ -44,6 +46,8 @@ protected:
 	double m_i;
 	double m_d;
 	double m_y;
+	double m_angle;
+	bool m_enabled;
 };
 
 
