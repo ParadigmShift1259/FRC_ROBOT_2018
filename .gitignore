@@ -54,3 +54,4 @@ local.properties
 .springBeans
 .recommenders/
 /Debug/
+.doxygen/
