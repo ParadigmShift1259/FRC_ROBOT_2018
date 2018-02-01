@@ -9,12 +9,12 @@
 #define SRC_ROBOT_H_
 
 
+#include <Intake.h>
 #include <WPILib.h>
 #include "Const.h"
 #include "OperatorInputs.h"
 #include "Drivetrain.h"
 #include "Lifter.h"
-#include "Grabber.h"
 #include "Climber.h"
 #include "DrivePID.h"
 
@@ -37,7 +37,7 @@ protected:
 	Compressor *m_compressor;
 	DriverStation *m_driverstation;
 	Lifter *m_lifter;
-	Grabber *m_grabber;
+	Intake *m_intake;
 	Climber *m_climber;
 	DrivePID *m_drivepid;
 

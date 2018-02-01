@@ -97,8 +97,8 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Range Finder
-#define DIO_RANGEFINDER_ECHO_OUT 1
-#define DIO_RANGEFINDER_TRIGGER_IN 2
+//#define DIO_RANGEFINDER_ECHO_OUT 1
+//#define DIO_RANGEFINDER_TRIGGER_IN 2
 
 
 // Lifter
@@ -107,9 +107,13 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define LIFTER_MIN 500
 
 
-// Grabber
-#define CAN_GRABBER_LEFTMOTOR -1
-#define CAN_GRABBER_RIGHTMOTOR -1
+// Intake
+#define CAN_INTAKE_LEFTMOTOR -1
+#define CAN_INTAKE_RIGHTMOTOR -1
+#define PCM_INTAKE_MODULE 0
+#define PCM_INTAKE_SOLENOID -1
+#define DIO_INTAKE_CUBESENSOR 0
+
 
 
 // Shooter

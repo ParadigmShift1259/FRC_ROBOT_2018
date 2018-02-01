@@ -19,7 +19,6 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_d = 0.0;
 	m_y = 0.0;
 	m_angle = 0.0;
-	m_enabled = false;
 }
 
 
@@ -92,16 +91,14 @@ void DrivePID::EnablePID()
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	GetPIDController()->Reset();
 	Enable();
-	m_enabled = true;
 }
 
 
 void DrivePID::DisablePID()
 {
-	if (m_enabled)
+	if (GetPIDController()->IsEnabled())
 	{
 		Disable();
-		m_enabled = false;
 	}
 }
 

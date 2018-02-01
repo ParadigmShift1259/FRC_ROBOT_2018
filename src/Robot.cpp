@@ -28,7 +28,7 @@ void Robot::RobotInit()
 	if (PCM_COMPRESSOR_SOLENOID != -1)
 		m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 	m_lifter = new Lifter(m_operatorinputs);
-	m_grabber = new Grabber(m_operatorinputs);
+	m_intake = new Intake(m_operatorinputs);
 	m_climber = new Climber(m_operatorinputs);
 	m_drivepid = new DrivePID(m_drivetrain, m_operatorinputs);
 }
@@ -70,9 +70,9 @@ void Robot::AutonomousInit()
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
-	m_grabber->Init();
+	m_intake->Init();
 	m_climber->Init();
-	m_drivepid->Init(0.0005, 0.0, 0.0, true);
+	m_drivepid->Init(0.0005, 0.0, 0.0);
 	m_drivepid->SetRelativeAngle(90);
 }
 
@@ -101,7 +101,7 @@ void Robot::TestInit()
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
-	m_grabber->Init();
+	m_intake->Init();
 	m_climber->Init();
 }
 
@@ -110,7 +110,7 @@ void Robot::TestPeriodic()
 {
 	m_drivetrain->Loop();
 	m_lifter->Loop();
-	m_grabber->Loop();
+	m_intake->Loop();
 	m_climber->Loop();
 }
 
@@ -122,7 +122,7 @@ void Robot::TeleopInit()
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
-	m_grabber->Init();
+	m_intake->Init();
 	m_climber->Init();
 }
 
@@ -131,7 +131,7 @@ void Robot::TeleopPeriodic()
 {
 	m_drivetrain->Loop();
 	m_lifter->Loop();
-	m_grabber->Loop();
+	m_intake->Loop();
 	m_climber->Loop();
 }
 
@@ -142,7 +142,7 @@ void Robot::DisabledInit()
 		m_compressor->Stop();
 	m_drivetrain->Stop();
 	m_lifter->Stop();
-	m_grabber->Stop();
+	m_intake->Stop();
 	m_climber->Stop();
 	m_drivepid->Stop();
 }

@@ -1,40 +1,49 @@
 /*
- * Grabber.cpp
+ * Intake.cpp
  *
  *  Created on: Jan 20, 2018
  *      Author: Jival
  */
 
-#include "Grabber.h"
+#include <Intake.h>
 #include "Const.h"
 
 
 
-Grabber::Grabber(OperatorInputs *inputs)
+Intake::Intake(OperatorInputs *inputs)
 {
 	m_inputs = inputs;
-	if ((CAN_GRABBER_LEFTMOTOR == -1) || (CAN_GRABBER_RIGHTMOTOR == -1))
+	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
+	if ((CAN_INTAKE_LEFTMOTOR == -1) || (CAN_INTAKE_RIGHTMOTOR == -1))
 	{
 		m_leftmotor = nullptr;
 		m_rightmotor = nullptr;
 	}
 	else
 	{
-		m_leftmotor = new WPI_TalonSRX(CAN_GRABBER_LEFTMOTOR);
+		m_leftmotor = new WPI_TalonSRX(CAN_INTAKE_LEFTMOTOR);
 		m_leftmotor->Set(ControlMode::PercentOutput, 0);
 		m_leftmotor->SetNeutralMode(NeutralMode::Brake);
 
-		m_rightmotor = new WPI_TalonSRX(CAN_GRABBER_RIGHTMOTOR);
+		m_rightmotor = new WPI_TalonSRX(CAN_INTAKE_RIGHTMOTOR);
 		m_rightmotor->Set(ControlMode::PercentOutput, 0);
 		m_rightmotor->SetNeutralMode(NeutralMode::Brake);
+
+	}
+	if (PCM_INTAKE_SOLENOID == -1)
+	{
+		m_solenoid = nullptr;
+	}
+	else
+	{
+		m_solenoid = new Solenoid(PCM_INTAKE_MODULE, PCM_INTAKE_SOLENOID);
 	}
 	m_leftposition = 0;
 	m_rightposition = 0;
 }
 
 
-
-Grabber::~Grabber()
+Intake::~Intake()
 {
 	if (m_leftmotor != nullptr)
 		delete m_leftmotor;
@@ -44,9 +53,9 @@ Grabber::~Grabber()
 }
 
 
-void Grabber::Init()
+void Intake::Init()
 {
-	DriverStation::ReportError("GrabberInit");
+	DriverStation::ReportError("IntakeInit");
 
 	if (m_leftmotor != nullptr)
 		m_leftmotor->StopMotor();
@@ -56,7 +65,7 @@ void Grabber::Init()
 }
 
 
-void Grabber::Loop()
+void Intake::Loop()
 {
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr))
 		return;
@@ -66,7 +75,7 @@ void Grabber::Loop()
 }
 
 
-void Grabber::TestLoop()
+void Intake::TestLoop()
 {
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr))
 		return;
@@ -74,13 +83,13 @@ void Grabber::TestLoop()
 	m_leftposition = m_leftmotor->GetSelectedSensorPosition(0);
 	m_rightposition = m_rightmotor->GetSelectedSensorPosition(0);
 
-	if (m_inputs->xBoxBButton())
+	if (m_inputs->xBoxDPadLeft())
 	{
 		m_leftmotor->Set(0.5);
 		m_rightmotor->Set(0.5);
 	}
 	else
-	if (m_inputs->xBoxAButton())
+	if (m_inputs->xBoxDPadRight())
 	{
 			m_leftmotor->Set(-0.5);
 			m_rightmotor->Set(-0.5);
@@ -95,7 +104,7 @@ void Grabber::TestLoop()
 }
 
 
-void Grabber::Stop()
+void Intake::Stop()
 {
 	if (m_leftmotor != nullptr)
 		m_leftmotor->StopMotor();
@@ -104,7 +113,7 @@ void Grabber::Stop()
 }
 
 
-void Grabber::ResetPosition()
+void Intake::ResetPosition()
 {
 	m_leftposition = 0;
 	m_rightposition = 0;

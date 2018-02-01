@@ -47,7 +47,6 @@ protected:
 	double m_d;
 	double m_y;
 	double m_angle;
-	bool m_enabled;
 };
 
 
