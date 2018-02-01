@@ -24,6 +24,7 @@ Autonomous::~Autonomous()
 
 void Autonomous::Init()
 {
+	DriverStation::ReportError("AutonomousInit");
 	m_drivepid->Init(0.0005, 0.0, 0.0, true);
 	m_drivepid->SetRelativeAngle(90);
 }

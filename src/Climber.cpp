@@ -20,8 +20,6 @@ Climber::Climber(OperatorInputs *inputs)
 		m_motor->Set(ControlMode::PercentOutput, 0);
 		m_motor->SetNeutralMode(NeutralMode::Brake);
 	}
-
-
 }
 
 

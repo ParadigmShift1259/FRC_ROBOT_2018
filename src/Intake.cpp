@@ -50,6 +50,9 @@ Intake::~Intake()
 
 	if (m_rightmotor != nullptr)
 		delete m_rightmotor;
+
+	if (m_solenoid != nullptr)
+		delete m_solenoid;
 }
 
 

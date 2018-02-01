@@ -17,7 +17,7 @@
 class Climber
 {
 public:
-	Climber(OperatorInputs *m_inputs);
+	Climber(OperatorInputs *inputs);
 	virtual ~Climber();
 	void Init();
 	void Loop();
