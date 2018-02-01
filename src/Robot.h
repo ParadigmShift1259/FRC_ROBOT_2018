@@ -16,7 +16,7 @@
 #include "Drivetrain.h"
 #include "Lifter.h"
 #include "Climber.h"
-#include "DrivePID.h"
+#include "Autonomous.h"
 
 
 class Robot : public TimedRobot
@@ -39,7 +39,7 @@ protected:
 	Lifter *m_lifter;
 	Intake *m_intake;
 	Climber *m_climber;
-	DrivePID *m_drivepid;
+	Autonomous *m_autonomous;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

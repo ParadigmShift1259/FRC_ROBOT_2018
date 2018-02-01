@@ -30,7 +30,7 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_operatorinputs);
 	m_intake = new Intake(m_operatorinputs);
 	m_climber = new Climber(m_operatorinputs);
-	m_drivepid = new DrivePID(m_drivetrain, m_operatorinputs);
+	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
 }
 
 
@@ -72,8 +72,7 @@ void Robot::AutonomousInit()
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
-	m_drivepid->Init(0.0005, 0.0, 0.0);
-	m_drivepid->SetRelativeAngle(90);
+	m_autonomous->Init();
 }
 
 
@@ -90,7 +89,7 @@ void Robot::AutonomousPeriodic()
 	}
 */
 //	DriverStation::ReportError("AutonomousPeriodic");
-	m_drivepid->Drive(-0.5);
+	m_autonomous->Loop();
 }
 
 
@@ -144,7 +143,7 @@ void Robot::DisabledInit()
 	m_lifter->Stop();
 	m_intake->Stop();
 	m_climber->Stop();
-	m_drivepid->Stop();
+	m_autonomous->Stop();
 }
 
 
