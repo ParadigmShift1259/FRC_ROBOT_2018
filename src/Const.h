@@ -139,10 +139,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Climber
-#define PWM_CLIMBER_MOTOR 0
-#define PDP_CLIMBER_MOTOR 4
-#define CAN_CLIMBER_MOTOR 7
-#define CAN_PDP 0
+#define CAN_CLIMBER_MOTOR -1
 
 
 // Autonomous
