@@ -25,14 +25,14 @@ Autonomous::~Autonomous()
 void Autonomous::Init()
 {
 	DriverStation::ReportError("AutonomousInit");
-	m_drivepid->Init(0.0005, 0.0, 0.0, true);
+	m_drivepid->Init(0.001, 0.0005, 0.0, true);
 	m_drivepid->SetRelativeAngle(90);
 }
 
 
 void Autonomous::Loop()
 {
-	m_drivepid->Drive(-0.5);
+	//m_drivepid->Drive(-0.5);
 }
 
 

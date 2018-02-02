@@ -12,21 +12,20 @@
 Lifter::Lifter(OperatorInputs *inputs)
 {
 	m_inputs = inputs;
-	if (CAN_LIFTER_MOTOR == -1)
-		m_motor = nullptr;
-	else
+
+	m_motor = nullptr;
+	m_solenoid = nullptr;
+	m_position = 0;
+
+	if (CAN_LIFTER_MOTOR != -1)
 	{
 		m_motor = new WPI_TalonSRX(CAN_LIFTER_MOTOR);
 		m_motor->Set(ControlMode::PercentOutput, 0);
 		m_motor->SetNeutralMode(NeutralMode::Brake);
 	}
 
-	if (PCM_LIFTER_SOLENOID == -1)
-		m_solenoid = nullptr;
-	else
+	if (PCM_LIFTER_SOLENOID != -1)
 		m_solenoid = new Solenoid(PCM_LIFTER_MODULE, PCM_LIFTER_SOLENOID);
-
-	m_position = 0;
 }
 
 
@@ -41,16 +40,19 @@ Lifter::~Lifter()
 
 void Lifter::Init()
 {
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
+		return;
+
 	DriverStation::ReportError("LifterInit");
-	if (m_motor != nullptr)
-		m_motor->StopMotor();
+
+	m_motor->StopMotor();
 	m_solenoid->Set(false);
 }
 
 
 void Lifter::Loop()
 {
-	if (m_motor == nullptr)
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
 		return;
 
 	m_motor->StopMotor();
@@ -59,7 +61,7 @@ void Lifter::Loop()
 
 void Lifter::TestLoop()
 {
-	if (m_motor == nullptr)
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
 		return;
 
 	m_position = m_motor->GetSelectedSensorPosition(0);
@@ -96,13 +98,18 @@ void Lifter::TestLoop()
 
 void Lifter::Stop()
 {
-	if (m_motor != nullptr)
-		m_motor->StopMotor();
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
+		return;
+
+	m_motor->StopMotor();
 }
 
 
 void Lifter::ResetPosition()
 {
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
+		return;
+
 	m_motor->SetSelectedSensorPosition(0, 0, 0);
 	m_position = 0;
 }

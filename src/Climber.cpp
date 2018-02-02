@@ -11,10 +11,11 @@
 
 Climber::Climber(OperatorInputs *inputs)
 {
+	m_motor = nullptr;
+
 	m_inputs = inputs;
-	if (CAN_CLIMBER_MOTOR == -1)
-		m_motor = nullptr;
-	else
+
+	if (CAN_CLIMBER_MOTOR != -1)
 	{
 		m_motor = new WPI_TalonSRX(CAN_CLIMBER_MOTOR);
 		m_motor->Set(ControlMode::PercentOutput, 0);
@@ -32,7 +33,12 @@ Climber::~Climber()
 
 void Climber::Init()
 {
+	if (m_motor == nullptr)
+		return;
+
 	DriverStation::ReportError("ClimberInit");
+
+	m_motor->StopMotor();
 }
 
 
@@ -60,8 +66,8 @@ void Climber::TestLoop()
 
 void Climber::Stop()
 {
-	if (m_motor != nullptr)
-		m_motor->StopMotor();
+	if (m_motor == nullptr)
+		return;
+
+	m_motor->StopMotor();
 }
-
-

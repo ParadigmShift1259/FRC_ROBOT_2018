@@ -12,14 +12,15 @@
 
 Intake::Intake(OperatorInputs *inputs)
 {
+	m_leftmotor = nullptr;
+	m_rightmotor = nullptr;
+	m_solenoid = nullptr;
+	m_leftposition = 0;
+	m_rightposition = 0;
+
 	m_inputs = inputs;
-	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
-	if ((CAN_INTAKE_LEFTMOTOR == -1) || (CAN_INTAKE_RIGHTMOTOR == -1))
-	{
-		m_leftmotor = nullptr;
-		m_rightmotor = nullptr;
-	}
-	else
+
+	if ((CAN_INTAKE_LEFTMOTOR != -1) && (CAN_INTAKE_RIGHTMOTOR != -1))
 	{
 		m_leftmotor = new WPI_TalonSRX(CAN_INTAKE_LEFTMOTOR);
 		m_leftmotor->Set(ControlMode::PercentOutput, 0);
@@ -30,12 +31,11 @@ Intake::Intake(OperatorInputs *inputs)
 		m_rightmotor->SetNeutralMode(NeutralMode::Brake);
 
 	}
-	if (PCM_INTAKE_SOLENOID == -1)
-		m_solenoid = nullptr;
-	else
+
+	if (PCM_INTAKE_SOLENOID != -1)
 		m_solenoid = new Solenoid(PCM_INTAKE_MODULE, PCM_INTAKE_SOLENOID);
-	m_leftposition = 0;
-	m_rightposition = 0;
+
+	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
 }
 
 
@@ -52,19 +52,20 @@ Intake::~Intake()
 
 void Intake::Init()
 {
+	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
+		return;
+
 	DriverStation::ReportError("IntakeInit");
 
-	if (m_leftmotor != nullptr)
-		m_leftmotor->StopMotor();
-	if (m_rightmotor != nullptr)
-		m_rightmotor->StopMotor();
+	m_leftmotor->StopMotor();
+	m_rightmotor->StopMotor();
 	m_solenoid->Set(false);
 }
 
 
 void Intake::Loop()
 {
-	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr))
+	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
 	m_leftmotor->StopMotor();
@@ -74,7 +75,7 @@ void Intake::Loop()
 
 void Intake::TestLoop()
 {
-	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr))
+	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
 	m_leftposition = m_leftmotor->GetSelectedSensorPosition(0);
@@ -110,15 +111,19 @@ void Intake::TestLoop()
 
 void Intake::Stop()
 {
-	if (m_leftmotor != nullptr)
-		m_leftmotor->StopMotor();
-	if (m_rightmotor != nullptr)
-		m_rightmotor->StopMotor();
+	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
+		return;
+
+	m_leftmotor->StopMotor();
+	m_rightmotor->StopMotor();
 }
 
 
 void Intake::ResetPosition()
 {
+	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
+		return;
+
 	m_leftposition = 0;
 	m_rightposition = 0;
 	m_leftmotor->SetSelectedSensorPosition(0, 0, 0);
