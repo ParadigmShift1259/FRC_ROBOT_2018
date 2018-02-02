@@ -47,32 +47,13 @@ void Robot::RobotInit()
  */
 void Robot::AutonomousInit()
 {
-	m_autoSelected = m_chooser.GetSelected();
-	// m_autoSelected = SmartDashboard::GetString(
-	// 		"Auto Selector", kAutoNameDefault);
-	std::cout << "Auto selected: " << m_autoSelected << std::endl;
-
-	if (m_autoSelected == kAutoNameCustom)
-	{
-		// Custom Auto goes here
-	}
-	else
-	{
-		// Default Auto goes here
-	}
+	m_drivetrain->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	if (m_autoSelected == kAutoNameCustom)
-	{
-		// Custom Auto goes here
-	}
-	else
-	{
-		// Default Auto goes here
-	}
+	m_drivetrain->DriveStraight(25000);
 }
 
 

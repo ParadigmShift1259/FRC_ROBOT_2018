@@ -57,6 +57,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define DT_DEFAULT_DIRECTION 1.0
 #define WHEEL_CIRCUMFERENCE 4
 #define WHEEL_BASE 28.825
+#define ACCEL_TIME 1
 // Inverts
 #define INVERT_LEFT -1.0
 #define INVERT_RIGHT 1.0		// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
