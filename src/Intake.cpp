@@ -31,13 +31,9 @@ Intake::Intake(OperatorInputs *inputs)
 
 	}
 	if (PCM_INTAKE_SOLENOID == -1)
-	{
 		m_solenoid = nullptr;
-	}
 	else
-	{
 		m_solenoid = new Solenoid(PCM_INTAKE_MODULE, PCM_INTAKE_SOLENOID);
-	}
 	m_leftposition = 0;
 	m_rightposition = 0;
 }
@@ -47,10 +43,8 @@ Intake::~Intake()
 {
 	if (m_leftmotor != nullptr)
 		delete m_leftmotor;
-
 	if (m_rightmotor != nullptr)
 		delete m_rightmotor;
-
 	if (m_solenoid != nullptr)
 		delete m_solenoid;
 }
@@ -64,7 +58,7 @@ void Intake::Init()
 		m_leftmotor->StopMotor();
 	if (m_rightmotor != nullptr)
 		m_rightmotor->StopMotor();
-
+	m_solenoid->Set(false);
 }
 
 
@@ -86,22 +80,29 @@ void Intake::TestLoop()
 	m_leftposition = m_leftmotor->GetSelectedSensorPosition(0);
 	m_rightposition = m_rightmotor->GetSelectedSensorPosition(0);
 
-	if (m_inputs->xBoxDPadLeft())
+	if (!m_cubesensor->Get() && m_inputs->xBoxBButton())
 	{
 		m_leftmotor->Set(0.5);
 		m_rightmotor->Set(0.5);
 	}
 	else
-	if (m_inputs->xBoxDPadRight())
+	if (m_inputs->xBoxAButton())
 	{
-			m_leftmotor->Set(-0.5);
-			m_rightmotor->Set(-0.5);
+		m_leftmotor->Set(-0.5);
+		m_rightmotor->Set(-0.5);
 	}
 	else
 	{
 		m_leftmotor->StopMotor();
 		m_rightmotor->StopMotor();
 	}
+
+	if (m_inputs->xBoxDPadLeft())
+		m_solenoid->Set(true);
+	else
+	if (m_inputs->xBoxDPadRight())
+		m_solenoid->Set(false);
+
 	SmartDashboard::PutNumber("L1_left_position", m_leftposition);
 	SmartDashboard::PutNumber("L2_right_position", m_rightposition);
 }

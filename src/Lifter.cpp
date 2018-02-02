@@ -20,6 +20,12 @@ Lifter::Lifter(OperatorInputs *inputs)
 		m_motor->Set(ControlMode::PercentOutput, 0);
 		m_motor->SetNeutralMode(NeutralMode::Brake);
 	}
+
+	if (PCM_LIFTER_SOLENOID == -1)
+		m_solenoid = nullptr;
+	else
+		m_solenoid = new Solenoid(PCM_LIFTER_MODULE, PCM_LIFTER_SOLENOID);
+
 	m_position = 0;
 }
 
@@ -28,6 +34,8 @@ Lifter::~Lifter()
 {
 	if (m_motor != nullptr)
 		delete m_motor;
+	if (m_solenoid != nullptr)
+		delete m_solenoid;
 }
 
 
@@ -36,6 +44,7 @@ void Lifter::Init()
 	DriverStation::ReportError("LifterInit");
 	if (m_motor != nullptr)
 		m_motor->StopMotor();
+	m_solenoid->Set(false);
 }
 
 
@@ -74,6 +83,12 @@ void Lifter::TestLoop()
 	{
 		m_motor->StopMotor();
 	}
+
+	if (m_inputs->xBoxDPadUp())
+		m_solenoid->Set(true);
+	else
+	if (m_inputs->xBoxDPadDown())
+		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("L1_position", m_position);
 }

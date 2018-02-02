@@ -105,6 +105,8 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define CAN_LIFTER_MOTOR -1
 #define LIFTER_MAX 20000
 #define LIFTER_MIN 500
+#define PCM_LIFTER_MODULE 0
+#define PCM_LIFTER_SOLENOID -1
 
 
 // Intake
