@@ -1,11 +1,21 @@
-#include <Autonomous.h>
+/*
+ * Autonomous.cpp
+ *
+ *  Created on: Jan 20, 2018
+ *      Author: Matt
+ */
+
+#include "Autonomous.h"
+#include "Const.h"
 #include <cmath>
+
 
 Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 {
 	m_inputs = inputs;
 	m_drivetrain = drivetrain;
 	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
+
 	m_timerstraight = new Timer();
 	m_timerstraight->Reset();
 
@@ -17,7 +27,8 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 
 Autonomous::~Autonomous()
 {
-
+	delete m_drivepid;
+	delete m_timerstraight;
 }
 
 
@@ -32,14 +43,17 @@ void Autonomous::Init()
 	m_timermod = ACCEL_TIME;
 	m_timerstraight->Start();
 	m_timerstraight->Reset();
-	m_drivepid->Init(0.001, 0.0005, 0.0, true);
-	m_drivepid->SetRelativeAngle(90);
+
+	m_drivepid->Init(0.001, 0.0005, 0.0, true);			//Make Constants in future
 }
+
 
 void Autonomous::Loop()
 {
-	DriveStraight(SmartDashboard::GetNumber("AutoDistance",0));
+	//DriveStraight(SmartDashboard::GetNumber("AutoDistance",0));
+	m_drivepid->Drive(-0.5);
 }
+
 
 /*!
  * Drives straight the specified number of ticks and returns true when the function is done.
@@ -48,11 +62,13 @@ void Autonomous::Loop()
  */
 bool Autonomous::DriveStraight(double targetdistance)
 {
-	SmartDashboard::PutNumber("LeftEncoder",m_drivetrain->LeftTalonPosition());
-	SmartDashboard::PutNumber("RightEncoder",m_drivetrain->RightTalonPosition());
-	double timervalue = m_timerstraight->Get(); //!<Stores the current timer value
-	double greatestdistance = abs((abs(m_drivetrain->RightTalonPosition()) > abs(m_drivetrain->LeftTalonPosition())) ?
-			m_drivetrain->RightTalonPosition() : m_drivetrain->LeftTalonPosition()); //!< Stores the absolute value of the greatest encoder distance
+	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition());
+	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition());
+
+	double timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value
+
+	double greatestdistance = abs((abs(m_drivetrain->GetRightPosition()) > abs(m_drivetrain->GetLeftPosition())) ?
+			m_drivetrain->GetRightPosition() : m_drivetrain->GetLeftPosition()); //!< Stores the absolute value of the greatest encoder distance
 
 	switch (m_straightstate)
 	{
@@ -61,16 +77,16 @@ bool Autonomous::DriveStraight(double targetdistance)
 	 * 1/3rd the target distance is reached in which case kDecel is moved into
 	 */
 	case kStart:
+		m_drivepid->EnablePID();
 		m_timerstraight->Start();
-		m_drivetrain->LeftTalonLead()->SetSelectedSensorPosition(0, 0, 0);
-		m_drivetrain->RightTalonLead()->SetSelectedSensorPosition(0, 0, 0);
-		m_drivetrain->LeftTalonLead()->SetNeutralMode(NeutralMode::Brake);
-		m_drivetrain->RightTalonLead()->SetNeutralMode(NeutralMode::Brake);
+		m_drivetrain->ResetLeftPosition();
+		m_drivetrain->ResetRightPosition();
 		m_straightstate = kAccel;
 		m_timermod = ACCEL_TIME; // @suppress("No break at end of case")
+
 	case kAccel:
 		//If acceleration has reached max time
-		if((((int)(timervalue*50))/50.0) > ACCEL_TIME)
+		if (timervalue > ACCEL_TIME)			//Quantizes the timer value into increments of 20ms
 		{
 			m_acceldistance = greatestdistance;
 			m_straightstate = kMaintain;
@@ -81,7 +97,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 		else
 		{
 			//Handles the case where a triangle acceleration is required
-			if(greatestdistance > targetdistance/3)
+			if (greatestdistance > targetdistance/3)
 			{
 				m_timermod = timervalue;
 				m_timerstraight->Reset();
@@ -90,10 +106,12 @@ bool Autonomous::DriveStraight(double targetdistance)
 			}
 			else
 			{
-				m_drivetrain->Drive(0,-1*(((int)(timervalue*50))/50.0)/ACCEL_TIME,false);
+//				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME);
+				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
 				break;
 			}
 		} // @suppress("No break at end of case")
+
 		/*
 		 * Maintaines top speed until 2x the acceldistance away from targetdistance
 		 */
@@ -108,26 +126,31 @@ bool Autonomous::DriveStraight(double targetdistance)
 		}
 		else
 		{
-			m_drivetrain->Drive(0,-1,false);
+//			m_drivepid->Drive(-1);
+			m_drivetrain->Drive(0, -1, false);
 			break;
 		} // @suppress("No break at end of case")
+
 		/*
 		 * Decelerates over the course of ACCEL_TIME which happens to be about
 		 * 2x the acceleration distance
 		 */
 	case kDecel:
-		if((((int)(timervalue*50))/50.0) > m_timermod)
+		if (timervalue > m_timermod)
 		{
-			m_drivetrain->Drive(0,0,false);
+//			m_drivepid->Drive(0);
+			m_drivetrain->Drive(0, 0, false);
 			return true;
 		}
 		else
 		{
-			m_drivetrain->Drive(0,-1*(m_timermod-(((int)(timervalue*50))/50.0))/ACCEL_TIME,false);
+//			m_drivepid->Drive(-1 * (m_timermod - timervalue) / ACCEL_TIME);
+			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
 		}
 	}
 	return false;
 }
+
 
 void Autonomous::Stop()
 {

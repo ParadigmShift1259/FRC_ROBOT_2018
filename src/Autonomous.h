@@ -1,10 +1,8 @@
 #ifndef SRC_AUTONOMOUS_H_
 #define SRC_AUTONOMOUS_H_
 
-
-#include <Drivetrain.h>
 #include <WPILib.h>
-#include "Const.h"
+#include "Drivetrain.h"
 #include "OperatorInputs.h"
 #include "DrivePID.h"
 
@@ -12,6 +10,8 @@
 class Autonomous
 {
 public:
+	enum DriveStraightState {kStart, kAccel, kMaintain, kDecel};
+
 	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain);
 	virtual ~Autonomous();
 	void Init();
@@ -25,9 +25,7 @@ protected:
 	OperatorInputs *m_inputs;
 	DrivePID *m_drivepid;
 
-	enum DriveStraightState {kStart, kAccel, kMaintain, kDecel};
 	DriveStraightState m_straightstate;
-
 	double m_acceldistance;
 	double m_timermod;
 };

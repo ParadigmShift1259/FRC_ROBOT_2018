@@ -37,8 +37,10 @@ public:
 	void setRamp(double newValue) {m_rampmax = newValue;}
 	bool getIsHighGear() {return m_ishighgear;}
 
-	double LeftTalonPosition();
-	double RightTalonPosition();
+	double GetLeftPosition() {return m_lefttalonlead->GetSelectedSensorPosition(0);}
+	double GetRightPosition() {return m_righttalonlead->GetSelectedSensorPosition(0);}
+	void ResetLeftPosition() {m_lefttalonlead->SetSelectedSensorPosition(0,0,0);}
+	void ResetRightPosition() {m_righttalonlead->SetSelectedSensorPosition(0,0,0);}
 
 	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
 	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}

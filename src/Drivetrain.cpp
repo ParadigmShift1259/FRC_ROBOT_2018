@@ -440,13 +440,3 @@ double DriveTrain::RightMotor(double &maxpower)
 	}*/
 	return rightpow;
 }
-
-double DriveTrain::LeftTalonPosition()
-{
-	return m_lefttalonlead->GetSelectedSensorPosition(0);
-}
-
-double DriveTrain::RightTalonPosition()
-{
-	return m_righttalonlead->GetSelectedSensorPosition(0);
-}

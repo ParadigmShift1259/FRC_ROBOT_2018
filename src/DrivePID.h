@@ -25,9 +25,6 @@ public:
 	void Drive(double y);
 	void Stop();
 
-	void EnableAnglePID();
-	void DisableAnglePID();
-
 	void SetP(double p);
 	void SetI(double i);
 	void SetD(double d);
