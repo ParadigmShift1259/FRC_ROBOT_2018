@@ -81,13 +81,13 @@ void Intake::TestLoop()
 	m_leftposition = m_leftmotor->GetSelectedSensorPosition(0);
 	m_rightposition = m_rightmotor->GetSelectedSensorPosition(0);
 
-	if (!m_cubesensor->Get() && m_inputs->xBoxBButton())
+	if (!m_cubesensor->Get() && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))		/// ingest cube - positive
 	{
 		m_leftmotor->Set(0.5);
 		m_rightmotor->Set(0.5);
 	}
 	else
-	if (m_inputs->xBoxAButton())
+	if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold))		/// eject cube - negative
 	{
 		m_leftmotor->Set(-0.5);
 		m_rightmotor->Set(-0.5);
@@ -98,10 +98,10 @@ void Intake::TestLoop()
 		m_rightmotor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadLeft())
+	if (m_inputs->xBoxDPadLeft())		/// open intake - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadRight())
+	if (m_inputs->xBoxDPadRight())		/// close intake - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("L1_left_position", m_leftposition);

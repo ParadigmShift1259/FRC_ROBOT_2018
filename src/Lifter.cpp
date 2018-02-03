@@ -66,7 +66,7 @@ void Lifter::TestLoop()
 
 	m_position = m_motor->GetSelectedSensorPosition(0);
 
-	if (m_inputs->xBoxYButton())
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold))		/// raise lifter - positive
 	{
 		if (m_position < LIFTER_MAX)
 			m_motor->Set(0.5);
@@ -74,7 +74,7 @@ void Lifter::TestLoop()
 			m_motor->StopMotor();
 	}
 	else
-	if (m_inputs->xBoxXButton())
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold))		/// lower lifter - negative
 	{
 		if (m_position > LIFTER_MIN)
 			m_motor->Set(-0.5);
@@ -86,10 +86,10 @@ void Lifter::TestLoop()
 		m_motor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadUp())
+	if (m_inputs->xBoxDPadUp())		/// angle lifter - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadDown())
+	if (m_inputs->xBoxDPadDown())		/// straighten lifter - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("L1_position", m_position);
