@@ -5,7 +5,7 @@
  */
 
 
-#include "DriveTrain.h"
+#include <DriveTrain.h>
 #include "Const.h"
 
 
@@ -56,13 +56,7 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 	m_direction = DT_DEFAULT_DIRECTION;
 
 	m_timerramp = new Timer();
-	m_timerstraight = new Timer();
-	m_distancetargetticks = 0;
-	m_isdrivingstraight = false;
 	m_rampmax = RAMPING_RATE_MAX;
-	m_timermod = 0;
-	m_acceldistance = 0;
-	m_straightstate = kAccel;
 }
 
 
@@ -162,13 +156,6 @@ void DriveTrain::Init(DriveMode mode)
 	m_lowspeedmode = false;
 	m_shift = false;
 	m_direction = DT_DEFAULT_DIRECTION;
-	m_timerstraight->Reset();
-	m_timerstraight->Stop();
-	m_isdrivingstraight = false;
-	m_distancetargetticks = 0;
-	m_timermod = 0;
-	m_acceldistance = 0;
-	m_straightstate = kAccel;
 }
 
 
@@ -446,96 +433,12 @@ double DriveTrain::RightMotor(double &maxpower)
 	return rightpow;
 }
 
-/*!
- * Drives straight the specified number of ticks and returns true when the function is done.
- * not guarenteed to be perfectly accurate but is pretty close. Will not try to target after
- * done with the state machine and will hold the incorrect value.
- */
-bool DriveTrain::DriveStraight(double targetdistance)
+double DriveTrain::LeftTalonPosition()
 {
-	SmartDashboard::PutNumber("LeftEncoder",m_lefttalonlead->GetSelectedSensorPosition(0));
-	SmartDashboard::PutNumber("RightEncoder",m_righttalonlead->GetSelectedSensorPosition(0));
-	double timervalue = m_timerstraight->Get(); //!<Stores the current timer value
-	double greatestdistance = fabs((fabs(m_righttalonlead->GetSelectedSensorPosition(0)) > fabs(m_lefttalonlead->GetSelectedSensorPosition(0))) ?
-			m_righttalonlead->GetSelectedSensorPosition(0) : m_lefttalonlead->GetSelectedSensorPosition(0)); //!< Stores the absolute value of the greatest encoder distance
+	return m_lefttalonlead->GetSelectedSensorPosition(0);
+}
 
-	switch (m_straightstate)
-	{
-	/*
-	 * Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain unless
-	 * 1/3rd the target distance is reached in which case kDecel is moved into
-	 */
-	case kAccel:
-		if (timervalue < 0.00001)
-		{
-			m_timermod = ACCEL_TIME;
-			m_timerstraight->Start();
-			m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
-			m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
-			m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
-			m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
-		}
-
-		//If acceleration has reached max time
-		if(timervalue > ACCEL_TIME)
-		{
-			m_acceldistance = greatestdistance;
-			m_straightstate = kMaintain;
-			m_timerstraight->Reset();
-			m_timerstraight->Start();
-			SmartDashboard::PutNumber("StopAccel", greatestdistance);
-		}
-		else
-		{
-			//Handles the case where a triangle acceleration is required
-			if(greatestdistance > targetdistance/3)
-			{
-				m_timermod = timervalue;
-				m_timerstraight->Reset();
-				m_timerstraight->Start();
-				m_straightstate = kDecel;
-			}
-			else
-			{
-				m_righttalonlead->Set(timervalue/ACCEL_TIME);
-				m_lefttalonlead->Set(-timervalue/ACCEL_TIME);
-				break;
-			}
-		} // @suppress("No break at end of case")
-		/*
-		 * Maintaines top speed until 2x the acceldistance away from targetdistance
-		 */
-	case kMaintain:
-		if (targetdistance-greatestdistance <= m_acceldistance*2)
-		{
-			m_straightstate = kDecel;
-			m_timerstraight->Reset();
-			m_timerstraight->Start();
-			timervalue = 0;
-			SmartDashboard::PutNumber("StartDecel", greatestdistance);
-		}
-		else
-		{
-			m_righttalonlead->Set(1);
-			m_lefttalonlead->Set(-1);
-			break;
-		} // @suppress("No break at end of case")
-		/*
-		 * Decelerates over the course of ACCEL_TIME which happens to be about
-		 * 2x the acceleration distance
-		 */
-	case kDecel:
-		if(timervalue > m_timermod)
-		{
-			m_righttalonlead->Set(0);
-			m_lefttalonlead->Set(0);
-			return true;
-		}
-		else
-		{
-			m_righttalonlead->Set((m_timermod-timervalue)/ACCEL_TIME);
-			m_lefttalonlead->Set((-1)*((m_timermod-timervalue)/ACCEL_TIME));
-		}
-	}
-	return false;
+double DriveTrain::RightTalonPosition()
+{
+	return m_righttalonlead->GetSelectedSensorPosition(0);
 }

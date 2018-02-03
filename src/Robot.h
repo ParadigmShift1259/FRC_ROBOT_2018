@@ -9,10 +9,11 @@
 #define SRC_ROBOT_H_
 
 
+#include <DriveTrain.h>
 #include <WPILib.h>
+#include "Autonomous.h"
 #include "Const.h"
 #include "OperatorInputs.h"
-#include "Drivetrain.h"
 #include "Lifter.h"
 #include "Grabber.h"
 #include "Climber.h"
@@ -31,6 +32,7 @@ public:
 	virtual void DisabledInit();
 
 protected:
+	Autonomous * m_auto;
 	OperatorInputs *m_operatorinputs;
 	DriveTrain *m_drivetrain;
 	Compressor *m_compressor;

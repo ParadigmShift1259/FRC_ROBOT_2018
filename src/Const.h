@@ -77,7 +77,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define RAMPING_RATE_MAX 4
 #define X_SCALING 1.0
 #define Y_SCALING 1.0
-#define LEFT_MOTOR_SCALING 1
+#define LEFT_MOTOR_SCALING 0.9915
 #define RIGHT_MOTOR_SCALING 1
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25

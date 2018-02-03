@@ -28,6 +28,7 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_operatorinputs);
 	m_grabber = new Grabber(m_operatorinputs);
 	m_climber = new Climber(m_operatorinputs);
+	m_auto = new Autonomous(m_drivetrain);
 }
 
 
@@ -48,12 +49,13 @@ void Robot::RobotInit()
 void Robot::AutonomousInit()
 {
 	m_drivetrain->Init();
+	m_auto->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	m_drivetrain->DriveStraight(25000);
+	m_auto->Loop();
 }
 
 

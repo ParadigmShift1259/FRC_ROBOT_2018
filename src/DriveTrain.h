@@ -34,11 +34,13 @@ public:
 	double LeftMotor(double &invMaxValueXPlusY);
 	double RightMotor(double &invMaxValueXPlusY);
 
-	bool DriveStraight(double distance);
-
 	void setCoasting(double newCoasting) {m_coasting = newCoasting;}
 	void setRamp(double newValue) {m_rampmax = newValue;}
 	bool getIsHighGear() {return m_ishighgear;}
+
+	double LeftTalonPosition();
+	double RightTalonPosition();
+
 	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
 	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
 	WPI_TalonSRX *LeftTalonFollow() {return m_lefttalonfollow;}
@@ -60,9 +62,6 @@ protected:
 	DifferentialDrive *m_differentialdrive;
 	Solenoid *m_shifter;
 	Timer *m_timerramp;
-	Timer *m_timerstraight; //!<Used for DriveStraight
-	enum DriveStraightState {kAccel, kMaintain, kDecel};
-	DriveStraightState m_straightstate;
 
 	double m_leftpow;
 	double m_rightpow;
@@ -83,11 +82,6 @@ protected:
 	bool m_isdownshifting;
 	bool m_lowspeedmode;
 	bool m_shift;
-
-	bool m_isdrivingstraight;
-	double m_distancetargetticks;
-	double m_acceldistance;
-	double m_timermod;
 };
 
 
