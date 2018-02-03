@@ -22,7 +22,7 @@ public:
 	DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs);
 	~DrivePID();
 	void Init(double p = 0, double i = 0, double d = 0, bool enable = false);
-	void Drive(double y);
+	void Drive(double y, bool ramp = false);
 	void Stop();
 
 	void SetP(double p);
@@ -43,6 +43,7 @@ protected:
 	double m_i;
 	double m_d;
 	double m_y;
+	double m_ramp;
 	double m_angle;
 };
 

@@ -9,10 +9,6 @@
 #define SRC_CONST_H_
 
 
-// autonomous modes
-enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShootGear, kAutoOldBlueShoot, kAutoOldLeftGear, kAutoOldRedShoot, kAutoOldRightGear, kAutoShootOnly, kAutoStraightGear, kAutoStraightShootGear };
-
-
 //OperatorInputs
 //	Controllers
 #define INP_JOYSTICK -1
@@ -56,9 +52,6 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 // Drivetrain
 #define DT_DEFAULT_DIRECTION 1.0
-#define WHEEL_CIRCUMFERENCE 4
-#define WHEEL_BASE 28.825
-#define ACCEL_TIME 1
 // Inverts
 #define INVERT_LEFT -1.0
 #define INVERT_RIGHT 1.0		// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
@@ -88,19 +81,9 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define WHEEL_DIAMETER 6
 #define WHEEL_TRACK 22.50
 
+
 // Compressor
 #define PCM_COMPRESSOR_SOLENOID -1
-
-
-// Camera
-#define USB_CAMERA_FRONT "cam1"
-#define USB_CAMERA_REAR "cam0"
-#define RLY_CAMERA_LED 0
-
-
-// Range Finder
-//#define DIO_RANGEFINDER_ECHO_OUT 1
-//#define DIO_RANGEFINDER_TRIGGER_IN 2
 
 
 // Lifter
@@ -120,50 +103,12 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 
-// Shooter
-//#define PCM_SHOOTER_SOLENOID 2
-
-#define CAN_SHOOTER_MOTOR 4
-/*#define DIO_SHOOTER_LIMIT_DOWN 2
-#define DIO_SHOOTER_MOTOR_A 3
-#define DIO_SHOOTER_MOTOR_B 4*/
-#define CAN_FEED_MOTOR 5
-#define CAN_SHOOTER_P 0.055
-#define CAN_SHOOTER_I 0.0005
-#define CAN_SHOOTER_D 1.5
-#define CAN_SHOOTER_F 0.027
-#define CAN_SHOOTER_ENCODER_TICKS 4096
-#define SD_SHOOTER_SLIDER_DEFAULT 2.5
-#define SHOOTER_SLIDER_TO_RPM -600.0
-#define SHOOTER_RADIUS 0.0508
-#define SHOOTER_LOW_RPM 300
-#define SHOOTER_SHOOT_RPM 881
-#define SHOOTER_DIRECTION 1
-#define SHOOTER_ERROR_RPM 20
-
-
-//Feeder
-#define FEEDER_DIRECTION -1
-
-
 // Climber
 #define CAN_CLIMBER_MOTOR -1
 
 
 // Autonomous
-#define ALG_AUTONOMOUS_GYRO 0
-
-
-// Auger
-#define AUGER_CHANNEL 16 //Auger
-#define AUGER_POWER 1
-#define AUGER_RAMP 0.1
-#define AUGER_ON_TIME 1
-#define AUGER_OFF_TIME .5
-
-
-// Flipper
-#define PWM_FLIPPER_SOLENOID 1
+#define ACCEL_TIME 1
 
 
 #endif /* SRC_CONST_H_ */

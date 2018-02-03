@@ -18,6 +18,7 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_i = 0.0;
 	m_d = 0.0;
 	m_y = 0.0;
+	m_ramp = false;
 	m_angle = 0.0;
 }
 
@@ -46,9 +47,10 @@ void DrivePID::Stop()
 }
 
 
-void DrivePID::Drive(double y)
+void DrivePID::Drive(double y, bool ramp)
 {
 	SetY(y);
+	m_ramp = ramp;
 }
 
 
@@ -122,5 +124,5 @@ double DrivePID::ReturnPIDInput()
 
 void DrivePID::UsePIDOutput(double output)
 {
-	m_drivetrain->Drive(output, m_y, false);
+	m_drivetrain->Drive(output, m_y, m_ramp);
 }
