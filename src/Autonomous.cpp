@@ -50,8 +50,8 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	//DriveStraight(SmartDashboard::GetNumber("AutoDistance",0));
-	m_drivepid->Drive(-0.5);
+	DriveStraight(SmartDashboard::GetNumber("AutoDistance",0));
+	//m_drivepid->Drive(-0.5);
 }
 
 
@@ -77,12 +77,14 @@ bool Autonomous::DriveStraight(double targetdistance)
 	 * 1/3rd the target distance is reached in which case kDecel is moved into
 	 */
 	case kStart:
-		m_drivepid->EnablePID();
-		m_timerstraight->Start();
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
+		Wait(0.25);
+		m_drivepid->EnablePID();
+		m_timerstraight->Start();
 		m_straightstate = kAccel;
-		m_timermod = ACCEL_TIME; // @suppress("No break at end of case")
+		m_timermod = ACCEL_TIME;
+		greatestdistance = 0.0;		// @suppress("No break at end of case")
 
 	case kAccel:
 		//If acceleration has reached max time
@@ -106,8 +108,8 @@ bool Autonomous::DriveStraight(double targetdistance)
 			}
 			else
 			{
-//				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME);
-				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
+				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME);
+//				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
 				break;
 			}
 		} // @suppress("No break at end of case")
@@ -126,8 +128,8 @@ bool Autonomous::DriveStraight(double targetdistance)
 		}
 		else
 		{
-//			m_drivepid->Drive(-1);
-			m_drivetrain->Drive(0, -1, false);
+			m_drivepid->Drive(-1);
+//			m_drivetrain->Drive(0, -1, false);
 			break;
 		} // @suppress("No break at end of case")
 
@@ -138,14 +140,14 @@ bool Autonomous::DriveStraight(double targetdistance)
 	case kDecel:
 		if (timervalue > m_timermod)
 		{
-//			m_drivepid->Drive(0);
-			m_drivetrain->Drive(0, 0, false);
+			m_drivepid->Drive(0);
+//			m_drivetrain->Drive(0, 0, false);
 			return true;
 		}
 		else
 		{
-//			m_drivepid->Drive(-1 * (m_timermod - timervalue) / ACCEL_TIME);
-			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
+			m_drivepid->Drive(-1 * (m_timermod - timervalue) / ACCEL_TIME);
+//			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
 		}
 	}
 	return false;
