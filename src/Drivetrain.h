@@ -39,8 +39,7 @@ public:
 
 	double GetLeftPosition() {return m_lefttalonlead->GetSelectedSensorPosition(0);}
 	double GetRightPosition() {return m_righttalonlead->GetSelectedSensorPosition(0);}
-	void ResetLeftPosition() {m_lefttalonlead->SetSelectedSensorPosition(0,0,0);}
-	void ResetRightPosition() {m_righttalonlead->SetSelectedSensorPosition(0,0,0);}
+	void ResetPositions();
 	double GetLeftDistance();
 	double GetRightDistance();
 

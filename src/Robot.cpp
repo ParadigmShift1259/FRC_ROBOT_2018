@@ -30,7 +30,6 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_operatorinputs);
 	m_intake = new Intake(m_operatorinputs);
 	m_climber = new Climber(m_operatorinputs);
-
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
 }
 
@@ -54,22 +53,18 @@ void Robot::AutonomousInit()
 	DriverStation::ReportError("AutonomousInit");
 
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
-	m_autonomous->Init();
-
 	if (m_compressor != nullptr)
 		m_compressor->Start();
-
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
+	m_autonomous->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-
 	m_autonomous->Loop();
-
 }
 
 

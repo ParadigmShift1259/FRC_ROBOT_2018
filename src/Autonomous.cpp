@@ -16,45 +16,87 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 	m_drivetrain = drivetrain;
 	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
 
-	m_timerstraight = new Timer();
-	m_timerstraight->Reset();
+	m_stage = kIdle;
 
-	m_straightstate = kStart;
-	m_distance = 0;
-	m_acceldistance = 0;
-	m_timermod = ACCEL_TIME;
+//	m_timerstraight = new Timer();
+//	m_timerstraight->Reset();
+
+//	m_straightstate = kStart;
+//	m_distance = 0;
+//	m_acceldistance = 0;
+//	m_timermod = ACCEL_TIME;
 }
 
 
 Autonomous::~Autonomous()
 {
 	delete m_drivepid;
-	delete m_timerstraight;
+//	delete m_timerstraight;
 }
 
 
 void Autonomous::Init()
 {
-	DriverStation::ReportError("AutonomousInit");
+//	if (SmartDashboard::GetNumber("AutoDistance", 0) == 0)
+//		SmartDashboard::PutNumber("AutoDistance", 150);
 
-	if (SmartDashboard::GetNumber("AutoDistance", 0) == 0)
-		SmartDashboard::PutNumber("AutoDistance", 150);
+//	m_straightstate = kStart;
+//	m_distance = SmartDashboard::GetNumber("AutoDistance", 0);
+//	m_acceldistance = 0;
+//	m_timermod = ACCEL_TIME;
+//	m_timerstraight->Reset();
+//	m_timerstraight->Start();
 
-	m_straightstate = kStart;
-	m_distance = SmartDashboard::GetNumber("AutoDistance", 0);
-	m_acceldistance = 0;
-	m_timermod = ACCEL_TIME;
-	m_timerstraight->Reset();
-	m_timerstraight->Start();
-
-	m_drivepid->Init(0.003, 0.0005, 0.0, true);			//Make Constants in future
+	m_stage = kStraight;
+	m_drivetrain->ResetPositions();
+	m_drivepid->Init(0.001, 0.0005, 0.0, true);			//Make Constants in future
 }
 
 
 void Autonomous::Loop()
 {
-	DriveStraight(35000);
+	switch (m_stage)
+	{
+		kIdle:
+			break;
+
+		kStraight:
+			if (GoStraight(60, -0.5))
+				m_stage = kIdle;
+			break;
+
+		kTurn:
+			break;
+	};
+//	DriveStraight(35000);
 //	m_drivepid->Drive(-0.7,true);
+}
+
+
+bool Autonomous::GoStraight(double inches, double power)
+{
+	double leftdistance = m_drivetrain->GetLeftDistance();
+	double rightdistance = m_drivetrain->GetRightDistance();
+
+	double distance = inches;
+
+	double distancetotarget = abs(distance) - (abs((leftdistance - rightdistance) / 2));
+
+	if (distancetotarget <= (0.5 * abs(distance)))
+		power = 0.25 * (power/abs(power));
+
+	SmartDashboard::PutNumber("AU1_distance", distancetotarget);
+	SmartDashboard::PutNumber("AU2_power", power);
+
+	if (distancetotarget <= 5)
+	{
+		m_drivepid->Stop();
+		m_drivepid->Drive(0);
+		m_drivetrain->Drive(0, 0);
+		return true;
+	}
+	m_drivepid->Drive(power, true);
+	return false;
 }
 
 
@@ -63,6 +105,7 @@ void Autonomous::Loop()
  * not guarenteed to be perfectly accurate but is pretty close. Will not try to target after
  * done with the state machine and will hold the incorrect value.
  */
+/*
 bool Autonomous::DriveStraight(double targetdistance)
 {
 	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition());
@@ -76,10 +119,10 @@ bool Autonomous::DriveStraight(double targetdistance)
 
 	switch (m_straightstate)
 	{
-	/*
-	 * Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain unless
-	 * 1/3rd the target distance is reached in which case kDecel is moved into
-	 */
+	//
+	// Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain unless
+	// 1/3rd the target distance is reached in which case kDecel is moved into
+	//
 	case kStart:
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
@@ -118,9 +161,9 @@ bool Autonomous::DriveStraight(double targetdistance)
 			}
 		} // @suppress("No break at end of case")
 
-		/*
-		 * Maintaines top speed until 2x the acceldistance away from targetdistance
-		 */
+		//
+		// Maintaines top speed until 2x the acceldistance away from targetdistance
+		//
 	case kMaintain:
 		if ((targetdistance - distance) <= 17000)
 		{
@@ -137,10 +180,10 @@ bool Autonomous::DriveStraight(double targetdistance)
 			break;
 		} // @suppress("No break at end of case")
 
-		/*
-		 * Decelerates over the course of ACCEL_TIME which happens to be about
-		 * 2x the acceleration distance
-		 */
+		//
+		// Decelerates over the course of ACCEL_TIME which happens to be about
+		// 2x the acceleration distance
+		//
 	case kDecel:
 		if ((timervalue > m_timermod) || (distance > (targetdistance - 4)))
 		{
@@ -158,6 +201,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 	}
 	return false;
 }
+*/
 
 
 void Autonomous::Stop()

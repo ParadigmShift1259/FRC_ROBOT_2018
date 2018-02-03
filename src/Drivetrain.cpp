@@ -442,6 +442,14 @@ double DriveTrain::RightMotor(double &maxpower)
 }
 
 
+void DriveTrain::ResetPositions()
+{
+	 m_lefttalonlead->SetSelectedSensorPosition(0,0,0);
+	 m_righttalonlead->SetSelectedSensorPosition(0,0,0);
+	 Wait(0.1);
+}
+
+
 double DriveTrain::GetLeftDistance()
 {
 	double distance = GetLeftPosition();
