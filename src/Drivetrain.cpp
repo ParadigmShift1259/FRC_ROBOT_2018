@@ -440,3 +440,19 @@ double DriveTrain::RightMotor(double &maxpower)
 	}*/
 	return rightpow;
 }
+
+
+double DriveTrain::GetLeftDistance()
+{
+	double distance = GetLeftPosition();
+	distance = (distance / CODES_PER_REV) * WHEEL_DIAMETER * 3.1415926535;
+	return distance;
+}
+
+
+double DriveTrain::GetRightDistance()
+{
+	double distance = GetRightPosition();
+	distance = (distance / CODES_PER_REV) * WHEEL_DIAMETER * 3.1415926535;
+	return distance;
+}

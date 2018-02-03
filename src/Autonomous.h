@@ -26,6 +26,7 @@ protected:
 	DrivePID *m_drivepid;
 
 	DriveStraightState m_straightstate;
+	double m_distance;
 	double m_acceldistance;
 	double m_timermod;
 };

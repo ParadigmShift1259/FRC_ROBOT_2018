@@ -41,6 +41,8 @@ public:
 	double GetRightPosition() {return m_righttalonlead->GetSelectedSensorPosition(0);}
 	void ResetLeftPosition() {m_lefttalonlead->SetSelectedSensorPosition(0,0,0);}
 	void ResetRightPosition() {m_righttalonlead->SetSelectedSensorPosition(0,0,0);}
+	double GetLeftDistance();
+	double GetRightDistance();
 
 	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
 	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
