@@ -88,7 +88,6 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define WHEEL_DIAMETER 6
 #define WHEEL_TRACK 22.50
 
-
 // Compressor
 #define PCM_COMPRESSOR_SOLENOID -1
 

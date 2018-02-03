@@ -1,4 +1,5 @@
 #include <Autonomous.h>
+
 Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 {
 	m_inputs = inputs;
@@ -16,14 +17,16 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 
 Autonomous::~Autonomous()
 {
+
 }
+
 
 void Autonomous::Init()
 {
 	DriverStation::ReportError("AutonomousInit");
 
-	if(SmartDashboard::GetNumber("AutoDistance",0) == 0)
-		SmartDashboard::PutNumber("AutoDistance",30000);
+	if (SmartDashboard::GetNumber("AutoDistance", 0) == 0)
+		SmartDashboard::PutNumber("AutoDistance", 30000);
 	m_straightstate = kStart;
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
@@ -58,14 +61,13 @@ bool Autonomous::DriveStraight(double targetdistance)
 	 * 1/3rd the target distance is reached in which case kDecel is moved into
 	 */
 	case kStart:
-		m_timermod = ACCEL_TIME;
 		m_timerstraight->Start();
 		m_drivetrain->LeftTalonLead()->SetSelectedSensorPosition(0, 0, 0);
 		m_drivetrain->RightTalonLead()->SetSelectedSensorPosition(0, 0, 0);
 		m_drivetrain->LeftTalonLead()->SetNeutralMode(NeutralMode::Brake);
 		m_drivetrain->RightTalonLead()->SetNeutralMode(NeutralMode::Brake);
 		m_straightstate = kAccel;
-		break;
+		m_timermod = ACCEL_TIME; // @suppress("No break at end of case")
 	case kAccel:
 		//If acceleration has reached max time
 		if((((int)(timervalue*50))/50.0) > ACCEL_TIME)
