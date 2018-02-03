@@ -1,25 +1,18 @@
-/*
- * Robot.h
- *
- *  Created on: Jan 11, 2018
- *      Author: Developer
- */
-
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 
-
-#include <DriveTrain.h>
+#include <Drivetrain.h>
+#include <Intake.h>
 #include <WPILib.h>
 #include "Autonomous.h"
 #include "Const.h"
 #include "OperatorInputs.h"
 #include "Lifter.h"
-#include "Grabber.h"
 #include "Climber.h"
+#include "Autonomous.h"
 
 
-class Robot : public IterativeRobot
+class Robot : public TimedRobot
 {
 public:
 	virtual void RobotInit();
@@ -32,14 +25,14 @@ public:
 	virtual void DisabledInit();
 
 protected:
-	Autonomous * m_auto;
 	OperatorInputs *m_operatorinputs;
 	DriveTrain *m_drivetrain;
 	Compressor *m_compressor;
 	DriverStation *m_driverstation;
 	Lifter *m_lifter;
-	Grabber *m_grabber;
+	Intake *m_intake;
 	Climber *m_climber;
+	Autonomous *m_autonomous;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

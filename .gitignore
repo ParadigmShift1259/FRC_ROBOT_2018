@@ -54,4 +54,8 @@ local.properties
 .springBeans
 .recommenders/
 /Debug/
+<<<<<<< HEAD
 doxygen/
+=======
+doxygen/
+>>>>>>> refs/remotes/origin/master

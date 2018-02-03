@@ -10,13 +10,14 @@
 
 
 #include <WPILib.h>
+#include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
 
 
 class Climber
 {
 public:
-	Climber(OperatorInputs *m_inputs);
+	Climber(OperatorInputs *inputs);
 	virtual ~Climber();
 	void Init();
 	void Loop();
@@ -25,6 +26,7 @@ public:
 
 protected:
 	OperatorInputs *m_inputs;
+	WPI_TalonSRX *m_motor;
 };
 
 

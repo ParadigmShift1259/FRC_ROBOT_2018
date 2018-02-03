@@ -28,6 +28,7 @@ public:
 protected:
 	OperatorInputs *m_inputs;
 	WPI_TalonSRX *m_motor;
+	Solenoid *m_solenoid;
 	int m_position;
 };
 

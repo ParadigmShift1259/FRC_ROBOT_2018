@@ -15,8 +15,9 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 //OperatorInputs
 //	Controllers
-#define JOYSTICK_NUMBER 0
-#define XBOX_NUMBER 1
+#define INP_JOYSTICK -1
+#define INP_XBOX_1 1
+#define INP_XBOX_2 -1
 //	Set to 1.0 or -1.0
 #define INVERT_Y_AXIS 1.0
 #define INVERT_X_AXIS -1.0
@@ -67,14 +68,14 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define CAN_RIGHT_PORT 1
 #define CAN_SECOND_RIGHT_PORT 3
 // Shifter
-#define PCM_SHIFT_PORT_LOW 0
+#define PCM_SHIFT_PORT_LOW -1
 #define PCM_SHIFT_MODULE 0
 #define CHILD_PROOF_SPEED 0.75
 #define FLIP_HIGH_GEAR true
 // Ramping
 #define RAMPING_RATE_PERIOD 0.10
 #define RAMPING_RATE_MIN 0.6
-#define RAMPING_RATE_MAX 4
+#define RAMPING_RATE_MAX 4.0
 #define X_SCALING 1.0
 #define Y_SCALING 1.0
 #define LEFT_MOTOR_SCALING 0.9915
@@ -82,12 +83,14 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
-#define CODES_PER_REV 1126
-#define ENCODER_TOP_SPEED 0.6
-#define ENCODER_WAIT_TIME 168
-#define CAN_DISTANCE_PER_PULSE 0.0006708
+#define CODES_PER_REV 4480
+#define CODES_PER_INCH 238
+#define WHEEL_DIAMETER 6
+#define WHEEL_TRACK 22.50
+
+
 // Compressor
-#define PCM_COMPRESSOR_SOLENOID 0
+#define PCM_COMPRESSOR_SOLENOID -1
 
 
 // Camera
@@ -97,19 +100,25 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Range Finder
-#define DIO_RANGEFINDER_ECHO_OUT 1
-#define DIO_RANGEFINDER_TRIGGER_IN 2
+//#define DIO_RANGEFINDER_ECHO_OUT 1
+//#define DIO_RANGEFINDER_TRIGGER_IN 2
 
 
 // Lifter
 #define CAN_LIFTER_MOTOR -1
 #define LIFTER_MAX 20000
 #define LIFTER_MIN 500
+#define PCM_LIFTER_MODULE 0
+#define PCM_LIFTER_SOLENOID -1
 
 
-//Grabber
-#define CAN_GRABBER_LEFTMOTOR -1
-#define CAN_GRABBER_RIGHTMOTOR -1
+// Intake
+#define CAN_INTAKE_LEFTMOTOR -1
+#define CAN_INTAKE_RIGHTMOTOR -1
+#define PCM_INTAKE_MODULE 0
+#define PCM_INTAKE_SOLENOID -1
+#define DIO_INTAKE_CUBESENSOR 0
+
 
 
 // Shooter
@@ -139,10 +148,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 
 
 // Climber
-#define PWM_CLIMBER_MOTOR 0
-#define PDP_CLIMBER_MOTOR 4
-#define CAN_CLIMBER_MOTOR 7
-#define CAN_PDP 0
+#define CAN_CLIMBER_MOTOR -1
 
 
 // Autonomous
@@ -157,7 +163,7 @@ enum Auto { kAutoBoilerGear, kAutoBoilerShootGear, kAutoFeedGear, kAutoFeedShoot
 #define AUGER_OFF_TIME .5
 
 
-//Flipper
+// Flipper
 #define PWM_FLIPPER_SOLENOID 1
 
 

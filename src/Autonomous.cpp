@@ -1,26 +1,27 @@
-/*
- * Autonomous.cpp
- *
- *  Created on: Feb 2, 2018
- *      Author: Developer
- */
-
 #include <Autonomous.h>
-
-Autonomous::Autonomous(DriveTrain *drivetrain)
+Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 {
+	m_inputs = inputs;
 	m_drivetrain = drivetrain;
+	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
+
 	m_timerstraight = new Timer();
 	m_timerstraight->Reset();
 
 	m_straightstate = kStart;
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
+}
 
+
+Autonomous::~Autonomous()
+{
 }
 
 void Autonomous::Init()
 {
+	DriverStation::ReportError("AutonomousInit");
+
 	if(SmartDashboard::GetNumber("AutoDistance",0) == 0)
 		SmartDashboard::PutNumber("AutoDistance",30000);
 	m_straightstate = kStart;
@@ -28,6 +29,8 @@ void Autonomous::Init()
 	m_timermod = ACCEL_TIME;
 	m_timerstraight->Start();
 	m_timerstraight->Reset();
+	m_drivepid->Init(0.001, 0.0005, 0.0, true);
+	m_drivepid->SetRelativeAngle(90);
 }
 
 void Autonomous::Loop()
@@ -124,9 +127,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 	return false;
 }
 
-
-
-Autonomous::~Autonomous()
+void Autonomous::Stop()
 {
+	m_drivepid->Stop();
 }
-
