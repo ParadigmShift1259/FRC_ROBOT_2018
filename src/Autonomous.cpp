@@ -1,11 +1,11 @@
 #include <Autonomous.h>
+#include <cmath>
 
 Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 {
 	m_inputs = inputs;
 	m_drivetrain = drivetrain;
 	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
-
 	m_timerstraight = new Timer();
 	m_timerstraight->Reset();
 
@@ -51,7 +51,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 	SmartDashboard::PutNumber("LeftEncoder",m_drivetrain->LeftTalonPosition());
 	SmartDashboard::PutNumber("RightEncoder",m_drivetrain->RightTalonPosition());
 	double timervalue = m_timerstraight->Get(); //!<Stores the current timer value
-	double greatestdistance = fabs((fabs(m_drivetrain->RightTalonPosition()) > fabs(m_drivetrain->LeftTalonPosition())) ?
+	double greatestdistance = abs((abs(m_drivetrain->RightTalonPosition()) > abs(m_drivetrain->LeftTalonPosition())) ?
 			m_drivetrain->RightTalonPosition() : m_drivetrain->LeftTalonPosition()); //!< Stores the absolute value of the greatest encoder distance
 
 	switch (m_straightstate)

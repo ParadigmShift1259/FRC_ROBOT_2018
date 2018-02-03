@@ -12,7 +12,6 @@
 #include <WPILib.h>
 #include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
-#include <Math.h>
 
 class DriveTrain
 {
