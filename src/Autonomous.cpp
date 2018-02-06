@@ -17,6 +17,7 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
 
 	m_stage = kIdle;
+	m_turning = false;
 
 //	m_timerstraight = new Timer();
 //	m_timerstraight->Reset();
@@ -47,9 +48,9 @@ void Autonomous::Init()
 //	m_timerstraight->Reset();
 //	m_timerstraight->Start();
 
-	m_stage = kStraight;
+	m_stage = kTurn;
 	m_drivetrain->ResetPositions();
-	m_drivepid->Init(0.001, 0.0005, 0.0, true);			//Make Constants in future
+	m_drivepid->Init(0.001, 0.0001, 0.0, true);			//Make Constants in future
 }
 
 
@@ -57,15 +58,17 @@ void Autonomous::Loop()
 {
 	switch (m_stage)
 	{
-		kIdle:
+	case kIdle:
 			break;
 
-		kStraight:
+	case kStraight:
 			if (GoStraight(60, -0.5))
 				m_stage = kIdle;
 			break;
 
-		kTurn:
+	case kTurn:
+			if (TurnDegree(1024))
+				m_stage = kIdle;
 			break;
 	};
 //	DriveStraight(35000);
@@ -96,6 +99,29 @@ bool Autonomous::GoStraight(double inches, double power)
 		return true;
 	}
 	m_drivepid->Drive(power, true);
+	return false;
+}
+
+
+bool Autonomous::TurnDegree(double degrees)
+{
+	DriverStation::ReportError("TurnDegree");
+
+	if (!m_turning)
+	{
+		m_turning = true;
+		m_drivepid->SetRelativeAngle(degrees);
+	}
+	else
+	if (m_drivepid->OnTarget())
+	{
+		DriverStation::ReportError("OnTarget");
+		m_drivepid->Stop();
+		m_drivepid->Drive(0);
+		m_drivetrain->Drive(0, 0);
+		m_turning = false;
+		return true;
+	}
 	return false;
 }
 

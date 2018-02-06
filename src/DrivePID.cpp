@@ -35,7 +35,8 @@ void DrivePID::Init(double p, double i, double d, bool enable)
 	m_d = d;
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	SetSetpoint(0);
-	SetAbsoluteTolerance(10);
+	SetAbsoluteTolerance(1);
+	SetOutputRange(-0.5, 0.5);
 	if (enable)
 		EnablePID();
 }

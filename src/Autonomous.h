@@ -18,6 +18,7 @@ public:
 	void Init();
 	void Loop();
 	bool GoStraight(double inches, double power);
+	bool TurnDegree(double degrees);
 //	bool DriveStraight(double targetDistance);
 	void Stop();
 
@@ -28,6 +29,8 @@ protected:
 //	Timer *m_timerstraight;
 
 	Stage m_stage;
+	bool m_turning;
+
 //	DriveStraightState m_straightstate;
 //	double m_distance;
 //	double m_acceldistance;
