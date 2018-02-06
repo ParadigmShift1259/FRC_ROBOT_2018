@@ -23,6 +23,10 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
 	m_distance = 0;
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
+	m_notifier = new Notifier(Autonomous::VelocityAdjust, this);
+	timervalue = 0;
+	distance = 0;
+	m_target = 0;
 }
 
 
@@ -45,7 +49,6 @@ void Autonomous::Init()
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
 	m_timerstraight->Reset();
-	m_timerstraight->Start();
 
 	m_drivepid->Init(0.003, 0.0005, 0.0, true);			//Make Constants in future
 }
@@ -53,7 +56,7 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	DriveStraight(35000);
+	DriveStraight(30000);
 //	m_drivepid->Drive(-0.7,true);
 }
 
@@ -68,11 +71,13 @@ bool Autonomous::DriveStraight(double targetdistance)
 	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition());
 	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition());
 
-	double timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value
+	m_target = targetdistance;
+
+	timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value
 
 	double leftdistance = m_drivetrain->GetLeftPosition();
 	double rightdistance = m_drivetrain->GetRightPosition();
-	double distance = abs((abs(leftdistance) > abs(rightdistance)) ? leftdistance : rightdistance);   //!< Stores the absolute value of the greatest encoder distance
+	distance = abs((abs(leftdistance) > abs(rightdistance)) ? leftdistance : rightdistance);   //!< Stores the absolute value of the greatest encoder distance
 
 	switch (m_straightstate)
 	{
@@ -112,7 +117,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 			}
 			else
 			{
-				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME *.5);
+				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME * AUTO_POWER);
 //				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
 				break;
 			}
@@ -122,7 +127,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 		 * Maintaines top speed until 2x the acceldistance away from targetdistance
 		 */
 	case kMaintain:
-		if ((targetdistance - distance) <= 17000)
+		if ((targetdistance - distance) <= DECEL_DISTANCE)
 		{
 			m_straightstate = kDecel;
 			m_timerstraight->Reset();
@@ -130,17 +135,17 @@ bool Autonomous::DriveStraight(double targetdistance)
 			timervalue = 0;
 			SmartDashboard::PutNumber("StartDecel", distance);
 		}
+		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5) + distance) <= DECEL_DISTANCE)
+		{
+			m_notifier->StartSingle((targetdistance - m_drivetrain->GetLeftPosition()) / (m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) * 10));
+		}
 		else
 		{
-			m_drivepid->Drive(-0.5);
+			m_drivepid->Drive(-AUTO_POWER);
 //			m_drivetrain->Drive(0, -1, false);
 			break;
 		} // @suppress("No break at end of case")
 
-		/*
-		 * Decelerates over the course of ACCEL_TIME which happens to be about
-		 * 2x the acceleration distance
-		 */
 	case kDecel:
 		if ((timervalue > m_timermod) || (distance > (targetdistance - 4)))
 		{
@@ -152,11 +157,22 @@ bool Autonomous::DriveStraight(double targetdistance)
 		}
 		else
 		{
-			m_drivepid->Drive(-1 * (m_timermod - timervalue) / ACCEL_TIME * .5);
+			m_drivepid->Drive(-1 * ((ACCEL_TIME - timervalue) / ACCEL_TIME) * AUTO_POWER);
 //			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
 		}
 	}
 	return false;
+}
+
+
+void Autonomous::VelocityAdjust(Autonomous *arg)
+{
+	arg->m_straightstate = kDecel;
+	arg->m_timerstraight->Reset();
+	arg->m_timerstraight->Start();
+	arg->timervalue = 0;
+	arg->DriveStraight(arg->m_target);
+	SmartDashboard::PutNumber("StartDecel", arg->distance);
 }
 
 

@@ -108,7 +108,9 @@
 
 
 // Autonomous
-#define ACCEL_TIME 1
+#define ACCEL_TIME 1.0
+#define AUTO_POWER 0.5
+#define DECEL_DISTANCE 2197
 
 
 #endif /* SRC_CONST_H_ */

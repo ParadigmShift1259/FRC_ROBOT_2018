@@ -17,6 +17,7 @@ public:
 	void Init();
 	void Loop();
 	bool DriveStraight(double targetDistance);
+	static void VelocityAdjust(Autonomous *arg);
 	void Stop();
 
 protected:
@@ -24,11 +25,15 @@ protected:
 	Timer *m_timerstraight;
 	OperatorInputs *m_inputs;
 	DrivePID *m_drivepid;
+	Notifier* m_notifier;
 
 	DriveStraightState m_straightstate;
 	double m_distance;
 	double m_acceldistance;
 	double m_timermod;
+	double timervalue;
+	double distance;
+	double m_target;
 };
 
 
