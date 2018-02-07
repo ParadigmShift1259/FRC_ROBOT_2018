@@ -34,11 +34,14 @@ protected:
 	Climber *m_climber;
 	Autonomous *m_autonomous;
 
+	bool m_test;
+
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
 	frc::SendableChooser<std::string> m_chooser;
 	const std::string kAutoNameDefault = "Default";
 	const std::string kAutoNameCustom = "My Auto";
+	const std::string kAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
 };
 

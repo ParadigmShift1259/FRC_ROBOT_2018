@@ -19,6 +19,7 @@ void Robot::RobotInit()
 {
 	m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
 	m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
+	m_chooser.AddObject(kAutoTestMode, kAutoTestMode);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -32,6 +33,8 @@ void Robot::RobotInit()
 	m_climber = new Climber(m_operatorinputs);
 
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
+
+	m_test = false;
 }
 
 
@@ -53,6 +56,8 @@ void Robot::AutonomousInit()
 {
 	DriverStation::ReportError("AutonomousInit");
 
+	m_autoSelected = m_chooser.GetSelected();
+
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_autonomous->Init();
 
@@ -67,36 +72,31 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-
 	m_autonomous->Loop();
-
 }
 
 
 void Robot::TestInit()
 {
 	DriverStation::ReportError("TestInit");
-	if (m_compressor != nullptr)
-		m_compressor->Start();
-	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
-	m_lifter->Init();
-	m_intake->Init();
-	m_climber->Init();
 }
 
 
 void Robot::TestPeriodic()
 {
-	m_drivetrain->Loop();
-	m_lifter->Loop();
-	m_intake->Loop();
-	m_climber->Loop();
 }
 
 
 void Robot::TeleopInit()
 {
-	DriverStation::ReportError("TeleopInit");
+	m_autoSelected = m_chooser.GetSelected();
+	m_test = (m_autoSelected == kAutoTestMode);
+
+	if (m_test)
+		DriverStation::ReportError("TeleopInit Test Mode");
+	else
+		DriverStation::ReportError("TeleopInit");
+
 	if (m_compressor != nullptr)
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
@@ -108,10 +108,20 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
-	m_drivetrain->Loop();
-	m_lifter->Loop();
-	m_intake->Loop();
-	m_climber->Loop();
+	if (m_test)
+	{
+		m_drivetrain->Loop();
+		m_lifter->TestLoop();
+		m_intake->TestLoop();
+		m_climber->TestLoop();
+	}
+	else
+	{
+		m_drivetrain->Loop();
+		m_lifter->Loop();
+		m_intake->Loop();
+		m_climber->Loop();
+	}
 }
 
 
