@@ -17,6 +17,8 @@
 class Intake
 {
 public:
+	enum Stage {kBottom, kIngest, kIngestWait, kBox, kEject};
+
 	Intake(OperatorInputs *inputs);
 	virtual ~Intake();
 	void Init();
@@ -33,6 +35,8 @@ protected:
 	DigitalInput *m_cubesensor;
 	int m_leftposition;
 	int m_rightposition;
+	Stage m_stage;
+	Timer m_timer;
 };
 
 

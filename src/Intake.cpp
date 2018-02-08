@@ -36,6 +36,8 @@ Intake::Intake(OperatorInputs *inputs)
 		m_solenoid = new Solenoid(PCM_INTAKE_MODULE, PCM_INTAKE_SOLENOID);
 
 	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
+
+	m_stage = kBottom;
 }
 
 
@@ -60,6 +62,9 @@ void Intake::Init()
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
 	m_solenoid->Set(false);
+	m_timer.Reset();
+	m_timer.Start();
+
 }
 
 
@@ -68,8 +73,87 @@ void Intake::Loop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
+	switch (m_stage)
+	{
+		case kBottom:
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+			if (/*add pos*/)
+			{
+				m_solenoid->Set(true);
+				m_stage = kIngest;
+			}
+			break;
+
+		case kIngest:
+			if (m_cubesensor->Get())
+			{
+				m_solenoid->Set(false);
+				m_timer.Reset();
+				m_leftmotor->Set(0.5);
+				m_rightmotor->Set(0.5);
+				m_stage = kIngestWait;
+			}
+			else
+			if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
+			{
+				m_leftmotor->Set(0.5);
+				m_rightmotor->Set(0.5);
+			}
+			else
+			{
+				m_leftmotor->StopMotor();
+				m_rightmotor->StopMotor();
+			}
+			break;
+
+		case kIngestWait:
+			if (m_timer.HasPeriodPassed(0.2))
+			{
+				m_stage = kBox;
+			}
+			else
+			{
+				m_leftmotor->Set(0.5);
+				m_rightmotor->Set(0.5);
+			}
+			break;
+
+		case kBox:
+			if(m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold))
+			{
+				m_leftmotor->Set(-0.5);
+				m_rightmotor->Set(-0.5);
+				m_timer.Reset();
+				m_stage = kEject;
+			}
+			else
+			{
+				m_leftmotor->StopMotor();
+				m_rightmotor->StopMotor();
+			}
+			break;
+
+		case kEject:
+			if(m_timer.HasPeriodPassed(1.0))
+			{
+				m_solenoid->Set(true);
+				m_stage = kBottom;
+			}
+			else
+			{
+				m_leftmotor->Set(-0.5);
+				m_rightmotor->Set(-0.5);
+			}
+			break;
+
+	};
+
+
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
+
+
 }
 
 
@@ -116,6 +200,7 @@ void Intake::Stop()
 
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
+	m_timer.Stop();
 }
 
 
