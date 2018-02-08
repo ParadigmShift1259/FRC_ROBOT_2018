@@ -114,7 +114,7 @@ double DrivePID::ReturnPIDInput()
 	double m_rightpos = m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0);
 	m_rightpos = m_rightpos / CODES_PER_REV;
 
-	double retval = (360 / 2 * 3.1415926535) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;
+	double retval = (360 / (2 * 3.1415926535)) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;
 
 	SmartDashboard::PutNumber("ReturnPosition", m_leftpos + m_rightpos);
 	SmartDashboard::PutNumber("ReturnCurrentPosition", retval);

@@ -50,7 +50,8 @@ void Autonomous::Init()
 
 	m_stage = kTurn;
 	m_drivetrain->ResetPositions();
-	m_drivepid->Init(0.001, 0.0001, 0.0, true);			//Make Constants in future
+	Wait(0.25);
+	m_drivepid->Init(0.01, 0.001, 0.0, true);			//Make Constants in future
 }
 
 
@@ -67,7 +68,7 @@ void Autonomous::Loop()
 			break;
 
 	case kTurn:
-			if (TurnDegree(1024))
+			if (TurnDegree(120))
 				m_stage = kIdle;
 			break;
 	};
