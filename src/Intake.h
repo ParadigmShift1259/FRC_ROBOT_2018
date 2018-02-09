@@ -12,6 +12,7 @@
 #include <WPILib.h>
 #include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
+#include "Lifter.h"
 
 
 class Intake
@@ -19,7 +20,7 @@ class Intake
 public:
 	enum Stage {kBottom, kIngest, kIngestWait, kBox, kEject};
 
-	Intake(OperatorInputs *inputs);
+	Intake(OperatorInputs *inputs, Lifter *lifter);
 	virtual ~Intake();
 	void Init();
 	void Loop();
@@ -29,6 +30,7 @@ public:
 
 protected:
 	OperatorInputs *m_inputs;
+	Lifter *m_lifter;
 	WPI_TalonSRX *m_leftmotor;
 	WPI_TalonSRX *m_rightmotor;
 	Solenoid *m_solenoid;

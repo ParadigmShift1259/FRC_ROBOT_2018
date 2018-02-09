@@ -10,7 +10,7 @@
 
 
 
-Intake::Intake(OperatorInputs *inputs)
+Intake::Intake(OperatorInputs *inputs, Lifter *lifter)
 {
 	m_leftmotor = nullptr;
 	m_rightmotor = nullptr;
@@ -19,6 +19,7 @@ Intake::Intake(OperatorInputs *inputs)
 	m_rightposition = 0;
 
 	m_inputs = inputs;
+	m_lifter = lifter;
 
 	if ((CAN_INTAKE_LEFTMOTOR != -1) && (CAN_INTAKE_RIGHTMOTOR != -1))
 	{
@@ -73,87 +74,88 @@ void Intake::Loop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
+	const double MOTOR_SPEED = 0.5;
+
 	switch (m_stage)
 	{
-		case kBottom:
+	case kBottom:
+		m_leftmotor->StopMotor();				/// motors are off by default
+		m_rightmotor->StopMotor();
+		if (m_lifter->IsBottom())				/// check for lifter to be on the bottom
+		{
+			m_solenoid->Set(true);					/// open intake arms
+			m_stage = kIngest;						/// lifter is at bottom, go to ingest stage
+		}
+		break;
+
+	case kIngest:
+		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
+		{
+			m_solenoid->Set(false);				/// we have cube, close intake arms
+			m_timer.Reset();
+			m_leftmotor->Set(MOTOR_SPEED);
+			m_rightmotor->Set(MOTOR_SPEED);
+			m_stage = kIngestWait;
+		}
+		else
+		if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
+		{
+			m_leftmotor->Set(MOTOR_SPEED);
+			m_rightmotor->Set(MOTOR_SPEED);
+		}
+		else
+		{
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
-			if (/*add pos*/)
-			{
-				m_solenoid->Set(true);
-				m_stage = kIngest;
-			}
-			break;
+		}
+		break;
 
-		case kIngest:
-			if (m_cubesensor->Get())
-			{
-				m_solenoid->Set(false);
-				m_timer.Reset();
-				m_leftmotor->Set(0.5);
-				m_rightmotor->Set(0.5);
-				m_stage = kIngestWait;
-			}
-			else
-			if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
-			{
-				m_leftmotor->Set(0.5);
-				m_rightmotor->Set(0.5);
-			}
-			else
-			{
-				m_leftmotor->StopMotor();
-				m_rightmotor->StopMotor();
-			}
-			break;
+	case kIngestWait:
+		if (m_timer.HasPeriodPassed(0.2))
+		{
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+			m_stage = kBox;
+		}
+		else
+		{
+			m_leftmotor->Set(MOTOR_SPEED);
+			m_rightmotor->Set(MOTOR_SPEED);
+		}
+		break;
 
-		case kIngestWait:
-			if (m_timer.HasPeriodPassed(0.2))
-			{
-				m_stage = kBox;
-			}
-			else
-			{
-				m_leftmotor->Set(0.5);
-				m_rightmotor->Set(0.5);
-			}
-			break;
+	case kBox:
+		if (m_inputs->xBoxBButton())
+		{
+			m_leftmotor->Set(MOTOR_SPEED * -1);
+			m_rightmotor->Set(MOTOR_SPEED * -1);
+			m_timer.Reset();
+			m_stage = kEject;
+		}
+		else
+		{
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+		}
+		break;
 
-		case kBox:
-			if(m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold))
-			{
-				m_leftmotor->Set(-0.5);
-				m_rightmotor->Set(-0.5);
-				m_timer.Reset();
-				m_stage = kEject;
-			}
-			else
-			{
-				m_leftmotor->StopMotor();
-				m_rightmotor->StopMotor();
-			}
-			break;
-
-		case kEject:
-			if(m_timer.HasPeriodPassed(1.0))
-			{
-				m_solenoid->Set(true);
-				m_stage = kBottom;
-			}
-			else
-			{
-				m_leftmotor->Set(-0.5);
-				m_rightmotor->Set(-0.5);
-			}
-			break;
-
+	case kEject:
+		if (m_timer.HasPeriodPassed(1.0))
+		{
+			m_solenoid->Set(true);
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+			m_stage = kBottom;
+		}
+		else
+		{
+			m_leftmotor->Set(MOTOR_SPEED * -1);
+			m_rightmotor->Set(MOTOR_SPEED * -1);
+		}
+		break;
 	};
 
-
-	m_leftmotor->StopMotor();
-	m_rightmotor->StopMotor();
-
-
+	SmartDashboard::PutNumber("LI_cubesensor", m_cubesensor->Get());
 }
 
 
@@ -190,6 +192,7 @@ void Intake::TestLoop()
 
 	SmartDashboard::PutNumber("L1_left_position", m_leftposition);
 	SmartDashboard::PutNumber("L2_right_position", m_rightposition);
+	SmartDashboard::PutNumber("Li_cube_sensor", m_cubesensor->Get());
 }
 
 

@@ -24,6 +24,7 @@ public:
 	void TestLoop();
 	void Stop();
 	void ResetPosition();
+	bool IsBottom();
 
 protected:
 	OperatorInputs *m_inputs;

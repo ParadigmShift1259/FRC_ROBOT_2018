@@ -29,7 +29,7 @@ void Robot::RobotInit()
 	if (PCM_COMPRESSOR_SOLENOID != -1)
 		m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 	m_lifter = new Lifter(m_operatorinputs);
-	m_intake = new Intake(m_operatorinputs);
+	m_intake = new Intake(m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
 
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
