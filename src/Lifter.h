@@ -31,6 +31,10 @@ protected:
 	WPI_TalonSRX *m_motor;
 	Solenoid *m_solenoid;
 	int m_position;
+	double m_raisespeed;
+	double m_lowerspeed;
+	double m_liftermin;
+	double m_liftermax;
 };
 
 

@@ -16,6 +16,10 @@ Lifter::Lifter(OperatorInputs *inputs)
 	m_motor = nullptr;
 	m_solenoid = nullptr;
 	m_position = 0;
+	m_raisespeed = 0.5;
+	m_lowerspeed = -0.5;
+	m_liftermin = 0;
+	m_liftermax = 0;
 
 	if (CAN_LIFTER_MOTOR != -1)
 	{
@@ -68,31 +72,36 @@ void Lifter::TestLoop()
 
 	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold))		/// raise lifter - positive
 	{
-		if (m_position < LIFTER_MAX)
-			m_motor->Set(0.5);
-		else
-			m_motor->StopMotor();
+		m_motor->Set(m_raisespeed);
 	}
 	else
 	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold))		/// lower lifter - negative
 	{
-		if (m_position > LIFTER_MIN)
-			m_motor->Set(-0.5);
-		else
-			m_motor->StopMotor();
+		m_motor->Set(m_lowerspeed);
 	}
 	else
 	{
 		m_motor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadUp())		/// angle lifter - deploy - true
+	if (m_inputs->xBoxDPadUp())			/// angle lifter - deploy - true
 		m_solenoid->Set(true);
 	else
 	if (m_inputs->xBoxDPadDown())		/// straighten lifter - retract - false (default)
 		m_solenoid->Set(false);
 
-	SmartDashboard::PutNumber("L1_position", m_position);
+	if (m_inputs->xBoxLeftBumper())
+	{
+		m_liftermin = m_position + 100;
+	}
+	if (m_inputs->xBoxRightBumper())
+	{
+		m_liftermax = m_position - 100;
+	}
+
+	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
+	SmartDashboard::PutNumber("LI2_liftermax", m_liftermax);
+	SmartDashboard::PutNumber("LI3_position", m_position);
 }
 
 
@@ -117,7 +126,7 @@ void Lifter::ResetPosition()
 
 bool Lifter::IsBottom()
 {
-	if (m_position <= LIFTER_MIN)
+	if (m_position <= m_liftermin)
 		return true;
 	else
 		return false;
