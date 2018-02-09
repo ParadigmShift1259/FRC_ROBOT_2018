@@ -35,10 +35,10 @@ protected:
 	WPI_TalonSRX *m_rightmotor;
 	Solenoid *m_solenoid;
 	DigitalInput *m_cubesensor;
-	int m_leftposition;
-	int m_rightposition;
 	Stage m_stage;
 	Timer m_timer;
+	double m_ingestspeed;
+	double m_ejectspeed;
 };
 
 
