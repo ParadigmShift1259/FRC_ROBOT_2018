@@ -61,7 +61,7 @@
 #define CAN_RIGHT_PORT 1
 #define CAN_SECOND_RIGHT_PORT 3
 // Shifter
-#define PCM_SHIFT_PORT_LOW -1
+#define PCM_SHIFT_PORT_LOW 0
 #define PCM_SHIFT_MODULE 0
 #define CHILD_PROOF_SPEED 0.75
 #define FLIP_HIGH_GEAR true
@@ -83,26 +83,26 @@
 
 
 // Compressor
-#define PCM_COMPRESSOR_SOLENOID -1
+#define PCM_COMPRESSOR_SOLENOID 0
 
 
 // Lifter
-#define CAN_LIFTER_MOTOR -1
+#define CAN_LIFTER_MOTOR 6
 #define PCM_LIFTER_MODULE 0
-#define PCM_LIFTER_SOLENOID -1
+#define PCM_LIFTER_SOLENOID 2
 
 
 // Intake
-#define CAN_INTAKE_LEFTMOTOR -1
-#define CAN_INTAKE_RIGHTMOTOR -1
+#define CAN_INTAKE_LEFTMOTOR 4
+#define CAN_INTAKE_RIGHTMOTOR 5
 #define PCM_INTAKE_MODULE 0
-#define PCM_INTAKE_SOLENOID -1
+#define PCM_INTAKE_SOLENOID 1
 #define DIO_INTAKE_CUBESENSOR 0
 
 
 
 // Climber
-#define CAN_CLIMBER_MOTOR -1
+#define CAN_CLIMBER_MOTOR 7
 
 
 // Autonomous

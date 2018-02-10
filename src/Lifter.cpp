@@ -16,16 +16,17 @@ Lifter::Lifter(OperatorInputs *inputs)
 	m_motor = nullptr;
 	m_solenoid = nullptr;
 	m_position = 0;
-	m_raisespeed = 0.5;
-	m_lowerspeed = -0.5;
-	m_liftermin = 0;
-	m_liftermax = 0;
+	m_raisespeed = -0.75;
+	m_lowerspeed = 0.75;
+	m_liftermin = 400;
+	m_liftermax = 41000;
 
 	if (CAN_LIFTER_MOTOR != -1)
 	{
 		m_motor = new WPI_TalonSRX(CAN_LIFTER_MOTOR);
 		m_motor->Set(ControlMode::PercentOutput, 0);
 		m_motor->SetNeutralMode(NeutralMode::Brake);
+		m_motor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	}
 
 	if (PCM_LIFTER_SOLENOID != -1)
@@ -51,6 +52,7 @@ void Lifter::Init()
 
 	m_motor->StopMotor();
 	m_solenoid->Set(false);
+	m_motor->SetSelectedSensorPosition(0 ,0, 0);
 }
 
 
@@ -59,7 +61,37 @@ void Lifter::Loop()
 	if ((m_motor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	m_motor->StopMotor();
+	m_position = m_motor->GetSelectedSensorPosition(0);
+
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold) && (m_position < m_liftermax))		/// raise lifter - positive
+	{
+		m_motor->Set(m_raisespeed);
+	}
+	else
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold) && (m_position > m_liftermin))		/// lower lifter - negative
+	{
+		m_motor->Set(m_lowerspeed);
+	}
+	else
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold) && (m_position <= m_liftermin))
+	{
+		m_motor->StopMotor();
+		m_motor->SetSelectedSensorPosition(0, 0, 0);
+	}
+	else
+	{
+		m_motor->StopMotor();
+	}
+
+	if (m_inputs->xBoxDPadUp())			/// angle lifter - deploy - true
+		m_solenoid->Set(true);
+	else
+	if (m_inputs->xBoxDPadDown())		/// straighten lifter - retract - false (default)
+		m_solenoid->Set(false);
+
+	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
+	SmartDashboard::PutNumber("LI2_liftermax", m_liftermax);
+	SmartDashboard::PutNumber("LI3_position", m_position);
 }
 
 

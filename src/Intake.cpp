@@ -87,19 +87,19 @@ void Intake::Loop()
 		break;
 
 	case kIngest:
-		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
+		if (/*m_cubesensor->Get() ||*/ m_inputs->xBoxBackButton())
 		{
 			m_solenoid->Set(false);				/// we have cube, close intake arms
 			m_timer.Reset();
 			m_leftmotor->Set(m_ingestspeed);	/// turn on motors to ingest cube
-			m_rightmotor->Set(m_ingestspeed);
+			m_rightmotor->Set(m_ingestspeed * -1.0);
 			m_stage = kIngestWait;				/// wait for box to ingest
 		}
 		else
 		if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
 		{
 			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed
-			m_rightmotor->Set(m_ingestspeed);
+			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
 		{
@@ -118,7 +118,7 @@ void Intake::Loop()
 		else
 		{
 			m_leftmotor->Set(m_ingestspeed);		/// run the motors to ensure we have the box
-			m_rightmotor->Set(m_ingestspeed);
+			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		break;
 
@@ -126,7 +126,7 @@ void Intake::Loop()
 		if (m_inputs->xBoxBButton())
 		{
 			m_leftmotor->Set(m_ejectspeed);			/// eject the box
-			m_rightmotor->Set(m_ejectspeed);
+			m_rightmotor->Set(m_ejectspeed * -1.0);
 			m_timer.Reset();
 			m_stage = kEject;
 		}
@@ -148,7 +148,7 @@ void Intake::Loop()
 		else
 		{
 			m_leftmotor->Set(m_ejectspeed);			/// ensure the box is ejected
-			m_rightmotor->Set(m_ejectspeed);
+			m_rightmotor->Set(m_ejectspeed * -1.0);
 		}
 		break;
 	};
@@ -166,16 +166,16 @@ void Intake::TestLoop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	if (!m_cubesensor->Get() && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))		/// ingest cube - positive
+	if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))		/// ingest cube - positive
 	{
 		m_leftmotor->Set(m_ingestspeed);
-		m_rightmotor->Set(m_ingestspeed);
+		m_rightmotor->Set(m_ingestspeed * -1.0);
 	}
 	else
 	if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold))		/// eject cube - negative
 	{
 		m_leftmotor->Set(m_ejectspeed);
-		m_rightmotor->Set(m_ejectspeed);
+		m_rightmotor->Set(m_ejectspeed * -1.0);
 	}
 	else
 	{
