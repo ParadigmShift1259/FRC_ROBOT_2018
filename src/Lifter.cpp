@@ -68,13 +68,6 @@ void Lifter::Loop()
 	if ((m_motor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	/*  working on this!
-	if ((automode == kAutoStage) && m_inputs->xBoxStartButton())
-	{
-		m_motor->SetSelectedSensorPosition(0, 0, 0);
-	}
-	*/
-
 	m_position = m_motor->GetSelectedSensorPosition(0);
 
 	/// if left bumper and Y override position sensor and raise lift
@@ -162,6 +155,18 @@ void Lifter::TestLoop()
 	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
 	SmartDashboard::PutNumber("LI2_liftermax", m_liftermax);
 	SmartDashboard::PutNumber("LI3_position", m_position);
+}
+
+
+void Lifter::StageLoop()
+{
+	if ((m_motor == nullptr) || (m_solenoid == nullptr))
+			return;
+
+	if ((automode == kAutoStage) && m_inputs->xBoxStartButton())
+	{
+		m_motor->SetSelectedSensorPosition(0, 0, 0);
+	}
 }
 
 

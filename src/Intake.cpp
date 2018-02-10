@@ -110,7 +110,7 @@ void Intake::Loop()
 		break;
 
 	case kIngestWait:
-		if (m_timer.HasPeriodPassed(0.2))		/// wait for 200ms
+		if (m_timer.HasPeriodPassed(0.5))		/// wait for 500ms
 		{
 			m_leftmotor->StopMotor();				/// ingestion is complete stop motors
 			m_rightmotor->StopMotor();

@@ -22,6 +22,7 @@ public:
 	void Init();
 	void Loop();
 	void TestLoop();
+	void StageLoop();
 	void Stop();
 	void ResetPosition();
 	bool IsBottom();
