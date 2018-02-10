@@ -38,6 +38,12 @@ void Robot::RobotInit()
 }
 
 
+void Robot::RobotPeriodic()
+{
+
+}
+
+
 /*
  * This autonomous (along with the chooser code above) shows how to
  * select
@@ -55,8 +61,6 @@ void Robot::RobotInit()
 void Robot::AutonomousInit()
 {
 	DriverStation::ReportError("AutonomousInit");
-
-	m_autoSelected = m_chooser.GetSelected();
 
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_autonomous->Init();
@@ -145,6 +149,12 @@ void Robot::DisabledInit()
 	m_intake->Stop();
 	m_climber->Stop();
 	m_autonomous->Stop();
+}
+
+
+void Robot::DisablePeriodic()
+{
+	m_autoSelected = m_chooser.GetSelected();
 }
 
 

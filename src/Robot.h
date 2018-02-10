@@ -16,6 +16,7 @@ class Robot : public TimedRobot
 {
 public:
 	virtual void RobotInit();
+	virtual void RobotPeriodic();
 	virtual void AutonomousInit();
 	virtual void AutonomousPeriodic();
 	virtual void TeleopInit();
@@ -23,6 +24,7 @@ public:
 	virtual void TestInit();
 	virtual void TestPeriodic();
 	virtual void DisabledInit();
+	virtual void DisablePeriodic();
 
 protected:
 	OperatorInputs *m_operatorinputs;

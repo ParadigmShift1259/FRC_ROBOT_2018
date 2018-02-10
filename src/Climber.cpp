@@ -56,7 +56,7 @@ void Climber::TestLoop()
 	if (m_motor == nullptr)
 		return;
 
-	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold))		/// initiate climb - positive
+	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold) && (automode != kAutoStage))		/// initiate climb - positive
 		m_motor->Set(0.5);
 	else
 		m_motor->StopMotor();

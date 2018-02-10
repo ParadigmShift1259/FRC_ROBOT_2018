@@ -23,6 +23,7 @@ Lifter::Lifter(DriverStation *ds, OperatorInputs *inputs)
 	m_liftermax = LIF_LIFTERMAX;
 	m_lifterminspd = LIF_LIFTERMINSPD;
 	m_liftermaxspd = LIF_LIFTERMAXSPD;
+	m_stage = kIdle;
 
 	if (CAN_LIFTER_MOTOR != -1)
 	{
@@ -107,10 +108,13 @@ void Lifter::Loop()
 		m_motor->StopMotor();
 		m_motor->SetSelectedSensorPosition(0, 0, 0);
 	}
-	/// stop the motors
+	/// no buttons pressed so stop motors
 	else
 	{
-		m_motor->StopMotor();
+		if (automode == kAutoStage)
+			Staging();
+		else
+			m_motor->StopMotor();
 	}
 
 	if (m_inputs->xBoxDPadUp())			/// angle lifter - deploy - true
@@ -158,18 +162,6 @@ void Lifter::TestLoop()
 }
 
 
-void Lifter::StageLoop()
-{
-	if ((m_motor == nullptr) || (m_solenoid == nullptr))
-			return;
-
-	if ((automode == kAutoStage) && m_inputs->xBoxStartButton())
-	{
-		m_motor->SetSelectedSensorPosition(0, 0, 0);
-	}
-}
-
-
 void Lifter::Stop()
 {
 	if ((m_motor == nullptr) || (m_solenoid == nullptr))
@@ -195,4 +187,41 @@ bool Lifter::IsBottom()
 		return true;
 	else
 		return false;
+}
+
+
+void Lifter::Staging()
+{
+	m_position = m_motor->GetSelectedSensorPosition(0);
+
+	switch (m_stage)
+	{
+	case kIdle:
+		if (m_inputs->xBoxStartButton())
+		{
+			m_motor->SetSelectedSensorPosition(0, 0, 0);
+			m_stage = kRaise;
+		}
+		else
+			m_motor->StopMotor();
+		break;
+
+	case kRaise:
+		if (m_position < LIF_LIFTERSTART)
+			m_motor->Set(m_raisespeed * 0.5);
+		else
+		{
+			m_motor->StopMotor();
+			m_stage = kStop;
+		}
+		break;
+
+	case kStop:
+		m_motor->StopMotor();
+		break;
+	}
+
+	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
+	SmartDashboard::PutNumber("LI2_liftermax", m_liftermax);
+	SmartDashboard::PutNumber("LI3_position", m_position);
 }

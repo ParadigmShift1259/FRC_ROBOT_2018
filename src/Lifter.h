@@ -17,21 +17,24 @@
 class Lifter
 {
 public:
+	enum Stage {kIdle, kRaise, kStop};
+
 	Lifter(DriverStation *ds, OperatorInputs *inputs);
 	virtual ~Lifter();
 	void Init();
 	void Loop();
 	void TestLoop();
-	void StageLoop();
 	void Stop();
 	void ResetPosition();
 	bool IsBottom();
+	void Staging();
 
 protected:
 	DriverStation *m_ds;
 	OperatorInputs *m_inputs;
 	WPI_TalonSRX *m_motor;
 	Solenoid *m_solenoid;
+	Stage m_stage;
 	int m_position;
 	double m_raisespeed;
 	double m_lowerspeed;
@@ -39,6 +42,7 @@ protected:
 	double m_liftermax;
 	double m_lifterminspd;
 	double m_liftermaxspd;
+
 };
 
 
