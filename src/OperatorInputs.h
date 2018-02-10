@@ -21,7 +21,7 @@ class OperatorInputs
 public:
 	enum ToggleChoice { kToggle = 0, kHold = 1 };
 
-	OperatorInputs(string curconfig = "SingleXBox");
+	OperatorInputs();
 	~OperatorInputs();
 	// xbox
 	double xBoxLeftX(unsigned int i = m_controllermap[m_curconfig]["xBoxLeftX"]);
@@ -60,6 +60,9 @@ public:
 	bool joystickButton8(ToggleChoice choice = kToggle);
 	bool joystickButton9(ToggleChoice choice = kToggle);
 	bool joystickButton10(ToggleChoice choice = kToggle);
+
+	static void setConfig(string curconfig);
+	static void addControllerMap(string mapname, map<string, int> mapval);
 
 protected:
 	Joystick *m_joystick;

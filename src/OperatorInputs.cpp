@@ -9,8 +9,8 @@
 #include "Const.h"
 #include <cmath>
 
-OperatorInputs::m_curconfig = "SingleXBox";
-OperatorInputs::m_controllermap =
+string OperatorInputs::m_curconfig = "SingleXBox";
+map<string, map<string, int> > OperatorInputs::m_controllermap =
 {
 		{"SingleXBox",
 				{
@@ -51,17 +51,17 @@ OperatorInputs::m_controllermap =
 						{"xBoxRightTrigger", 1},
 						{"xBoxStartButton", 1},
 						{"xBoxBackButton", 1},
-						{"xBoxDPadUp", 0},
-						{"xBoxDPadRight", 0},
-						{"xBoxDPadDown", 0},
-						{"xBoxDPadLeft", 0},
+						{"xBoxDPadUp", 1},
+						{"xBoxDPadRight", 1},
+						{"xBoxDPadDown", 1},
+						{"xBoxDPadLeft", 1},
 						{"xBoxR3", 1}
 				}
 		}
 };
 
 
-OperatorInputs::OperatorInputs(string curconfig)
+OperatorInputs::OperatorInputs()
 {
 	m_joystick = nullptr;
 	if (INP_JOYSTICK != -1)
@@ -70,7 +70,6 @@ OperatorInputs::OperatorInputs(string curconfig)
 		m_xbox.push_back(new Joystick(INP_XBOX_1));
 	if (INP_XBOX_2 != -1)
 		m_xbox.push_back(new Joystick(INP_XBOX_2));
-	m_curconfig = curconfig;
 }
 
 
@@ -611,4 +610,14 @@ double OperatorInputs::deadzoneFilterZ(double joyStickValue)
 	}
 	double sub = joyStickValue / abs(joyStickValue);
 	return (joyStickValue - (sub * DEADZONE_Z)) / (1.0-DEADZONE_Z);
+}
+
+void OperatorInputs::setConfig(string curconfig)
+{
+	m_curconfig = curconfig;
+}
+
+void OperatorInputs::addControllerMap(string mapname, map<string, int> mapval)
+{
+	m_controllermap[mapname] = mapval;
 }
