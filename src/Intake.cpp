@@ -74,6 +74,8 @@ void Intake::Loop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
+	m_inputs->xBoxAButton();					/// check A Button to record state of button toggle (used in kBox)
+
 	switch (m_stage)
 	{
 	case kBottom:
@@ -125,10 +127,7 @@ void Intake::Loop()
 
 	case kBox:
 		if (m_inputs->xBoxAButton())			/// allow ingest motor only when A button released and pressed again
-		{
 			m_allowingest = true;
-			DriverStation::ReportError("A button pressed");
-		}
 		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
 		{
 			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed
