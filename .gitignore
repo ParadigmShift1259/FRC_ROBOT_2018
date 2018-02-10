@@ -54,6 +54,7 @@ local.properties
 .springBeans
 .recommenders/
 /Debug/
+linux_simulate/
 <<<<<<< HEAD
 doxygen/
 =======

@@ -56,7 +56,7 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	DriveStraight(30000);
+	DriveStraight(96);
 //	m_drivepid->Drive(-0.7,true);
 }
 
@@ -68,22 +68,20 @@ void Autonomous::Loop()
  */
 bool Autonomous::DriveStraight(double targetdistance)
 {
-	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition());
-	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition());
-
+	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition()/CODES_PER_INCH);
+	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	m_target = targetdistance;
 
-	timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value
+	timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value. Quantizes the timer value into increments of 20ms
 
-	double leftdistance = m_drivetrain->GetLeftPosition();
-	double rightdistance = m_drivetrain->GetRightPosition();
+	double leftdistance = m_drivetrain->GetLeftPosition()/CODES_PER_INCH;
+	double rightdistance = m_drivetrain->GetRightPosition()/CODES_PER_INCH;
 	distance = abs((abs(leftdistance) > abs(rightdistance)) ? leftdistance : rightdistance);   //!< Stores the absolute value of the greatest encoder distance
 
 	switch (m_straightstate)
 	{
 	/*
-	 * Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain unless
-	 * 1/3rd the target distance is reached in which case kDecel is moved into
+	 * Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 	 */
 	case kStart:
 		m_drivetrain->ResetLeftPosition();
@@ -97,35 +95,21 @@ bool Autonomous::DriveStraight(double targetdistance)
 
 	case kAccel:
 		//If acceleration has reached max time
-		if (timervalue > ACCEL_TIME)			//Quantizes the timer value into increments of 20ms
+		if (timervalue > ACCEL_TIME)
 		{
 			m_acceldistance = distance;
 			m_straightstate = kMaintain;
 			m_timerstraight->Reset();
 			m_timerstraight->Start();
-			SmartDashboard::PutNumber("StopAccel", distance);
 		}
 		else
 		{
-			//Handles the case where a triangle acceleration is required
-			if (distance > targetdistance / 3)
-			{
-				m_timermod = timervalue;
-				m_timerstraight->Reset();
-				m_timerstraight->Start();
-				m_straightstate = kDecel;
-			}
-			else
-			{
 				m_drivepid->Drive(-1 * timervalue / ACCEL_TIME * AUTO_POWER);
 //				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
 				break;
-			}
+
 		} // @suppress("No break at end of case")
 
-		/*
-		 * Maintaines top speed until 2x the acceldistance away from targetdistance
-		 */
 	case kMaintain:
 		if ((targetdistance - distance) <= DECEL_DISTANCE)
 		{
@@ -135,9 +119,13 @@ bool Autonomous::DriveStraight(double targetdistance)
 			timervalue = 0;
 			SmartDashboard::PutNumber("StartDecel", distance);
 		}
-		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5) + distance) <= DECEL_DISTANCE)
+		/*
+		 * If it appears that the robot will shoot past the proper time to decelerate
+		 */
+		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5)/CODES_PER_INCH + distance) <= DECEL_DISTANCE)
 		{
 			m_notifier->StartSingle((targetdistance - m_drivetrain->GetLeftPosition()) / (m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) * 10));
+			break;
 		}
 		else
 		{
@@ -147,7 +135,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 		} // @suppress("No break at end of case")
 
 	case kDecel:
-		if ((timervalue > m_timermod) || (distance > (targetdistance - 4)))
+		if ((timervalue > m_timermod) || (distance > (targetdistance - 100/CODES_PER_INCH)))
 		{
 			m_drivepid->Drive(0);
 			m_drivepid->DisablePID();
