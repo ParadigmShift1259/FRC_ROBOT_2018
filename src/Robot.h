@@ -1,13 +1,13 @@
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 
-#include <Drivetrain.h>
-#include <Intake.h>
+
 #include <WPILib.h>
-#include "Autonomous.h"
 #include "Const.h"
 #include "OperatorInputs.h"
+#include "Drivetrain.h"
 #include "Lifter.h"
+#include "Intake.h"
 #include "Climber.h"
 #include "Autonomous.h"
 
@@ -34,14 +34,12 @@ protected:
 	Climber *m_climber;
 	Autonomous *m_autonomous;
 
-	bool m_test;
-
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
 	frc::SendableChooser<std::string> m_chooser;
-	const std::string kAutoNameDefault = "Default";
-	const std::string kAutoNameCustom = "My Auto";
+	const std::string kAutoAutoMode = "Auto Mode";
 	const std::string kAutoTestMode = "Test Mode";
+	const std::string kAutoStageMode = "Stage Mode";
 	std::string m_autoSelected;
 };
 

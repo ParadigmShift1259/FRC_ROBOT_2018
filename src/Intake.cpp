@@ -37,8 +37,9 @@ Intake::Intake(OperatorInputs *inputs, Lifter *lifter)
 	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
 
 	m_stage = kBottom;
-	m_ingestspeed = 0.5;
-	m_ejectspeed = -0.5;
+	m_ingestspeed = INT_INGESTSPEED;
+	m_ejectspeed = INT_EJECTSPEED;
+	m_allowingest = false;
 }
 
 
@@ -123,6 +124,14 @@ void Intake::Loop()
 		break;
 
 	case kBox:
+		if (m_inputs->xBoxAButton())			/// allow ingest motor only when A button released and pressed again
+			m_allowingest = true;
+		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
+		{
+			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed
+			m_rightmotor->Set(m_ingestspeed * -1.0);
+		}
+		else
 		if (m_inputs->xBoxBButton())
 		{
 			m_leftmotor->Set(m_ejectspeed);			/// eject the box

@@ -39,6 +39,7 @@ protected:
 	Timer m_timer;
 	double m_ingestspeed;
 	double m_ejectspeed;
+	bool m_allowingest;
 };
 
 

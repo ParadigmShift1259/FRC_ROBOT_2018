@@ -15,11 +15,14 @@
 #include "Robot.h"
 
 
+AutoMode automode = kAutoAuto;
+
+
 void Robot::RobotInit()
 {
-	m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
-	m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
+	m_chooser.AddDefault(kAutoAutoMode, kAutoAutoMode);
 	m_chooser.AddObject(kAutoTestMode, kAutoTestMode);
+	m_chooser.AddObject(kAutoStageMode, kAutoStageMode);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -28,13 +31,10 @@ void Robot::RobotInit()
 	m_compressor = nullptr;
 	if (PCM_COMPRESSOR_SOLENOID != -1)
 		m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
-	m_lifter = new Lifter(m_operatorinputs);
+	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
 	m_intake = new Intake(m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
-
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
-
-	m_test = false;
 }
 
 
@@ -90,10 +90,21 @@ void Robot::TestPeriodic()
 void Robot::TeleopInit()
 {
 	m_autoSelected = m_chooser.GetSelected();
-	m_test = (m_autoSelected == kAutoTestMode);
 
-	if (m_test)
+	if (m_autoSelected == kAutoAutoMode)
+		automode = kAutoAuto;
+	else
+	if (m_autoSelected == kAutoTestMode)
+		automode = kAutoTest;
+	else
+	if (m_autoSelected == kAutoStageMode)
+		automode = kAutoStage;
+
+	if (automode == kAutoTest)
 		DriverStation::ReportError("TeleopInit Test Mode");
+	else
+	if (automode == kAutoStage)
+		DriverStation::ReportError("TeleopInit Stage Mode");
 	else
 		DriverStation::ReportError("TeleopInit");
 
@@ -108,7 +119,7 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
-	if (m_test)
+	if (automode == kAutoTest)
 	{
 		m_drivetrain->Loop();
 		m_lifter->TestLoop();

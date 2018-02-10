@@ -17,7 +17,7 @@
 class Lifter
 {
 public:
-	Lifter(OperatorInputs *inputs);
+	Lifter(DriverStation *ds, OperatorInputs *inputs);
 	virtual ~Lifter();
 	void Init();
 	void Loop();
@@ -27,6 +27,7 @@ public:
 	bool IsBottom();
 
 protected:
+	DriverStation *m_ds;
 	OperatorInputs *m_inputs;
 	WPI_TalonSRX *m_motor;
 	Solenoid *m_solenoid;
@@ -35,6 +36,8 @@ protected:
 	double m_lowerspeed;
 	double m_liftermin;
 	double m_liftermax;
+	double m_lifterminspd;
+	double m_liftermaxspd;
 };
 
 

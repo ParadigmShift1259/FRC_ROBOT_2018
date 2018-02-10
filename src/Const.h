@@ -87,17 +87,26 @@
 
 
 // Lifter
-#define CAN_LIFTER_MOTOR 6
+#define CAN_LIFTER_MOTOR -1
 #define PCM_LIFTER_MODULE 0
-#define PCM_LIFTER_SOLENOID 2
+#define PCM_LIFTER_SOLENOID -1
+#define LIF_RAISESPEED 0.75
+#define LIF_LOWERSPEED -0.75
+#define LIF_LIFTERMIN 400
+#define LIF_LIFTERMAX 41000
+#define LIF_LIFTERMAXSPD 36900			/// 90% of 41000 (max height)
+#define LIF_LIFTERMINSPD 4100			/// 10% of 41000 (max height)
+#define LIF_LIFTERSTART 13600			/// starting position
 
 
 // Intake
-#define CAN_INTAKE_LEFTMOTOR 4
-#define CAN_INTAKE_RIGHTMOTOR 5
+#define CAN_INTAKE_LEFTMOTOR -1
+#define CAN_INTAKE_RIGHTMOTOR -1
 #define PCM_INTAKE_MODULE 0
-#define PCM_INTAKE_SOLENOID 1
+#define PCM_INTAKE_SOLENOID -1
 #define DIO_INTAKE_CUBESENSOR 0
+#define INT_INGESTSPEED 0.5
+#define INT_EJECTSPEED -0.5
 
 
 
@@ -106,6 +115,9 @@
 
 
 // Autonomous
+enum AutoMode {kAutoAuto, kAutoTest, kAutoStage};
+extern AutoMode automode;
+
 #define ACCEL_TIME 1.0
 #define AUTO_POWER 0.5
 #define DECEL_DISTANCE 2197
