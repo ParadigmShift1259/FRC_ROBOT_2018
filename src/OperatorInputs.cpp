@@ -9,8 +9,59 @@
 #include "Const.h"
 #include <cmath>
 
+OperatorInputs::m_curconfig = "SingleXBox";
+OperatorInputs::m_controllermap =
+{
+		{"SingleXBox",
+				{
+						{"xBoxLeftX", 0},
+						{"xBoxRightX", 0},
+						{"xBoxLeftY", 0},
+						{"xBoxRightY", 0},
+						{"xBoxAButton", 0},
+						{"xBoxBButton", 0},
+						{"xBoxXButton", 0},
+						{"xBoxYButton", 0},
+						{"xBoxLeftBumper", 0},
+						{"xBoxRightBumper", 0},
+						{"xBoxLeftTrigger", 0},
+						{"xBoxRightTrigger", 0},
+						{"xBoxStartButton", 0},
+						{"xBoxBackButton", 0},
+						{"xBoxDPadUp", 0},
+						{"xBoxDPadRight", 0},
+						{"xBoxDPadDown", 0},
+						{"xBoxDPadLeft", 0},
+						{"xBoxR3", 0}
+				}
+		},
+		{"DualXBox",
+				{
+						{"xBoxLeftX", 0},
+						{"xBoxRightX", 0},
+						{"xBoxLeftY", 0},
+						{"xBoxRightY", 0},
+						{"xBoxAButton", 1},
+						{"xBoxBButton", 1},
+						{"xBoxXButton", 1},
+						{"xBoxYButton", 1},
+						{"xBoxLeftBumper", 0},
+						{"xBoxRightBumper", 1},
+						{"xBoxLeftTrigger", 0},
+						{"xBoxRightTrigger", 1},
+						{"xBoxStartButton", 1},
+						{"xBoxBackButton", 1},
+						{"xBoxDPadUp", 0},
+						{"xBoxDPadRight", 0},
+						{"xBoxDPadDown", 0},
+						{"xBoxDPadLeft", 0},
+						{"xBoxR3", 1}
+				}
+		}
+};
 
-OperatorInputs::OperatorInputs()
+
+OperatorInputs::OperatorInputs(string curconfig)
 {
 	m_joystick = nullptr;
 	if (INP_JOYSTICK != -1)
@@ -19,6 +70,7 @@ OperatorInputs::OperatorInputs()
 		m_xbox.push_back(new Joystick(INP_XBOX_1));
 	if (INP_XBOX_2 != -1)
 		m_xbox.push_back(new Joystick(INP_XBOX_2));
+	m_curconfig = curconfig;
 }
 
 

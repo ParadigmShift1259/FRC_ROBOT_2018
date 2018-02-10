@@ -21,28 +21,28 @@ class OperatorInputs
 public:
 	enum ToggleChoice { kToggle = 0, kHold = 1 };
 
-	OperatorInputs();
+	OperatorInputs(string curconfig = "SingleXBox");
 	~OperatorInputs();
 	// xbox
-	double xBoxLeftX(unsigned int i = 0);
-	double xBoxRightX(unsigned int i = 0);
-	double xBoxLeftY(unsigned int i = 0);
-	double xBoxRightY(unsigned int i = 0);
-	bool xBoxAButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxBButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxXButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxYButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxLeftBumper(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxRightBumper(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxLeftTrigger(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxRightTrigger(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxStartButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxBackButton(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxDPadUp(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxDPadRight(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxDPadDown(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxDPadLeft(ToggleChoice choice = kToggle, unsigned int i = 0);
-	bool xBoxR3(ToggleChoice choice = kToggle, unsigned int i = 0);
+	double xBoxLeftX(unsigned int i = m_controllermap[m_curconfig]["xBoxLeftX"]);
+	double xBoxRightX(unsigned int i = m_controllermap[m_curconfig]["xBoxRightX"]);
+	double xBoxLeftY(unsigned int i = m_controllermap[m_curconfig]["xBoxLeftY"]);
+	double xBoxRightY(unsigned int i = m_controllermap[m_curconfig]["xBoxRightY"]);
+	bool xBoxAButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxAButton"]);
+	bool xBoxBButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxBButton"]);
+	bool xBoxXButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxXButton"]);
+	bool xBoxYButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxYButton"]);
+	bool xBoxLeftBumper(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxLeftBumper"]);
+	bool xBoxRightBumper(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxRightBumper"]);
+	bool xBoxLeftTrigger(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxLeftTrigger"]);
+	bool xBoxRightTrigger(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxRightTrigger"]);
+	bool xBoxStartButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxStartButton"]);
+	bool xBoxBackButton(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxBackButton"]);
+	bool xBoxDPadUp(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxDPadUp"]);
+	bool xBoxDPadRight(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxDPadRight"]);
+	bool xBoxDPadDown(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxDPadDown"]);
+	bool xBoxDPadLeft(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxDPadLeft"]);
+	bool xBoxR3(ToggleChoice choice = kToggle, unsigned int i = m_controllermap[m_curconfig]["xBoxR3"]);
 	// joystick
 	double joystickX();
 	double joystickY();
@@ -70,8 +70,10 @@ private:
 	double deadzoneFilterY(double joyStickValue);
 	double deadzoneFilterX(double joyStickValue);
 	double deadzoneFilterZ(double joyStickValue);
+	static string m_curconfig;
 
 	map<string, bool> m_togglebuttons;
+	static map<string, map<string, int> > m_controllermap;
 };
 
 
