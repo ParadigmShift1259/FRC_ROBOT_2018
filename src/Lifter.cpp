@@ -54,13 +54,15 @@ void Lifter::Init()
 
 	DriverStation::ReportError("LifterInit");
 
+	// do initialization for auto mode
 	if (m_ds->IsAutonomous())
-		 m_motor->SetSelectedSensorPosition(LIF_LIFTERSTART, 0, 0);
-	else
-		m_motor->SetSelectedSensorPosition(0, 0, 0);
+	{
+		m_motor->SetSelectedSensorPosition(LIF_LIFTERSTART, 0, 0);
+		m_solenoid->Set(false);
+	}
 
+	// do initialization for any mode
 	m_motor->StopMotor();
-	m_solenoid->Set(false);
 }
 
 

@@ -66,7 +66,6 @@ void Intake::Init()
 	m_solenoid->Set(false);
 	m_timer.Reset();
 	m_timer.Start();
-
 }
 
 
@@ -88,12 +87,13 @@ void Intake::Loop()
 		break;
 
 	case kIngest:
-		if (/*m_cubesensor->Get() ||*/ m_inputs->xBoxBackButton())
+		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
 		{
 			m_solenoid->Set(false);				/// we have cube, close intake arms
 			m_timer.Reset();
 			m_leftmotor->Set(m_ingestspeed);	/// turn on motors to ingest cube
 			m_rightmotor->Set(m_ingestspeed * -1.0);
+			m_allowingest = false;
 			m_stage = kIngestWait;				/// wait for box to ingest
 		}
 		else
@@ -125,7 +125,10 @@ void Intake::Loop()
 
 	case kBox:
 		if (m_inputs->xBoxAButton())			/// allow ingest motor only when A button released and pressed again
+		{
 			m_allowingest = true;
+			DriverStation::ReportError("A button pressed");
+		}
 		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
 		{
 			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed

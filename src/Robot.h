@@ -24,7 +24,7 @@ public:
 	virtual void TestInit();
 	virtual void TestPeriodic();
 	virtual void DisabledInit();
-	virtual void DisablePeriodic();
+	virtual void DisabledPeriodic();
 
 protected:
 	OperatorInputs *m_operatorinputs;

@@ -40,7 +40,6 @@ void Robot::RobotInit()
 
 void Robot::RobotPeriodic()
 {
-
 }
 
 
@@ -93,25 +92,6 @@ void Robot::TestPeriodic()
 
 void Robot::TeleopInit()
 {
-	m_autoSelected = m_chooser.GetSelected();
-
-	if (m_autoSelected == kAutoAutoMode)
-		automode = kAutoAuto;
-	else
-	if (m_autoSelected == kAutoTestMode)
-		automode = kAutoTest;
-	else
-	if (m_autoSelected == kAutoStageMode)
-		automode = kAutoStage;
-
-	if (automode == kAutoTest)
-		DriverStation::ReportError("TeleopInit Test Mode");
-	else
-	if (automode == kAutoStage)
-		DriverStation::ReportError("TeleopInit Stage Mode");
-	else
-		DriverStation::ReportError("TeleopInit");
-
 	if (m_compressor != nullptr)
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
@@ -152,9 +132,20 @@ void Robot::DisabledInit()
 }
 
 
-void Robot::DisablePeriodic()
+void Robot::DisabledPeriodic()
 {
 	m_autoSelected = m_chooser.GetSelected();
+
+	if (m_autoSelected == kAutoAutoMode)
+		automode = kAutoAuto;
+	else
+	if (m_autoSelected == kAutoTestMode)
+		automode = kAutoTest;
+	else
+	if (m_autoSelected == kAutoStageMode)
+		automode = kAutoStage;
+
+	SmartDashboard::PutNumber("AU1_automode", automode);
 }
 
 
