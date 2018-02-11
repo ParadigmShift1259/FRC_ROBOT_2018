@@ -20,7 +20,7 @@ class Intake
 public:
 	enum Stage {kBottom, kIngest, kIngestWait, kBox, kEject};
 
-	Intake(OperatorInputs *inputs, Lifter *lifter);
+	Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter);
 	virtual ~Intake();
 	void Init();
 	void Loop();
@@ -29,6 +29,7 @@ public:
 	void ResetPosition();
 
 protected:
+	DriverStation *m_ds;
 	OperatorInputs *m_inputs;
 	Lifter *m_lifter;
 	WPI_TalonSRX *m_leftmotor;

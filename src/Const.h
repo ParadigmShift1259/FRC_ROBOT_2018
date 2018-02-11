@@ -92,11 +92,11 @@
 #define PCM_LIFTER_SOLENOID 2
 #define LIF_RAISESPEED -1.0
 #define LIF_LOWERSPEED 0.75
-#define LIF_LIFTERMIN 400
-#define LIF_LIFTERMAX 41000
-#define LIF_LIFTERMAXSPD 36900			/// 90% of 41000 (max height)
+#define LIF_LIFTERMIN 300				/// minimum cutoff
 #define LIF_LIFTERMINSPD 4100			/// 10% of 41000 (max height)
 #define LIF_LIFTERSTART 13600			/// starting position
+#define LIF_LIFTERMAXSPD 36900			/// 90% of 41000 (max height)
+#define LIF_LIFTERMAX 41000
 
 
 // Intake

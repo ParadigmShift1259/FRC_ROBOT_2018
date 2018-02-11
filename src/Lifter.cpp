@@ -63,6 +63,7 @@ void Lifter::Init()
 
 	// do initialization for any mode
 	m_motor->StopMotor();
+	m_stage = kIdle;
 }
 
 

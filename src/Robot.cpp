@@ -32,7 +32,7 @@ void Robot::RobotInit()
 	if (PCM_COMPRESSOR_SOLENOID != -1)
 		m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
 	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
-	m_intake = new Intake(m_operatorinputs, m_lifter);
+	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
 }
@@ -61,21 +61,24 @@ void Robot::AutonomousInit()
 {
 	DriverStation::ReportError("AutonomousInit");
 
-	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
-	m_autonomous->Init();
-
 	if (m_compressor != nullptr)
 		m_compressor->Start();
 
+	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
+	m_autonomous->Init();
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	m_autonomous->Loop();
+	m_drivetrain->Loop();
+	m_lifter->Loop();
+	m_intake->Loop();
+	m_climber->Loop();
+//	m_autonomous->Loop();
 }
 
 
@@ -92,6 +95,14 @@ void Robot::TestPeriodic()
 
 void Robot::TeleopInit()
 {
+	if (automode == kAutoTest)
+		DriverStation::ReportError("TeleopInit Test Mode");
+	else
+	if (automode == kAutoStage)
+		DriverStation::ReportError("TeleopInit Stage Mode");
+	else
+		DriverStation::ReportError("TeleopInit");
+
 	if (m_compressor != nullptr)
 		m_compressor->Start();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
@@ -122,6 +133,8 @@ void Robot::TeleopPeriodic()
 
 void Robot::DisabledInit()
 {
+	DriverStation::ReportError("DisabledInit");
+
 	if (m_compressor != nullptr)
 		m_compressor->Stop();
 	m_drivetrain->Stop();
@@ -134,6 +147,8 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
+	//DriverStation::ReportError("DisabledPeriodic");
+
 	m_autoSelected = m_chooser.GetSelected();
 
 	if (m_autoSelected == kAutoAutoMode)

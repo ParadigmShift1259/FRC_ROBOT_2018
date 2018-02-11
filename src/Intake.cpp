@@ -10,12 +10,13 @@
 
 
 
-Intake::Intake(OperatorInputs *inputs, Lifter *lifter)
+Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter)
 {
 	m_leftmotor = nullptr;
 	m_rightmotor = nullptr;
 	m_solenoid = nullptr;
 
+	m_ds = ds;
 	m_inputs = inputs;
 	m_lifter = lifter;
 
@@ -36,7 +37,7 @@ Intake::Intake(OperatorInputs *inputs, Lifter *lifter)
 
 	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
 
-	m_stage = kBottom;
+	m_stage = kIngest;
 	m_ingestspeed = INT_INGESTSPEED;
 	m_ejectspeed = INT_EJECTSPEED;
 	m_allowingest = false;
@@ -61,6 +62,11 @@ void Intake::Init()
 
 	DriverStation::ReportError("IntakeInit");
 
+	// do initialization for auto mode
+	if (m_ds->IsAutonomous())
+		m_stage = kBox;
+
+	// do initialization for any mode
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
 	m_solenoid->Set(false);
@@ -74,7 +80,7 @@ void Intake::Loop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	m_inputs->xBoxAButton();					/// check A Button to record state of button toggle (used in kBox)
+	bool xboxabuttontoggle = m_inputs->xBoxAButton();					/// check A Button to record state of button toggle (used in kBox)
 
 	switch (m_stage)
 	{
@@ -91,28 +97,30 @@ void Intake::Loop()
 	case kIngest:
 		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
 		{
-			m_solenoid->Set(false);				/// we have cube, close intake arms
+			m_solenoid->Set(false);					/// we have cube, close intake arms
 			m_timer.Reset();
-			m_leftmotor->Set(m_ingestspeed);	/// turn on motors to ingest cube
+			m_leftmotor->Set(m_ingestspeed);		/// turn on motors to ingest cube
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 			m_allowingest = false;
-			m_stage = kIngestWait;				/// wait for box to ingest
+			m_stage = kIngestWait;					/// wait for box to ingest
 		}
 		else
 		if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
 		{
-			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed
+			m_solenoid->Set(true);					/// open intake arms
+			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
 		{
-			m_leftmotor->StopMotor();			/// stop motors if button not pressed
+			m_solenoid->Set(true);					/// open intake arms
+			m_leftmotor->StopMotor();				/// stop motors if button not pressed
 			m_rightmotor->StopMotor();
 		}
 		break;
 
 	case kIngestWait:
-		if (m_timer.HasPeriodPassed(0.5))		/// wait for 500ms
+		if (m_timer.HasPeriodPassed(0.2))		/// wait for 200ms
 		{
 			m_leftmotor->StopMotor();				/// ingestion is complete stop motors
 			m_rightmotor->StopMotor();
@@ -126,11 +134,11 @@ void Intake::Loop()
 		break;
 
 	case kBox:
-		if (m_inputs->xBoxAButton())			/// allow ingest motor only when A button released and pressed again
+		if (xboxabuttontoggle)					/// allow ingest motor only when A button released and pressed again
 			m_allowingest = true;
 		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
 		{
-			m_leftmotor->Set(m_ingestspeed);	/// turn on motors if button pressed
+			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
@@ -154,7 +162,7 @@ void Intake::Loop()
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
-			m_stage = kBottom;						/// go back to beginning (reset loop)
+			m_stage = kIngest;						/// go back to beginning (reset loop)
 		}
 		else
 		{

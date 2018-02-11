@@ -28,11 +28,10 @@ protected:
 	Notifier* m_notifier;
 
 	DriveStraightState m_straightstate;
-	double m_distance;
 	double m_acceldistance;
 	double m_timermod;
-	double timervalue;
-	double distance;
+	double m_timervalue;
+	double m_distance;
 	double m_target;
 };
 
