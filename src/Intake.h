@@ -41,6 +41,7 @@ protected:
 	double m_ingestspeed;
 	double m_ejectspeed;
 	bool m_allowingest;
+	bool m_autoingest;
 };
 
 

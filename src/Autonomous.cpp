@@ -55,7 +55,7 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	DriveStraight(96);
+	//DriveStraight(96);
 //	m_drivepid->Drive(-0.7,true);
 }
 
