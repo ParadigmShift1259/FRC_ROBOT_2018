@@ -41,7 +41,6 @@ private:
 	frc::SendableChooser<std::string> m_chooser;
 	const std::string kAutoAutoMode = "Auto Mode";
 	const std::string kAutoTestMode = "Test Mode";
-	const std::string kAutoStageMode = "Stage Mode";
 	std::string m_autoSelected;
 };
 

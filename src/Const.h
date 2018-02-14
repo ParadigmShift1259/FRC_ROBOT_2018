@@ -11,9 +11,10 @@
 
 //OperatorInputs
 //	Controllers
+#define INP_DUAL 0
 #define INP_JOYSTICK -1
-#define INP_XBOX_1 1
-#define INP_XBOX_2 -1
+#define INP_XBOX_1 0
+#define INP_XBOX_2 1
 //	Set to 1.0 or -1.0
 #define INVERT_Y_AXIS 1.0
 #define INVERT_X_AXIS -1.0
@@ -115,7 +116,7 @@
 
 
 // Autonomous
-enum AutoMode {kAutoAuto, kAutoTest, kAutoStage};
+enum AutoMode {kAutoAuto, kAutoTest};
 extern AutoMode automode;
 
 #define ACCEL_TIME 1.0

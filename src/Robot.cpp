@@ -22,7 +22,6 @@ void Robot::RobotInit()
 {
 	m_chooser.AddDefault(kAutoAutoMode, kAutoAutoMode);
 	m_chooser.AddObject(kAutoTestMode, kAutoTestMode);
-	m_chooser.AddObject(kAutoStageMode, kAutoStageMode);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -98,9 +97,6 @@ void Robot::TeleopInit()
 	if (automode == kAutoTest)
 		DriverStation::ReportError("TeleopInit Test Mode");
 	else
-	if (automode == kAutoStage)
-		DriverStation::ReportError("TeleopInit Stage Mode");
-	else
 		DriverStation::ReportError("TeleopInit");
 
 	if (m_compressor != nullptr)
@@ -156,9 +152,6 @@ void Robot::DisabledPeriodic()
 	else
 	if (m_autoSelected == kAutoTestMode)
 		automode = kAutoTest;
-	else
-	if (m_autoSelected == kAutoStageMode)
-		automode = kAutoStage;
 
 	SmartDashboard::PutNumber("AU1_automode", automode);
 }

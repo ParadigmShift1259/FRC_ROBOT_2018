@@ -83,7 +83,8 @@ void Intake::Loop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	bool xboxabuttontoggle = m_inputs->xBoxAButton();					/// check A Button to record state of button toggle (used in kBox)
+	/// check A Button to record state of button toggle (used in kBox)
+	bool xboxabuttontoggle = m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL);
 
 	switch (m_stage)
 	{
@@ -100,7 +101,7 @@ void Intake::Loop()
 	case kIngest:
 		if(xboxabuttontoggle)
 			m_autoingest = true;
-		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
+		if (m_cubesensor->Get())
 		{
 			m_solenoid->Set(false);					/// we have cube, close intake arms
 			m_timer.Reset();
@@ -142,13 +143,13 @@ void Intake::Loop()
 	case kBox:
 		if (xboxabuttontoggle)					/// allow ingest motor only when A button released and pressed again
 			m_allowingest = true;
-		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))
+		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
 			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
-		if (m_inputs->xBoxBButton())
+		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
 			m_leftmotor->Set(m_ejectspeed);			/// eject the box
 			m_rightmotor->Set(m_ejectspeed * -1.0);
@@ -191,13 +192,13 @@ void Intake::TestLoop()
 	if ((m_leftmotor == nullptr) || (m_rightmotor == nullptr) || (m_solenoid == nullptr))
 		return;
 
-	if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold))		/// ingest cube - positive
+	if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// ingest cube - positive
 	{
 		m_leftmotor->Set(m_ingestspeed);
 		m_rightmotor->Set(m_ingestspeed * -1.0);
 	}
 	else
-	if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold))		/// eject cube - negative
+	if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// eject cube - negative
 	{
 		m_leftmotor->Set(m_ejectspeed);
 		m_rightmotor->Set(m_ejectspeed * -1.0);
@@ -208,10 +209,10 @@ void Intake::TestLoop()
 		m_rightmotor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadLeft())		/// open intake - deploy - true
+	if (m_inputs->xBoxDPadLeft(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// open intake - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadRight())		/// close intake - retract - false (default)
+	if (m_inputs->xBoxDPadRight(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// close intake - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("IN1_leftmotor", m_leftmotor->GetSelectedSensorVelocity(0));

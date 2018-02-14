@@ -75,13 +75,13 @@ void Lifter::Loop()
 	m_position = m_motor->GetSelectedSensorPosition(0);
 
 	/// if left bumper and Y override position sensor and raise lift
-	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold))
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 	{
 		m_motor->Set(m_raisespeed * 0.5);
 	}
 	else
 	/// if Y raise list only if not at max position
-	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold) && (m_position < m_liftermax))		/// raise lifter - positive
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position < m_liftermax))		/// raise lifter - positive
 	{
 		if (m_position > m_liftermaxspd)
 			m_motor->Set(m_raisespeed * 0.5);
@@ -90,14 +90,14 @@ void Lifter::Loop()
 	}
 	else
 	/// if left bumper and X override position sensor and lower lift
-	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold))
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 	{
 		m_motor->Set(m_lowerspeed * 0.5);
 		m_motor->SetSelectedSensorPosition(0, 0, 0);
 	}
 	else
 	/// if X lower lift only if not at min position
-	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold) && (m_position > m_liftermin))		/// lower lifter - negative
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position > m_liftermin))		/// lower lifter - negative
 	{
 		if (m_position < m_lifterminspd)
 			m_motor->Set(m_lowerspeed * 0.5);
@@ -106,24 +106,42 @@ void Lifter::Loop()
 	}
 	else
 	/// stop lift if less than or at min position
-	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold) && (m_position <= m_liftermin))
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position <= m_liftermin))
 	{
 		m_motor->StopMotor();
 		m_motor->SetSelectedSensorPosition(0, 0, 0);
 	}
-	/// no buttons pressed so stop motors
+	/// no buttons pressed so check for staging of lifter (pre game)
 	else
 	{
-		if (automode == kAutoStage)
-			Staging();
-		else
-			m_motor->StopMotor();
+		switch (m_stage)
+		{
+		case kIdle:
+			if (m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))
+			{
+				m_motor->SetSelectedSensorPosition(0, 0, 0);
+				m_stage = kRaise;
+			}
+			else
+				m_motor->StopMotor();
+			break;
+
+		case kRaise:
+			if (m_position < LIF_LIFTERSTART)
+				m_motor->Set(m_raisespeed * 0.5);
+			else
+			{
+				m_motor->StopMotor();
+				m_stage = kIdle;
+			}
+			break;
+		}
 	}
 
-	if (m_inputs->xBoxDPadUp())			/// angle lifter - deploy - true
+	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// angle lifter - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadDown())		/// straighten lifter - retract - false (default)
+	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// straighten lifter - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
@@ -139,12 +157,12 @@ void Lifter::TestLoop()
 
 	m_position = m_motor->GetSelectedSensorPosition(0);
 
-	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold))		/// raise lifter - positive
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// raise lifter - positive
 	{
 		m_motor->Set(m_raisespeed * 0.5);
 	}
 	else
-	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold))		/// lower lifter - negative
+	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// lower lifter - negative
 	{
 		m_motor->Set(m_lowerspeed * 0.5);
 	}
@@ -153,10 +171,10 @@ void Lifter::TestLoop()
 		m_motor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadUp())			/// angle lifter - deploy - true
+	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// angle lifter - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadDown())		/// straighten lifter - retract - false (default)
+	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// straighten lifter - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
@@ -190,41 +208,4 @@ bool Lifter::IsBottom()
 		return true;
 	else
 		return false;
-}
-
-
-void Lifter::Staging()
-{
-	m_position = m_motor->GetSelectedSensorPosition(0);
-
-	switch (m_stage)
-	{
-	case kIdle:
-		if (m_inputs->xBoxStartButton())
-		{
-			m_motor->SetSelectedSensorPosition(0, 0, 0);
-			m_stage = kRaise;
-		}
-		else
-			m_motor->StopMotor();
-		break;
-
-	case kRaise:
-		if (m_position < LIF_LIFTERSTART)
-			m_motor->Set(m_raisespeed * 0.5);
-		else
-		{
-			m_motor->StopMotor();
-			m_stage = kStop;
-		}
-		break;
-
-	case kStop:
-		m_motor->StopMotor();
-		break;
-	}
-
-	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
-	SmartDashboard::PutNumber("LI2_liftermax", m_liftermax);
-	SmartDashboard::PutNumber("LI3_position", m_position);
 }
