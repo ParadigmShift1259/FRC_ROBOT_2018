@@ -27,6 +27,7 @@ public:
 	void Stop();
 	void ResetPosition();
 	bool IsBottom();
+	void MoveSmidgeUp();
 
 protected:
 	DriverStation *m_ds;

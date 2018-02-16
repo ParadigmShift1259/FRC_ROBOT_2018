@@ -209,3 +209,16 @@ bool Lifter::IsBottom()
 	else
 		return false;
 }
+
+
+void Lifter::MoveSmidgeUp()
+{
+	if (m_motor->GetSelectedSensorPosition(0) < 4200)
+	{
+		m_motor->Set(m_raisespeed);
+	}
+	else
+	{
+		m_motor->Set(0);
+	}
+}
