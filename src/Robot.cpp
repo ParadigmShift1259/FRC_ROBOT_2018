@@ -115,16 +115,23 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
+	//static double pid[3] = {0.009, 0.0005, 0.07};
 	double ypr[3] = {0, 0, 0};
 	if (automode == kAutoTest)
 	{
-		/*if(m_operatorinputs->xBoxRightTrigger(OperatorInputs::ToggleChoice::kToggle,0))
+		/*pid[0] = SmartDashboard::GetNumber("P",pid[0]);
+		m_drivepid->SetP(pid[0]);
+		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
+		m_drivepid->SetI(pid[1]);
+		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
+		m_drivepid->SetD(pid[2]);
+		if(m_operatorinputs->xBoxRightTrigger(OperatorInputs::ToggleChoice::kToggle,0))
 			m_turn = kInit;
 		switch(m_turn)
 		{
 		case kInit:
 			m_drivepid->Enable();
-			m_drivepid->Init(0.009, 0.0005, 0.07, true);
+			m_drivepid->Init(pid[0], pid[1], pid[2], true);
 			m_drivepid->SetRelativeAngle(90);
 			m_turn = kTurning;
 		case kTurning:
