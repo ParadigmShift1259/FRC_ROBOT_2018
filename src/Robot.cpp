@@ -35,6 +35,7 @@ void Robot::RobotInit()
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
+	m_visiontarget = new VisionTarget();
 }
 
 
@@ -109,25 +110,27 @@ void Robot::TeleopInit()
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
+	m_visiontarget->Init();
 }
 
 
 void Robot::TeleopPeriodic()
 {
-	if (automode == kAutoTest)
-	{
-		m_drivetrain->Loop();
-		m_lifter->TestLoop();
-		m_intake->TestLoop();
-		m_climber->TestLoop();
-	}
-	else
-	{
-		m_drivetrain->Loop();
-		m_lifter->Loop();
-		m_intake->Loop();
-		m_climber->Loop();
-	}
+	m_visiontarget->Loop();
+//	if (automode == kAutoTest)
+//	{
+//		m_drivetrain->Loop();
+//		m_lifter->TestLoop();
+//		m_intake->TestLoop();
+//		m_climber->TestLoop();
+//	}
+//	else
+//	{
+//		m_drivetrain->Loop();
+//		m_lifter->Loop();
+//		m_intake->Loop();
+//		m_climber->Loop();
+//	}
 }
 
 

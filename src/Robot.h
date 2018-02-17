@@ -10,6 +10,7 @@
 #include "Intake.h"
 #include "Climber.h"
 #include "Autonomous.h"
+#include "VisionTarget.h"
 
 
 class Robot : public TimedRobot
@@ -35,6 +36,7 @@ protected:
 	Intake *m_intake;
 	Climber *m_climber;
 	Autonomous *m_autonomous;
+	VisionTarget *m_visiontarget;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
