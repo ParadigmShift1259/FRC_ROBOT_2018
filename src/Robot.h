@@ -15,6 +15,7 @@
 class Robot : public TimedRobot
 {
 public:
+	enum TurnState {kInit, kTurning, kIdle};
 	virtual void RobotInit();
 	virtual void RobotPeriodic();
 	virtual void AutonomousInit();
@@ -29,12 +30,15 @@ public:
 protected:
 	OperatorInputs *m_operatorinputs;
 	DriveTrain *m_drivetrain;
+	DrivePID *m_drivepid;
 	Compressor *m_compressor;
 	DriverStation *m_driverstation;
 	Lifter *m_lifter;
 	Intake *m_intake;
 	Climber *m_climber;
 	Autonomous *m_autonomous;
+	PigeonIMU *m_pigeon;
+	TurnState m_turn=kInit;
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
@@ -42,6 +46,7 @@ private:
 	const std::string kAutoAutoMode = "Auto Mode";
 	const std::string kAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
+	double m_gyroval[3];
 };
 
 

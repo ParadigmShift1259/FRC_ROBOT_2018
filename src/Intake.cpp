@@ -127,17 +127,19 @@ void Intake::Loop()
 		break;
 
 	case kIngestWait:
-		if (m_timer.HasPeriodPassed(0.2))		/// wait for 200ms
+		if (m_timer.Get() > 0.2)		/// wait for 200ms
 		{
 			m_leftmotor->StopMotor();				/// ingestion is complete stop motors
 			m_rightmotor->StopMotor();
-			m_stage = kBox;							/// we have the box
+			if(m_lifter->MoveSmidgeUp())
+			{
+				m_stage = kBox;							/// we have the box
+			}
 		}
 		else
 		{
 			m_leftmotor->Set(m_ingestspeed);		/// run the motors to ensure we have the box
 			m_rightmotor->Set(m_ingestspeed * -1.0);
-			m_lifter->MoveSmidgeUp();
 		}
 		break;
 
@@ -148,6 +150,15 @@ void Intake::Loop()
 		{
 			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
 			m_rightmotor->Set(m_ingestspeed * -1.0);
+		}
+		else
+		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+		{
+			m_ejectspeed *= 0.5;
+			m_leftmotor->Set(m_ejectspeed);
+			m_rightmotor->Set(m_ejectspeed);
+			m_timer.Reset();
+			m_stage = kEject;
 		}
 		else
 		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
@@ -170,6 +181,7 @@ void Intake::Loop()
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
+			m_ejectspeed = INT_EJECTSPEED;
 			m_stage = kIngest;						/// go back to beginning (reset loop)
 		}
 		else

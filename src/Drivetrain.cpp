@@ -61,6 +61,7 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 	m_timerramp = new Timer();
 	m_rampmax = RAMPING_RATE_MAX;
+	m_vision = new VisionTarget();
 }
 
 
@@ -196,7 +197,14 @@ void DriveTrain::Loop()
 		y = y * LOWSPEED_MODIFIER_Y;
 	}
 
-	Drive(x, y, true);
+	if ((INP_DUAL && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 0)) || (INP_DUAL == 0 && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 0)))
+	{
+			Drive(m_vision->GetVisionX(), y, true);
+	}
+	else
+	{
+		Drive(x, y, true);
+	}
 
 	if (m_shift)
 	{
@@ -232,6 +240,8 @@ void DriveTrain::Loop()
 	SmartDashboard::PutNumber("DT07_shift_down", m_isdownshifting);
 	SmartDashboard::PutNumber("DT08_abs_x", (abs(m_previousx * X_SCALING) < CHILD_PROOF_SPEED));
 	SmartDashboard::PutNumber("DT09_abs_y", (abs(m_previousy * Y_SCALING) < CHILD_PROOF_SPEED));
+	SmartDashboard::PutNumber("rightEncoderTicks", m_righttalonlead->GetSelectedSensorPosition(0));
+	SmartDashboard::PutNumber("leftEncoderTicks", m_lefttalonlead->GetSelectedSensorPosition(0));
 }
 
 

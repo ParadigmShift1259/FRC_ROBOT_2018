@@ -10,11 +10,11 @@
 #include <cmath>
 
 
-Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain)
+Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid)
 {
 	m_inputs = inputs;
 	m_drivetrain = drivetrain;
-	m_drivepid = new DrivePID(m_drivetrain, m_inputs);
+	m_drivepid = drivepid;
 
 	m_timerstraight = new Timer();
 	m_timerstraight->Reset();
@@ -55,7 +55,7 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	//DriveStraight(96);
+	DriveStraight(94);
 //	m_drivepid->Drive(-0.7,true);
 }
 
@@ -121,11 +121,11 @@ bool Autonomous::DriveStraight(double targetdistance)
 		/*
 		 * If it appears that the robot will shoot past the proper time to decelerate
 		 */
-		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5)/CODES_PER_INCH + m_distance) <= DECEL_DISTANCE)
-		{
-			m_notifier->StartSingle((targetdistance - m_drivetrain->GetLeftPosition()) / (m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) * 10));
-			break;
-		}
+//		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5)/CODES_PER_INCH + m_distance) <= DECEL_DISTANCE)
+//		{
+//			m_notifier->StartSingle((targetdistance - m_drivetrain->GetLeftPosition()) / (m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) * 10));
+//			break;
+//		}
 		else
 		{
 			m_drivepid->Drive(-AUTO_POWER);

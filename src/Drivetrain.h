@@ -12,6 +12,7 @@
 #include <WPILib.h>
 #include <ctre\Phoenix.h>
 #include "OperatorInputs.h"
+#include "VisionTarget.h"
 
 class DriveTrain
 {
@@ -65,6 +66,7 @@ protected:
 	DifferentialDrive *m_differentialdrive;
 	Solenoid *m_shifter;
 	Timer *m_timerramp;
+	VisionTarget *m_vision;
 
 	double m_leftpow;
 	double m_rightpow;

@@ -11,7 +11,7 @@
 
 //OperatorInputs
 //	Controllers
-#define INP_DUAL 0
+#define INP_DUAL 1
 #define INP_JOYSTICK -1
 #define INP_XBOX_1 0
 #define INP_XBOX_2 1
@@ -77,8 +77,8 @@
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
-#define CODES_PER_REV 4480.0
-#define CODES_PER_INCH 238.0
+#define CODES_PER_REV 7138.0
+#define CODES_PER_INCH 468.16
 #define WHEEL_DIAMETER 6.0
 #define WHEEL_TRACK 22.50
 
@@ -110,7 +110,6 @@
 #define INT_EJECTSPEED -0.5
 
 
-
 // Climber
 #define CAN_CLIMBER_MOTOR 7
 
@@ -121,7 +120,8 @@ extern AutoMode automode;
 
 #define ACCEL_TIME 1.0
 #define AUTO_POWER 0.5
-#define DECEL_DISTANCE 9.2
+#define DECEL_DISTANCE 20
+
 
 
 #endif /* SRC_CONST_H_ */
