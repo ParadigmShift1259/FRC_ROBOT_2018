@@ -110,16 +110,20 @@ void Robot::TeleopInit()
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
+	SmartDashboard::PutNumber("P", SmartDashboard::GetNumber("P",0.018));
+	SmartDashboard::PutNumber("I", SmartDashboard::GetNumber("I", 0.0003));
+	SmartDashboard::PutNumber("D", SmartDashboard::GetNumber("D", 0.05));
 }
 
 
 void Robot::TeleopPeriodic()
 {
-	//static double pid[3] = {0.009, 0.0005, 0.07};
+	SmartDashboard::PutBoolean("DriverControl",m_drivepid->GetEnabled());
+	static double pid[3] = {0.009, 0.0005, 0.07};
 	double ypr[3] = {0, 0, 0};
 	if (automode == kAutoTest)
 	{
-		/*pid[0] = SmartDashboard::GetNumber("P",pid[0]);
+		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
 		m_drivepid->SetP(pid[0]);
 		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
 		m_drivepid->SetI(pid[1]);
@@ -132,7 +136,7 @@ void Robot::TeleopPeriodic()
 		case kInit:
 			m_drivepid->Enable();
 			m_drivepid->Init(pid[0], pid[1], pid[2], true);
-			m_drivepid->SetRelativeAngle(90);
+			m_drivepid->SetRelativeAngle(45);
 			m_turn = kTurning;
 		case kTurning:
 			m_drivepid->Drive(0,false);
@@ -144,7 +148,7 @@ void Robot::TeleopPeriodic()
 		default:
 			m_drivepid->Stop();
 			m_drivetrain->Loop();
-		}*/
+		}
 		m_lifter->TestLoop();
 		m_intake->TestLoop();
 		m_climber->TestLoop();
@@ -168,6 +172,7 @@ void Robot::TeleopPeriodic()
 
 void Robot::DisabledInit()
 {
+	NetworkTableInstance::GetDefault().GetTable("OpenCV");
 	DriverStation::ReportError("DisabledInit");
 
 	if (m_compressor != nullptr)
@@ -182,7 +187,7 @@ void Robot::DisabledInit()
 	m_gyroval[2] = 0;
 	m_pigeon->SetFusedHeading(0,0);
 	m_pigeon->SetYaw(0,0);
-
+	m_drivepid->SetAbsoluteAngle(0);
 }
 
 

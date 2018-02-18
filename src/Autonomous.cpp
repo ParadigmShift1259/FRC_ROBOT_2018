@@ -26,6 +26,7 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 	m_timervalue = 0;
 	m_distance = 0;
 	m_target = 0;
+	int stage = 0;
 }
 
 
@@ -55,8 +56,13 @@ void Autonomous::Init()
 
 void Autonomous::Loop()
 {
-	DriveStraight(94);
-//	m_drivepid->Drive(-0.7,true);
+	switch (stage)
+	{
+	case 0:
+		if (DriveStraight(115))
+		{stage = 1;}
+	}
+	//	m_drivepid->Drive(-0.7,true);
 }
 
 
@@ -67,6 +73,7 @@ void Autonomous::Loop()
  */
 bool Autonomous::DriveStraight(double targetdistance)
 {
+	m_drivepid->SetRelativeAngle(0);
 	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition()/CODES_PER_INCH);
 	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	m_target = targetdistance;

@@ -158,7 +158,7 @@ void DriveTrain::Init(DriveMode mode)
 	m_ishighgear = true;
 	// Starts in high gear
 	if (m_shifter != nullptr)
-		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+		m_shifter->Set(!(FLIP_HIGH_GEAR ^ m_ishighgear));
 	m_isdownshifting = false;
 	m_lowspeedmode = false;
 	m_shift = false;

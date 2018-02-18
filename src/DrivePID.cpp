@@ -54,6 +54,10 @@ void DrivePID::Drive(double y, bool ramp)
 	m_ramp = ramp;
 }
 
+bool DrivePID::GetEnabled()
+{
+	return GetPIDController()->IsEnabled();
+}
 
 void DrivePID::SetP(double p)
 {

@@ -24,6 +24,8 @@ public:
 	void Drive(double y, bool ramp = false);
 	void Stop();
 
+	bool GetEnabled();
+
 	void SetP(double p);
 	void SetI(double i);
 	void SetD(double d);

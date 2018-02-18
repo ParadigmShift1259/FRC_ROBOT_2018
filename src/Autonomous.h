@@ -33,6 +33,7 @@ protected:
 	double m_timervalue;
 	double m_distance;
 	double m_target;
+	int stage;
 };
 
 

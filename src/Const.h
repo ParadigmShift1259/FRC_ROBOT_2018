@@ -11,7 +11,7 @@
 
 //OperatorInputs
 //	Controllers
-#define INP_DUAL 1
+#define INP_DUAL 0
 #define INP_JOYSTICK -1
 #define INP_XBOX_1 0
 #define INP_XBOX_2 1
@@ -78,7 +78,7 @@
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
 #define CODES_PER_REV 7138.0
-#define CODES_PER_INCH 468.16
+#define CODES_PER_INCH 234.375
 #define WHEEL_DIAMETER 6.0
 #define WHEEL_TRACK 22.50
 
@@ -119,8 +119,8 @@ enum AutoMode {kAutoAuto, kAutoTest};
 extern AutoMode automode;
 
 #define ACCEL_TIME 1.0
-#define AUTO_POWER 0.5
-#define DECEL_DISTANCE 20
+#define AUTO_POWER 0.3
+#define DECEL_DISTANCE 51.57
 
 
 
