@@ -26,7 +26,7 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 	m_timervalue = 0;
 	m_distance = 0;
 	m_target = 0;
-	int stage = 0;
+	stage = 0;
 }
 
 

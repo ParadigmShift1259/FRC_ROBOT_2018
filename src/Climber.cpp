@@ -47,7 +47,9 @@ void Climber::Loop()
 	if (m_motor == nullptr)
 		return;
 
-	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// initiate climb - positive
+	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// initiate climb - positive
+		m_motor->Set(-1.0);
+	else if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		m_motor->Set(1.0);
 	else
 		m_motor->StopMotor();
@@ -59,7 +61,10 @@ void Climber::TestLoop()
 	if (m_motor == nullptr)
 		return;
 
-	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// initiate climb - positive
+  
+	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// initiate climb - positive
+		m_motor->Set(-0.5);
+	else if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		m_motor->Set(0.5);
 	else
 		m_motor->StopMotor();

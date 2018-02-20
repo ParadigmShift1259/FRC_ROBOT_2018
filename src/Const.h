@@ -11,7 +11,7 @@
 
 //OperatorInputs
 //	Controllers
-#define INP_DUAL 0
+#define INP_DUAL 1
 #define INP_JOYSTICK -1
 #define INP_XBOX_1 0
 #define INP_XBOX_2 1
@@ -96,8 +96,8 @@
 #define LIF_LIFTERMIN 300				/// minimum cutoff
 #define LIF_LIFTERMINSPD 4100			/// 10% of 41000 (max height)
 #define LIF_LIFTERSTART 13600			/// starting position
-#define LIF_LIFTERMAXSPD 36900			/// 90% of 41000 (max height)
-#define LIF_LIFTERMAX 41000
+#define LIF_LIFTERMAXSPD 25650			/// 90% of 41000 (max height)
+#define LIF_LIFTERMAX 28500
 
 
 // Intake
