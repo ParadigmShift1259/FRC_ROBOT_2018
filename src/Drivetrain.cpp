@@ -61,6 +61,7 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 	m_timerramp = new Timer();
 	m_rampmax = RAMPING_RATE_MAX;
+	m_vision = new VisionTarget();
 }
 
 
@@ -157,7 +158,7 @@ void DriveTrain::Init(DriveMode mode)
 	m_ishighgear = true;
 	// Starts in high gear
 	if (m_shifter != nullptr)
-		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+		m_shifter->Set(!(FLIP_HIGH_GEAR ^ m_ishighgear));
 	m_isdownshifting = false;
 	m_lowspeedmode = false;
 	m_shift = false;
@@ -172,11 +173,11 @@ void DriveTrain::Loop()
 	double x;
 	double y;
 
-	if (m_inputs->xBoxR3())
+	if (m_inputs->xBoxR3(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 	{
 		ChangeDirection();
 	}
-	if (m_inputs->xBoxLeftTrigger())
+	if (m_inputs->xBoxLeftTrigger(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 	{
 		m_shift = true;
 		m_lowspeedmode = false;
@@ -184,8 +185,8 @@ void DriveTrain::Loop()
 
 	LowSpeedDriving();
 
-	x = m_inputs->xBoxLeftX();
-	y = m_inputs->xBoxLeftY();
+	x = m_inputs->xBoxLeftX(0 * INP_DUAL);
+	y = m_inputs->xBoxLeftY(0 * INP_DUAL);
 
 	if (m_isdownshifting)
 		y = 0;
@@ -196,7 +197,14 @@ void DriveTrain::Loop()
 		y = y * LOWSPEED_MODIFIER_Y;
 	}
 
-	Drive(x, y, true);
+	if ((INP_DUAL && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 0)) || (INP_DUAL == 0 && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 0)))
+	{
+			Drive(m_vision->GetVisionX(), y, true);
+	}
+	else
+	{
+		Drive(x, y, true);
+	}
 
 	if (m_shift)
 	{
@@ -232,6 +240,8 @@ void DriveTrain::Loop()
 	SmartDashboard::PutNumber("DT07_shift_down", m_isdownshifting);
 	SmartDashboard::PutNumber("DT08_abs_x", (abs(m_previousx * X_SCALING) < CHILD_PROOF_SPEED));
 	SmartDashboard::PutNumber("DT09_abs_y", (abs(m_previousy * Y_SCALING) < CHILD_PROOF_SPEED));
+	SmartDashboard::PutNumber("rightEncoderTicks", m_righttalonlead->GetSelectedSensorPosition(0));
+	SmartDashboard::PutNumber("leftEncoderTicks", m_lefttalonlead->GetSelectedSensorPosition(0));
 }
 
 
@@ -369,7 +379,7 @@ bool DriveTrain::ChangeDirection()
 void DriveTrain::LowSpeedDriving()
 {
 	SmartDashboard::PutNumber("DT16_lowspeed", m_lowspeedmode);
-	if (m_inputs->xBoxLeftTrigger())
+	if (m_inputs->xBoxLeftTrigger(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 	{
 		m_lowspeedmode = !m_lowspeedmode;
 		if (m_ishighgear && m_lowspeedmode)

@@ -12,24 +12,26 @@
 
 #include <Drivetrain.h>
 #include <WPILib.h>
-#include "DriveAnglePID.h"
 #include "OperatorInputs.h"
 
 
 class DrivePID: public PIDSubsystem
 {
 public:
-	DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs);
+	DrivePID(DriveTrain *drivetrain, PigeonIMU *pigeon, OperatorInputs *inputs);
 	~DrivePID();
 	void Init(double p = 0, double i = 0, double d = 0, bool enable = false);
 	void Drive(double y, bool ramp = false);
 	void Stop();
+
+	bool GetEnabled();
 
 	void SetP(double p);
 	void SetI(double i);
 	void SetD(double d);
 	void SetY(double y);
 	void SetRelativeAngle(double angle);
+	void SetAbsoluteAngle(double angle);
 
 	void EnablePID();
 	void DisablePID();
@@ -38,6 +40,7 @@ public:
 
 protected:
 	DriveTrain *m_drivetrain;
+	PigeonIMU *m_pigeon;
 	OperatorInputs *m_inputs;
 	double m_p;
 	double m_i;

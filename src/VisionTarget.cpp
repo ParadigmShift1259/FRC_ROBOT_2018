@@ -31,6 +31,13 @@ void VisionTarget::Loop()
 }
 
 
+double VisionTarget::GetVisionX()
+{
+	return 0;
+//	return m_nettable->GetNumber("xOffDistance", 0);
+}
+
+
 void VisionTarget::Stop()
 {
 

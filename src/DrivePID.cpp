@@ -10,7 +10,7 @@
 #include "const.h"
 
 
-DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem(0.0, 0.0, 0.0)
+DrivePID::DrivePID(DriveTrain *drivetrain, PigeonIMU *pigeon, OperatorInputs *inputs): PIDSubsystem(0.0, 0.0, 0.0)
 {
 	m_drivetrain = drivetrain;
 	m_inputs = inputs;
@@ -20,6 +20,7 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_y = 0.0;
 	m_ramp = false;
 	m_angle = 0.0;
+	m_pigeon = pigeon;
 }
 
 
@@ -35,7 +36,7 @@ void DrivePID::Init(double p, double i, double d, bool enable)
 	m_d = d;
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	SetSetpoint(0);
-	SetAbsoluteTolerance(10);
+	SetAbsoluteTolerance(0.5);
 	if (enable)
 		EnablePID();
 }
@@ -53,6 +54,10 @@ void DrivePID::Drive(double y, bool ramp)
 	m_ramp = ramp;
 }
 
+bool DrivePID::GetEnabled()
+{
+	return GetPIDController()->IsEnabled();
+}
 
 void DrivePID::SetP(double p)
 {
@@ -82,6 +87,13 @@ void DrivePID::SetY(double y)
 
 
 void DrivePID::SetRelativeAngle(double angle)
+{
+	m_angle += angle;
+	SetSetpointRelative(m_angle);
+}
+
+
+void DrivePID::SetAbsoluteAngle(double angle)
 {
 	m_angle = angle;
 	SetSetpointRelative(m_angle);
@@ -115,8 +127,10 @@ double DrivePID::ReturnPIDInput()
 
 	double retval = (360 / (2 * 3.1415926535)) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;
 
-	SmartDashboard::PutNumber("ReturnPosition", m_leftpos + m_rightpos);
-	SmartDashboard::PutNumber("ReturnCurrentPosition", retval);
+	SmartDashboard::PutNumber("ReturnPosition(Enc)", m_leftpos + m_rightpos);
+	SmartDashboard::PutNumber("ReturnCurrentPosition(Enc)", retval);
+	retval = m_pigeon->GetFusedHeading();
+	SmartDashboard::PutNumber("ReturnCurrentPosition(Gyro)", retval);
 
 	return retval;
 }

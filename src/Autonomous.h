@@ -12,7 +12,7 @@ class Autonomous
 public:
 	enum DriveStraightState {kStart, kAccel, kMaintain, kDecel};
 
-	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain);
+	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid);
 	virtual ~Autonomous();
 	void Init();
 	void Loop();
@@ -33,6 +33,7 @@ protected:
 	double m_timervalue;
 	double m_distance;
 	double m_target;
+	int stage;
 };
 
 

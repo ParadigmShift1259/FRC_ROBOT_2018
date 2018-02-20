@@ -11,9 +11,10 @@
 
 //OperatorInputs
 //	Controllers
+#define INP_DUAL 1
 #define INP_JOYSTICK -1
-#define INP_XBOX_1 1
-#define INP_XBOX_2 -1
+#define INP_XBOX_1 0
+#define INP_XBOX_2 1
 //	Set to 1.0 or -1.0
 #define INVERT_Y_AXIS 1.0
 #define INVERT_X_AXIS -1.0
@@ -76,8 +77,8 @@
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
-#define CODES_PER_REV 4480.0
-#define CODES_PER_INCH 238.0
+#define CODES_PER_REV 7138.0
+#define CODES_PER_INCH 234.375
 #define WHEEL_DIAMETER 6.0
 #define WHEEL_TRACK 22.50
 
@@ -95,8 +96,8 @@
 #define LIF_LIFTERMIN 300				/// minimum cutoff
 #define LIF_LIFTERMINSPD 4100			/// 10% of 41000 (max height)
 #define LIF_LIFTERSTART 13600			/// starting position
-#define LIF_LIFTERMAXSPD 36900			/// 90% of 41000 (max height)
-#define LIF_LIFTERMAX 41000
+#define LIF_LIFTERMAXSPD 25650			/// 90% of 41000 (max height)
+#define LIF_LIFTERMAX 28500
 
 
 // Intake
@@ -109,18 +110,18 @@
 #define INT_EJECTSPEED -0.5
 
 
-
 // Climber
 #define CAN_CLIMBER_MOTOR 7
 
 
 // Autonomous
-enum AutoMode {kAutoAuto, kAutoTest, kAutoStage};
+enum AutoMode {kAutoAuto, kAutoTest};
 extern AutoMode automode;
 
 #define ACCEL_TIME 1.0
-#define AUTO_POWER 0.5
-#define DECEL_DISTANCE 9.2
+#define AUTO_POWER 0.3
+#define DECEL_DISTANCE 51.57
+
 
 
 #endif /* SRC_CONST_H_ */

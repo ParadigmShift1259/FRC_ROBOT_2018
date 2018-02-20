@@ -22,7 +22,6 @@ void Robot::RobotInit()
 {
 	m_chooser.AddDefault(kAutoAutoMode, kAutoAutoMode);
 	m_chooser.AddObject(kAutoTestMode, kAutoTestMode);
-	m_chooser.AddObject(kAutoStageMode, kAutoStageMode);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -34,8 +33,12 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
-	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain);
-	m_visiontarget = new VisionTarget();
+	m_pigeon = new PigeonIMU(0);
+	m_gyroval[0] = 0;
+	m_gyroval[1] = 0;
+	m_gyroval[2] = 0;
+	m_drivepid = new DrivePID(m_drivetrain, m_pigeon, m_operatorinputs);
+	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid);
 }
 
 
@@ -75,11 +78,11 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-	m_drivetrain->Loop();
+//	m_drivetrain->Loop();
 	m_lifter->Loop();
 	m_intake->Loop();
 	m_climber->Loop();
-//	m_autonomous->Loop();
+	m_autonomous->Loop();
 }
 
 
@@ -99,9 +102,6 @@ void Robot::TeleopInit()
 	if (automode == kAutoTest)
 		DriverStation::ReportError("TeleopInit Test Mode");
 	else
-	if (automode == kAutoStage)
-		DriverStation::ReportError("TeleopInit Stage Mode");
-	else
 		DriverStation::ReportError("TeleopInit");
 
 	if (m_compressor != nullptr)
@@ -110,32 +110,69 @@ void Robot::TeleopInit()
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
-	m_visiontarget->Init();
+	SmartDashboard::PutNumber("P", SmartDashboard::GetNumber("P",0.018));
+	SmartDashboard::PutNumber("I", SmartDashboard::GetNumber("I", 0.0003));
+	SmartDashboard::PutNumber("D", SmartDashboard::GetNumber("D", 0.05));
 }
 
 
 void Robot::TeleopPeriodic()
 {
-	m_visiontarget->Loop();
-//	if (automode == kAutoTest)
-//	{
-//		m_drivetrain->Loop();
-//		m_lifter->TestLoop();
-//		m_intake->TestLoop();
-//		m_climber->TestLoop();
-//	}
-//	else
-//	{
-//		m_drivetrain->Loop();
-//		m_lifter->Loop();
-//		m_intake->Loop();
-//		m_climber->Loop();
-//	}
+	SmartDashboard::PutBoolean("DriverControl",m_drivepid->GetEnabled());
+	static double pid[3] = {0.009, 0.0005, 0.07};
+	double ypr[3] = {0, 0, 0};
+	if (automode == kAutoTest)
+	{
+		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
+		m_drivepid->SetP(pid[0]);
+		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
+		m_drivepid->SetI(pid[1]);
+		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
+		m_drivepid->SetD(pid[2]);
+		if(m_operatorinputs->xBoxRightTrigger(OperatorInputs::ToggleChoice::kToggle,0))
+			m_turn = kInit;
+		switch(m_turn)
+		{
+		case kInit:
+			m_drivepid->Enable();
+			m_drivepid->Init(pid[0], pid[1], pid[2], true);
+			m_drivepid->SetRelativeAngle(45);
+			m_turn = kTurning;
+		case kTurning:
+			m_drivepid->Drive(0,false);
+			SmartDashboard::PutNumber("DriveAngle Setpoint",m_drivepid->GetSetpoint());
+			if(m_drivepid->OnTarget())
+				m_turn = kIdle;
+			break;
+		case kIdle:
+		default:
+			m_drivepid->Stop();
+			m_drivetrain->Loop();
+		}
+		m_lifter->TestLoop();
+		m_intake->TestLoop();
+		m_climber->TestLoop();
+		m_pigeon->GetAccumGyro(m_gyroval);
+		m_pigeon->GetYawPitchRoll(ypr);
+		SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
+		SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
+		SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
+		SmartDashboard::PutNumber("GyroFused",m_pigeon->GetFusedHeading());
+		SmartDashboard::PutNumber("GyroYaw",ypr[0]);
+	}
+	else
+	{
+		m_drivetrain->Loop();
+		m_lifter->Loop();
+		m_intake->Loop();
+		m_climber->Loop();
+	}
 }
 
 
 void Robot::DisabledInit()
 {
+	NetworkTableInstance::GetDefault().GetTable("OpenCV");
 	DriverStation::ReportError("DisabledInit");
 
 	if (m_compressor != nullptr)
@@ -145,6 +182,12 @@ void Robot::DisabledInit()
 	m_intake->Stop();
 	m_climber->Stop();
 	m_autonomous->Stop();
+	m_gyroval[0] = 0;
+	m_gyroval[1] = 0;
+	m_gyroval[2] = 0;
+	m_pigeon->SetFusedHeading(0,0);
+	m_pigeon->SetYaw(0,0);
+	m_drivepid->SetAbsoluteAngle(0);
 }
 
 
@@ -159,9 +202,6 @@ void Robot::DisabledPeriodic()
 	else
 	if (m_autoSelected == kAutoTestMode)
 		automode = kAutoTest;
-	else
-	if (m_autoSelected == kAutoStageMode)
-		automode = kAutoStage;
 
 	SmartDashboard::PutNumber("AU1_automode", automode);
 }

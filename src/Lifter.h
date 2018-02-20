@@ -17,7 +17,7 @@
 class Lifter
 {
 public:
-	enum Stage {kIdle, kRaise, kStop};
+	enum Stage {kIdle, kRaise};
 
 	Lifter(DriverStation *ds, OperatorInputs *inputs);
 	virtual ~Lifter();
@@ -27,7 +27,7 @@ public:
 	void Stop();
 	void ResetPosition();
 	bool IsBottom();
-	void Staging();
+	bool MoveSmidgeUp();
 
 protected:
 	DriverStation *m_ds;
