@@ -20,6 +20,7 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 	m_timerstraight->Reset();
 
 	m_straightstate = kStart;
+	m_turn = kInit;
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
 	m_notifier = new Notifier(Autonomous::VelocityAdjust, this);
@@ -49,7 +50,8 @@ void Autonomous::Init()
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
 	m_timerstraight->Reset();
-
+	stage = 0;
+	m_turn = kInit;
 	m_drivepid->Init(0.003, 0.0005, 0.0, true);			//Make Constants in future
 }
 
@@ -59,8 +61,28 @@ void Autonomous::Loop()
 	switch (stage)
 	{
 	case 0:
-		if (DriveStraight(115))
-		{stage = 1;}
+//		if(DriveStraight(10, 0.1, 0.2, 4))
+		if(DriveStraight(40, 0.2, 0.3, 24.3))
+			stage = 1;
+//		if(DriveStraight(94.10, 1, 0.3, 51.57))
+//			stage = 1;
+		break;
+	case 1:
+		if (TurnAngle(50.39))
+		{stage = 2;}
+		break;
+	case 2:
+		if (DriveStraight(94.10, 1, 0.3, 51.57))
+			stage = 3;
+		break;
+	case 3:
+		if (TurnAngle(-50.39))
+		{stage = 4;}
+		break;
+	case 4:
+		if(DriveStraight(10, 0.1, 0.2, 4))
+			stage = 5;
+		break;
 	}
 	//	m_drivepid->Drive(-0.7,true);
 }
@@ -71,7 +93,7 @@ void Autonomous::Loop()
  * not guarenteed to be perfectly accurate but is pretty close. Will not try to target after
  * done with the state machine and will hold the incorrect value.
  */
-bool Autonomous::DriveStraight(double targetdistance)
+bool Autonomous::DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
 {
 	m_drivepid->SetRelativeAngle(0);
 	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition()/CODES_PER_INCH);
@@ -96,12 +118,12 @@ bool Autonomous::DriveStraight(double targetdistance)
 		m_drivepid->EnablePID();
 		m_timerstraight->Start();
 		m_straightstate = kAccel;
-		m_timermod = ACCEL_TIME;
+		m_timermod = acceltime;
 		m_distance = 0.0;		// @suppress("No break at end of case")
 
 	case kAccel:
 		//If acceleration has reached max time
-		if (m_timervalue > ACCEL_TIME)
+		if (m_timervalue > acceltime)
 		{
 			m_acceldistance = m_distance;
 			m_straightstate = kMaintain;
@@ -110,14 +132,14 @@ bool Autonomous::DriveStraight(double targetdistance)
 		}
 		else
 		{
-				m_drivepid->Drive(-1 * m_timervalue / ACCEL_TIME * AUTO_POWER);
+				m_drivepid->Drive(-1 * m_timervalue / acceltime * autopower);
 //				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
 				break;
 
 		} // @suppress("No break at end of case")
 
 	case kMaintain:
-		if ((targetdistance - m_distance) <= DECEL_DISTANCE)
+		if ((targetdistance - m_distance) <= deceldistance)
 		{
 			m_straightstate = kDecel;
 			m_timerstraight->Reset();
@@ -135,7 +157,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 //		}
 		else
 		{
-			m_drivepid->Drive(-AUTO_POWER);
+			m_drivepid->Drive(-autopower);
 //			m_drivetrain->Drive(0, -1, false);
 			break;
 		} // @suppress("No break at end of case")
@@ -151,7 +173,7 @@ bool Autonomous::DriveStraight(double targetdistance)
 		}
 		else
 		{
-			m_drivepid->Drive(-1 * ((ACCEL_TIME - m_timervalue) / ACCEL_TIME) * AUTO_POWER);
+			m_drivepid->Drive(-1 * ((acceltime - m_timervalue) / acceltime) * autopower);
 //			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
 		}
 	}
@@ -165,8 +187,42 @@ void Autonomous::VelocityAdjust(Autonomous *arg)
 	arg->m_timerstraight->Reset();
 	arg->m_timerstraight->Start();
 	arg->m_timervalue = 0;
-	arg->DriveStraight(arg->m_target);
+	//arg->DriveStraight(arg->m_target);
 	SmartDashboard::PutNumber("StartDecel", arg->m_distance);
+}
+
+
+bool Autonomous::TurnAngle(double angle)
+{
+
+	SmartDashboard::PutNumber("Running", 600);
+
+
+		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
+		m_drivepid->SetP(pid[0]);
+		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
+		m_drivepid->SetI(pid[1]);
+		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
+		m_drivepid->SetD(pid[2]);
+		switch (m_turn)
+		{
+		case kInit:
+			m_drivepid->Enable();
+			m_drivepid->Init(pid[0], pid[1], pid[2], true);
+			m_drivepid->SetRelativeAngle(angle);
+			m_turn = kTurning;
+			/* no break */
+		case kTurning:
+			m_drivepid->Drive(0,false);
+			SmartDashboard::PutNumber("DriveAngle Setpoint",m_drivepid->GetSetpoint());
+			if (m_drivepid->OnTarget())
+			{
+				return true;
+			}
+
+			break;
+		}
+		return false;
 }
 
 
