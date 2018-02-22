@@ -101,7 +101,7 @@ void Intake::Loop()
 	case kIngest:
 		if(xboxabuttontoggle)
 			m_autoingest = true;
-		if (m_cubesensor->Get() || m_inputs->xBoxBackButton())
+		if (m_cubesensor->Get() || m_inputs->xBoxBackButton() || m_inputs->xBoxBackButton(OperatorInputs::kToggle, 1))
 		{
 			m_solenoid->Set(false);					/// we have cube, close intake arms
 			m_timer.Reset();
