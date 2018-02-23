@@ -156,7 +156,7 @@ void Intake::Loop()
 		{
 			m_ejectspeed *= 0.5;
 			m_leftmotor->Set(m_ejectspeed);
-			m_rightmotor->Set(m_ejectspeed);
+			m_rightmotor->Set(-m_ejectspeed);
 			m_timer.Reset();
 			m_stage = kEject;
 		}

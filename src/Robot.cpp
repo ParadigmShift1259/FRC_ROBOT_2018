@@ -78,15 +78,12 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-	double ypr[3] = {0, 0, 0};
-
 //	m_drivetrain->Loop();
 	m_lifter->Loop();
 	m_intake->Loop();
 	m_climber->Loop();
 	m_autonomous->Loop();
 	m_pigeon->GetAccumGyro(m_gyroval);
-	m_pigeon->GetYawPitchRoll(ypr);
 	SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
 	SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
 	SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
@@ -174,6 +171,13 @@ void Robot::TeleopPeriodic()
 		m_lifter->Loop();
 		m_intake->Loop();
 		m_climber->Loop();
+		m_pigeon->GetAccumGyro(m_gyroval);
+		m_pigeon->GetYawPitchRoll(ypr);
+		SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
+		SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
+		SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
+		SmartDashboard::PutNumber("GyroFused",m_pigeon->GetFusedHeading());
+		SmartDashboard::PutNumber("GyroYaw",ypr[0]);
 	}
 }
 
