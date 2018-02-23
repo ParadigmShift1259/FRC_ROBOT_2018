@@ -79,6 +79,7 @@ void Robot::AutonomousPeriodic()
 	m_intake->AutoLoop();
 	m_climber->Loop();
 	m_autonomous->Loop();
+
 	m_drivepid->Loop();
 }
 

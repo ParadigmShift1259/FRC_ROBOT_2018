@@ -52,7 +52,7 @@ void Autonomous::Init()
 	m_timerstraight->Reset();
 	stage = 0;
 	m_turn = kInit;
-	m_drivepid->Init(0.003, 0.0005, 0.0, true);			//Make Constants in future
+	m_drivepid->Init(0.005, 0.0005, 0.0, true);			//Make Constants in future
 }
 
 
@@ -61,15 +61,12 @@ void Autonomous::Loop()
 	switch (stage)
 	{
 	case 0:
-//		if(DriveStraight(10, 0.1, 0.2, 4))
-		if(DriveStraight(40, 0.2, 0.3, 24.3))
+		if (DriveStraight(40, 0.2, 0.3, 24.3))
 			stage = 1;
-//		if(DriveStraight(94.10, 1, 0.3, 51.57))
-//			stage = 1;
 		break;
 	case 1:
 		if (TurnAngle(50.39))
-		{stage = 2;}
+			stage = 2;
 		break;
 	case 2:
 		if (DriveStraight(94.10, 1, 0.3, 51.57))
@@ -77,14 +74,14 @@ void Autonomous::Loop()
 		break;
 	case 3:
 		if (TurnAngle(-50.39))
-		{stage = 4;}
+			stage = 4;
 		break;
 	case 4:
 		if(DriveStraight(10, 0.1, 0.2, 4))
 			stage = 5;
 		break;
 	}
-	//	m_drivepid->Drive(-0.7,true);
+	SmartDashboard::PutNumber("Stage", stage);
 }
 
 
@@ -115,7 +112,9 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
 		Wait(0.25);
+		m_drivepid->Init();
 		m_drivepid->EnablePID();
+		m_drivepid->SetAbsoluteAngle(0);
 		m_timerstraight->Start();
 		m_straightstate = kAccel;
 		m_timermod = acceltime;
@@ -169,6 +168,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 			m_drivepid->DisablePID();
 			m_drivetrain->Drive(0, 0, false);
 			SmartDashboard::PutNumber("DecelDistance", m_distance - SmartDashboard::GetNumber("StartDecel",0));
+			m_straightstate = kStart;
 			return true;
 		}
 		else
@@ -194,8 +194,13 @@ void Autonomous::VelocityAdjust(Autonomous *arg)
 
 bool Autonomous::TurnAngle(double angle)
 {
+	if (m_drivepid->OnTarget())
+	{
+		SmartDashboard::PutNumber("Ontarget", 1111);
+	}
+		else
+		SmartDashboard::PutNumber("Ontarget", 0000);
 
-	SmartDashboard::PutNumber("Running", 600);
 
 
 		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
@@ -207,9 +212,9 @@ bool Autonomous::TurnAngle(double angle)
 		switch (m_turn)
 		{
 		case kInit:
-			m_drivepid->Enable();
 			m_drivepid->Init(pid[0], pid[1], pid[2], true);
-			m_drivepid->SetRelativeAngle(angle);
+			m_drivepid->EnablePID();
+			m_drivepid->SetAbsoluteAngle(angle);
 			m_turn = kTurning;
 			/* no break */
 		case kTurning:
@@ -217,6 +222,8 @@ bool Autonomous::TurnAngle(double angle)
 			SmartDashboard::PutNumber("DriveAngle Setpoint",m_drivepid->GetSetpoint());
 			if (m_drivepid->OnTarget())
 			{
+				m_drivepid->DisablePID();
+				m_turn = kInit;
 				return true;
 			}
 

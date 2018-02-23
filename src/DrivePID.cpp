@@ -41,6 +41,7 @@ void DrivePID::Init(double p, double i, double d, bool enable)
 	SetSetpoint(0);
 	SetAbsoluteTolerance(0.5);
 	SetOutputRange(-0.7,0.7);
+	m_pigeon->SetFusedHeading(0,0);
 	if (enable)
 		EnablePID();
 }
@@ -130,6 +131,7 @@ void DrivePID::EnablePID()
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	GetPIDController()->Reset();
 	Enable();
+
 }
 
 
