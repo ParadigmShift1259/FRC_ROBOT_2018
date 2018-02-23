@@ -29,7 +29,6 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter)
 		m_rightmotor = new WPI_TalonSRX(CAN_INTAKE_RIGHTMOTOR);
 		m_rightmotor->Set(ControlMode::PercentOutput, 0);
 		m_rightmotor->SetNeutralMode(NeutralMode::Brake);
-
 	}
 
 	if (PCM_INTAKE_SOLENOID != -1)
@@ -39,7 +38,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter)
 
 	m_stage = kIngest;
 	m_ingestspeed = INT_INGESTSPEED;
-	m_ejectspeed = INT_EJECTSPEED;
+	m_ejectspeed = INT_EJECTHIGH;
 	m_allowingest = false;
 	m_autoingest = false;
 }
@@ -63,14 +62,10 @@ void Intake::Init()
 
 	DriverStation::ReportError("IntakeInit");
 
-	// do initialization for auto mode
-	if (m_ds->IsAutonomous())
-		m_stage = kBox;
-
-	// do initialization for any mode
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
 	m_solenoid->Set(false);
+	m_stage = kIngest;
 	m_timer.Reset();
 	m_timer.Start();
 	m_allowingest = false;
@@ -154,9 +149,9 @@ void Intake::Loop()
 		else
 		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
-			m_ejectspeed *= 0.5;
+			m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
 			m_leftmotor->Set(m_ejectspeed);
-			m_rightmotor->Set(-m_ejectspeed);
+			m_rightmotor->Set(m_ejectspeed * -1.0);
 			m_timer.Reset();
 			m_stage = kEject;
 		}
@@ -181,7 +176,7 @@ void Intake::Loop()
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
-			m_ejectspeed = INT_EJECTSPEED;
+			m_ejectspeed = INT_EJECTHIGH;
 			m_stage = kIngest;						/// go back to beginning (reset loop)
 		}
 		else
@@ -197,6 +192,44 @@ void Intake::Loop()
 	SmartDashboard::PutNumber("IN3_solenoid", m_solenoid->Get());
 	SmartDashboard::PutNumber("IN4_cubesensor", m_cubesensor->Get());
 	SmartDashboard::PutNumber("IN5_stage", m_stage);
+}
+
+
+void Intake::AutoLoop()
+{
+	switch (m_stage)
+	{
+	case kBottom:
+	case kIngest:
+	case kIngestWait:
+		m_leftmotor->StopMotor();				/// stop motors until auto start
+		m_rightmotor->StopMotor();
+		break;
+
+	case kBox:
+		m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
+		m_leftmotor->Set(m_ejectspeed);
+		m_rightmotor->Set(m_ejectspeed * -1.0);
+		m_timer.Reset();
+		m_stage = kEject;
+		break;
+
+	case kEject:
+		if (m_timer.HasPeriodPassed(1.0))
+		{
+			m_solenoid->Set(true);					/// open arms
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+			m_ejectspeed = INT_EJECTHIGH;
+			m_stage = kIngest;						/// go back to beginning (reset loop)
+		}
+		else
+		{
+			m_leftmotor->Set(m_ejectspeed);			/// ensure the box is ejected
+			m_rightmotor->Set(m_ejectspeed * -1.0);
+		}
+		break;
+	};
 }
 
 
@@ -254,4 +287,10 @@ void Intake::ResetPosition()
 
 	m_leftmotor->SetSelectedSensorPosition(0, 0, 0);
 	m_rightmotor->SetSelectedSensorPosition(0, 0, 0);
+}
+
+
+void Intake::AutoEnable()
+{
+	m_stage = kBox;
 }

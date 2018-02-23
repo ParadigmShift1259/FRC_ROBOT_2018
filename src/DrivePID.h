@@ -18,9 +18,10 @@
 class DrivePID: public PIDSubsystem
 {
 public:
-	DrivePID(DriveTrain *drivetrain, PigeonIMU *pigeon, OperatorInputs *inputs);
+	DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs);
 	~DrivePID();
 	void Init(double p = 0, double i = 0, double d = 0, bool enable = false);
+	void Loop();
 	void Drive(double y, bool ramp = false);
 	void Stop();
 
@@ -40,8 +41,9 @@ public:
 
 protected:
 	DriveTrain *m_drivetrain;
-	PigeonIMU *m_pigeon;
 	OperatorInputs *m_inputs;
+	PigeonIMU *m_pigeon;
+	double m_gyroval[3];
 	double m_p;
 	double m_i;
 	double m_d;

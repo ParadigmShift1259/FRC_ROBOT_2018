@@ -107,7 +107,8 @@
 #define PCM_INTAKE_SOLENOID 1
 #define DIO_INTAKE_CUBESENSOR 0
 #define INT_INGESTSPEED 0.5
-#define INT_EJECTSPEED -0.5
+#define INT_EJECTHIGH -0.5
+#define INT_EJECTLOW -0.25
 
 
 // Climber

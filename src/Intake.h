@@ -24,9 +24,11 @@ public:
 	virtual ~Intake();
 	void Init();
 	void Loop();
+	void AutoLoop();
 	void TestLoop();
 	void Stop();
 	void ResetPosition();
+	void AutoEnable();
 
 protected:
 	DriverStation *m_ds;
