@@ -33,11 +33,7 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
-	m_pigeon = new PigeonIMU(0);
-	m_gyroval[0] = 0;
-	m_gyroval[1] = 0;
-	m_gyroval[2] = 0;
-	m_drivepid = new DrivePID(m_drivetrain, m_pigeon, m_operatorinputs);
+	m_drivepid = new DrivePID(m_drivetrain, m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid);
 }
 
@@ -78,19 +74,12 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-	double ypr[3] = {0, 0, 0};
-
 //	m_drivetrain->Loop();
 	m_lifter->Loop();
-	m_intake->Loop();
+	m_intake->AutoLoop();
 	m_climber->Loop();
 	m_autonomous->Loop();
-	m_pigeon->GetAccumGyro(m_gyroval);
-	m_pigeon->GetYawPitchRoll(ypr);
-	SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
-	SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
-	SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
-	SmartDashboard::PutNumber("GyroFused",m_pigeon->GetFusedHeading());
+	m_drivepid->Loop();
 }
 
 
@@ -128,7 +117,6 @@ void Robot::TeleopPeriodic()
 {
 	SmartDashboard::PutBoolean("DriverControl",m_drivepid->GetEnabled());
 	static double pid[3] = {0.009, 0.0005, 0.07};
-	double ypr[3] = {0, 0, 0};
 	if (automode == kAutoTest)
 	{
 		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
@@ -160,13 +148,7 @@ void Robot::TeleopPeriodic()
 		m_lifter->TestLoop();
 		m_intake->TestLoop();
 		m_climber->TestLoop();
-		m_pigeon->GetAccumGyro(m_gyroval);
-		m_pigeon->GetYawPitchRoll(ypr);
-		SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
-		SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
-		SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
-		SmartDashboard::PutNumber("GyroFused",m_pigeon->GetFusedHeading());
-		SmartDashboard::PutNumber("GyroYaw",ypr[0]);
+		m_drivepid->Loop();
 	}
 	else
 	{
@@ -174,6 +156,7 @@ void Robot::TeleopPeriodic()
 		m_lifter->Loop();
 		m_intake->Loop();
 		m_climber->Loop();
+		m_drivepid->Loop();
 	}
 }
 
@@ -190,12 +173,7 @@ void Robot::DisabledInit()
 	m_intake->Stop();
 	m_climber->Stop();
 	m_autonomous->Stop();
-	m_gyroval[0] = 0;
-	m_gyroval[1] = 0;
-	m_gyroval[2] = 0;
-	m_pigeon->SetFusedHeading(0,0);
-	m_pigeon->SetYaw(0,0);
-	m_drivepid->SetAbsoluteAngle(0);
+	m_drivepid->Stop();
 }
 
 
@@ -203,8 +181,9 @@ void Robot::DisabledPeriodic()
 {
 	//DriverStation::ReportError("DisabledPeriodic");
 
-	m_autoSelected = m_chooser.GetSelected();
+	m_drivepid->Loop();
 
+	m_autoSelected = m_chooser.GetSelected();
 	if (m_autoSelected == kAutoAutoMode)
 		automode = kAutoAuto;
 	else

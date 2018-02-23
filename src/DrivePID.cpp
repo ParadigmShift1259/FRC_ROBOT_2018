@@ -10,7 +10,7 @@
 #include "const.h"
 
 
-DrivePID::DrivePID(DriveTrain *drivetrain, PigeonIMU *pigeon, OperatorInputs *inputs): PIDSubsystem(0.0, 0.0, 0.0)
+DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem(0.0, 0.0, 0.0)
 {
 	m_drivetrain = drivetrain;
 	m_inputs = inputs;
@@ -20,7 +20,10 @@ DrivePID::DrivePID(DriveTrain *drivetrain, PigeonIMU *pigeon, OperatorInputs *in
 	m_y = 0.0;
 	m_ramp = false;
 	m_angle = 0.0;
-	m_pigeon = pigeon;
+	m_pigeon = new PigeonIMU(0);
+	m_gyroval[0] = 0;
+	m_gyroval[1] = 0;
+	m_gyroval[2] = 0;
 }
 
 
@@ -43,9 +46,28 @@ void DrivePID::Init(double p, double i, double d, bool enable)
 }
 
 
+void DrivePID::Loop()
+{
+	double ypr[3] = {0, 0, 0};
+
+	m_pigeon->GetAccumGyro(m_gyroval);
+	m_pigeon->GetYawPitchRoll(ypr);
+	SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
+	SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
+	SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
+	SmartDashboard::PutNumber("GyroFused",m_pigeon->GetFusedHeading());
+}
+
+
 void DrivePID::Stop()
 {
 	DisablePID();
+	SetAbsoluteAngle(0);
+	m_gyroval[0] = 0;
+	m_gyroval[1] = 0;
+	m_gyroval[2] = 0;
+	m_pigeon->SetFusedHeading(0,0);
+	m_pigeon->SetYaw(0,0);
 }
 
 
@@ -55,10 +77,12 @@ void DrivePID::Drive(double y, bool ramp)
 	m_ramp = ramp;
 }
 
+
 bool DrivePID::GetEnabled()
 {
 	return GetPIDController()->IsEnabled();
 }
+
 
 void DrivePID::SetP(double p)
 {

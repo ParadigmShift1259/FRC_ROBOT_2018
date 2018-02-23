@@ -37,7 +37,6 @@ protected:
 	Intake *m_intake;
 	Climber *m_climber;
 	Autonomous *m_autonomous;
-	PigeonIMU *m_pigeon;
 	TurnState m_turn=kInit;
 
 private:
@@ -46,7 +45,6 @@ private:
 	const std::string kAutoAutoMode = "Auto Mode";
 	const std::string kAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
-	double m_gyroval[3];
 };
 
 
