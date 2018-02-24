@@ -34,7 +34,7 @@ void Robot::RobotInit()
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
 	m_climber = new Climber(m_operatorinputs);
 	m_drivepid = new DrivePID(m_drivetrain, m_operatorinputs);
-	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid);
+	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake);
 }
 
 
@@ -79,7 +79,6 @@ void Robot::AutonomousPeriodic()
 	m_intake->AutoLoop();
 	m_climber->Loop();
 	m_autonomous->Loop();
-
 	m_drivepid->Loop();
 }
 

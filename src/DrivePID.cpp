@@ -49,10 +49,7 @@ void DrivePID::Init(double p, double i, double d, bool enable)
 
 void DrivePID::Loop()
 {
-	double ypr[3] = {0, 0, 0};
-
 	m_pigeon->GetAccumGyro(m_gyroval);
-	m_pigeon->GetYawPitchRoll(ypr);
 	SmartDashboard::PutNumber("Gyrox", m_gyroval[0]);
 	SmartDashboard::PutNumber("Gyroy", m_gyroval[1]);
 	SmartDashboard::PutNumber("Gyroz", m_gyroval[2]);
@@ -146,6 +143,7 @@ void DrivePID::DisablePID()
 
 double DrivePID::ReturnPIDInput()
 {
+/*
 	double m_leftpos = m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0);
 	m_leftpos = m_leftpos / CODES_PER_REV;
 
@@ -156,8 +154,10 @@ double DrivePID::ReturnPIDInput()
 
 	SmartDashboard::PutNumber("ReturnPosition(Enc)", m_leftpos + m_rightpos);
 	SmartDashboard::PutNumber("ReturnCurrentPosition(Enc)", retval);
-	retval = m_pigeon->GetFusedHeading();
-	SmartDashboard::PutNumber("ReturnCurrentPosition(Gyro)", retval);
+*/
+	double retval = m_pigeon->GetFusedHeading();
+
+	SmartDashboard::PutNumber("ReturnPIDInput(Gyro)", retval);
 
 	return retval;
 }

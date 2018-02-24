@@ -10,11 +10,12 @@
 #include <cmath>
 
 
-Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid)
+Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid, Intake* intake)
 {
 	m_inputs = inputs;
 	m_drivetrain = drivetrain;
 	m_drivepid = drivepid;
+	m_intake = intake;
 
 	m_timerstraight = new Timer();
 	m_timerstraight->Reset();
@@ -23,11 +24,10 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 	m_turn = kInit;
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
-	m_notifier = new Notifier(Autonomous::VelocityAdjust, this);
 	m_timervalue = 0;
 	m_distance = 0;
 	m_target = 0;
-	stage = 0;
+	m_stage = 0;
 }
 
 
@@ -42,46 +42,54 @@ void Autonomous::Init()
 {
 	DriverStation::ReportError("AutonomousInit");
 
-	if (SmartDashboard::GetNumber("AutoDistance", 0) == 0)
-		SmartDashboard::PutNumber("AutoDistance", 150);
-
 	m_straightstate = kStart;
-	m_distance = SmartDashboard::GetNumber("AutoDistance", 0);
 	m_acceldistance = 0;
 	m_timermod = ACCEL_TIME;
 	m_timerstraight->Reset();
-	stage = 0;
+	m_timerstraight->Start();
+	m_stage = 0;
 	m_turn = kInit;
-	m_drivepid->Init(0.005, 0.0005, 0.0, true);			//Make Constants in future
+	m_drivepid->Init(0.05, 0.0003, 0.05, true);			//Make Constants in future
 }
 
 
 void Autonomous::Loop()
 {
-	switch (stage)
+	switch (m_stage)
 	{
 	case 0:
-		if (DriveStraight(40, 0.2, 0.3, 24.3))
-			stage = 1;
+		if (DriveStraight(40, 0.5, 0.5, 24.0))
+			m_stage = 1;
 		break;
 	case 1:
-		if (TurnAngle(50.39))
-			stage = 2;
+		if (TurnAngle(-60))
+			m_stage = 2;
 		break;
 	case 2:
-		if (DriveStraight(94.10, 1, 0.3, 51.57))
-			stage = 3;
+		if (DriveStraight(62, 0.5, 0.5, 24.0))
+			m_stage = 3;
 		break;
 	case 3:
-		if (TurnAngle(-50.39))
-			stage = 4;
+		if (TurnAngle(60))
+			m_stage = 4;
 		break;
 	case 4:
-		if(DriveStraight(10, 0.1, 0.2, 4))
-			stage = 5;
+		if (DriveStraight(30, 0.5, 0.25, 12.0))
+			m_stage = 5;
+		break;
+	case 5:
+		m_intake->AutoEnable();
+		m_stage = 6;
+		break;
+	case 6:
 		break;
 	}
-	SmartDashboard::PutNumber("Stage", stage);
+	SmartDashboard::PutNumber("AU00_stage", m_stage);
+	SmartDashboard::PutNumber("AU01_leftinches", m_drivetrain->GetLeftPosition()/CODES_PER_INCH);
+	SmartDashboard::PutNumber("AU02_rightinches", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
+	SmartDashboard::PutNumber("AU03_leftposition", m_drivetrain->GetLeftPosition());
+	SmartDashboard::PutNumber("AU04_leftposition", m_drivetrain->GetRightPosition());
+	SmartDashboard::PutNumber("AU05_distance", m_drivetrain->GetMaxDistance());
 }
 
 
@@ -92,103 +100,68 @@ void Autonomous::Loop()
  */
 bool Autonomous::DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
 {
-	m_drivepid->SetRelativeAngle(0);
-	SmartDashboard::PutNumber("LeftEncoder", m_drivetrain->GetLeftPosition()/CODES_PER_INCH);
-	SmartDashboard::PutNumber("RightEncoder", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	m_target = targetdistance;
-
-	m_timervalue = (((int)(m_timerstraight->Get() * 50)) / 50.0); //!<Stores the current timer value. Quantizes the timer value into increments of 20ms
-
-	double leftdistance = m_drivetrain->GetLeftPosition()/CODES_PER_INCH;
-	double rightdistance = m_drivetrain->GetRightPosition()/CODES_PER_INCH;
-	m_distance = abs((abs(leftdistance) > abs(rightdistance)) ? leftdistance : rightdistance);   //!< Stores the absolute value of the greatest encoder distance
+	m_timervalue = m_timerstraight->Get();
+	m_distance = abs(m_drivetrain->GetMaxDistance());
 
 	switch (m_straightstate)
 	{
-	/*
-	 * Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-	 */
 	case kStart:
+		// Accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
-		Wait(0.25);
 		m_drivepid->Init();
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
-		m_timerstraight->Start();
+		m_timerstraight->Reset();
 		m_straightstate = kAccel;
 		m_timermod = acceltime;
-		m_distance = 0.0;		// @suppress("No break at end of case")
+		m_straightstate = kAccel;
+		break;
 
 	case kAccel:
-		//If acceleration has reached max time
+		// If acceleration has reached max time
 		if (m_timervalue > acceltime)
 		{
 			m_acceldistance = m_distance;
 			m_straightstate = kMaintain;
 			m_timerstraight->Reset();
-			m_timerstraight->Start();
 		}
 		else
 		{
-				m_drivepid->Drive(-1 * m_timervalue / acceltime * autopower);
-//				m_drivetrain->Drive(0, -1 * timervalue / ACCEL_TIME, false);
-				break;
-
-		} // @suppress("No break at end of case")
+			m_drivepid->Drive(-1 * m_timervalue / acceltime * autopower);
+		}
+		break;
 
 	case kMaintain:
 		if ((targetdistance - m_distance) <= deceldistance)
 		{
 			m_straightstate = kDecel;
 			m_timerstraight->Reset();
-			m_timerstraight->Start();
-			m_timervalue = 0;
 			SmartDashboard::PutNumber("StartDecel", m_distance);
 		}
-		/*
-		 * If it appears that the robot will shoot past the proper time to decelerate
-		 */
-//		else if (targetdistance - ((m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) / 5)/CODES_PER_INCH + m_distance) <= DECEL_DISTANCE)
-//		{
-//			m_notifier->StartSingle((targetdistance - m_drivetrain->GetLeftPosition()) / (m_drivetrain->LeftTalonLead()->GetSelectedSensorVelocity(0) * 10));
-//			break;
-//		}
 		else
 		{
 			m_drivepid->Drive(-autopower);
-//			m_drivetrain->Drive(0, -1, false);
-			break;
-		} // @suppress("No break at end of case")
+		}
+		break;
 
 	case kDecel:
-		if ((m_timervalue > m_timermod) || (m_distance > (targetdistance - 100/CODES_PER_INCH)))
+		if (m_distance > (targetdistance - 5.0))
 		{
 			m_drivepid->Drive(0);
 			m_drivepid->DisablePID();
 			m_drivetrain->Drive(0, 0, false);
-			SmartDashboard::PutNumber("DecelDistance", m_distance - SmartDashboard::GetNumber("StartDecel",0));
 			m_straightstate = kStart;
 			return true;
 		}
 		else
 		{
 			m_drivepid->Drive(-1 * ((acceltime - m_timervalue) / acceltime) * autopower);
-//			m_drivetrain->Drive(0, -1 * (m_timermod - timervalue) / ACCEL_TIME, false);
 		}
+		break;
 	}
 	return false;
-}
-
-
-void Autonomous::VelocityAdjust(Autonomous *arg)
-{
-	arg->m_straightstate = kDecel;
-	arg->m_timerstraight->Reset();
-	arg->m_timerstraight->Start();
-	arg->m_timervalue = 0;
-	//arg->DriveStraight(arg->m_target);
-	SmartDashboard::PutNumber("StartDecel", arg->m_distance);
 }
 
 
@@ -198,17 +171,17 @@ bool Autonomous::TurnAngle(double angle)
 	{
 		SmartDashboard::PutNumber("Ontarget", 1111);
 	}
-		else
+	else
 		SmartDashboard::PutNumber("Ontarget", 0000);
 
 
 
-		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
-		m_drivepid->SetP(pid[0]);
-		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
-		m_drivepid->SetI(pid[1]);
-		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
-		m_drivepid->SetD(pid[2]);
+//		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
+//		m_drivepid->SetP(pid[0]);
+//		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
+//		m_drivepid->SetI(pid[1]);
+//		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
+//		m_drivepid->SetD(pid[2]);
 		switch (m_turn)
 		{
 		case kInit:

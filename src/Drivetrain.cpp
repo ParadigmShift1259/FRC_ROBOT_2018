@@ -7,6 +7,7 @@
 
 #include <Drivetrain.h>
 #include "Const.h"
+#include <cmath>
 
 
 using namespace std;
@@ -229,8 +230,7 @@ void DriveTrain::Loop()
 		m_isdownshifting = false;
 	}
 
-
-	SmartDashboard::PutNumber("DIRECTION", m_direction);
+	SmartDashboard::PutNumber("DT00_direction", m_direction);
 	SmartDashboard::PutNumber("DT01_x", x);
 	SmartDashboard::PutNumber("DT02_y", y);
 	SmartDashboard::PutNumber("DT03_top", CHILD_PROOF_SPEED);
@@ -240,8 +240,6 @@ void DriveTrain::Loop()
 	SmartDashboard::PutNumber("DT07_shift_down", m_isdownshifting);
 	SmartDashboard::PutNumber("DT08_abs_x", (abs(m_previousx * X_SCALING) < CHILD_PROOF_SPEED));
 	SmartDashboard::PutNumber("DT09_abs_y", (abs(m_previousy * Y_SCALING) < CHILD_PROOF_SPEED));
-	SmartDashboard::PutNumber("rightEncoderTicks", m_righttalonlead->GetSelectedSensorPosition(0));
-	SmartDashboard::PutNumber("leftEncoderTicks", m_lefttalonlead->GetSelectedSensorPosition(0));
 }
 
 
@@ -466,3 +464,12 @@ double DriveTrain::GetRightDistance()
 	distance = (distance / CODES_PER_REV) * WHEEL_DIAMETER * 3.1415926535;
 	return distance;
 }
+
+
+double DriveTrain::GetMaxDistance()
+{
+	double maxleft = GetLeftDistance();
+	double maxright = GetRightDistance();
+	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
+}
+

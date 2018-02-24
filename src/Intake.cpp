@@ -207,7 +207,7 @@ void Intake::AutoLoop()
 		break;
 
 	case kBox:
-		m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
+		//m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
 		m_leftmotor->Set(m_ejectspeed);
 		m_rightmotor->Set(m_ejectspeed * -1.0);
 		m_timer.Reset();
@@ -220,7 +220,7 @@ void Intake::AutoLoop()
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
-			m_ejectspeed = INT_EJECTHIGH;
+			//m_ejectspeed = INT_EJECTHIGH;
 			m_stage = kIngest;						/// go back to beginning (reset loop)
 		}
 		else
