@@ -62,15 +62,15 @@ void Autonomous::Loop()
 			m_stage = 1;
 		break;
 	case 1:
-		if (TurnAngle(-60))
+		if (TurnAngle(60))
 			m_stage = 2;
 		break;
 	case 2:
-		if (DriveStraight(62, 0.5, 0.5, 24.0))
+		if (DriveStraight(68, 0.5, 0.5, 24.0))
 			m_stage = 3;
 		break;
 	case 3:
-		if (TurnAngle(60))
+		if (TurnAngle(-60))
 			m_stage = 4;
 		break;
 	case 4:
