@@ -116,13 +116,8 @@
 
 
 // Autonomous
-enum AutoMode {kAutoAuto, kAutoTest};
+enum AutoMode {kAutoDefault, kAutoCenterSwitchLeft, kAutoCenterSwitchRight, kAutoStraight, kAutoTest};
 extern AutoMode automode;
-
-#define ACCEL_TIME 1.0
-#define AUTO_POWER 0.3
-#define DECEL_DISTANCE 51.57
-
 
 
 #endif /* SRC_CONST_H_ */

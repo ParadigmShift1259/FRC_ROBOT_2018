@@ -15,13 +15,16 @@
 #include "Robot.h"
 
 
-AutoMode automode = kAutoAuto;
+AutoMode automode = kAutoStraight;
 
 
 void Robot::RobotInit()
 {
-	m_chooser.AddDefault(kAutoAutoMode, kAutoAutoMode);
-	m_chooser.AddObject(kAutoTestMode, kAutoTestMode);
+	m_chooser.AddDefault(kszAutoDefault, kszAutoDefault);
+	m_chooser.AddObject(kszAutoCenterSwitch, kszAutoCenterSwitch);
+	m_chooser.AddObject(kszAutoLeftSwitch, kszAutoLeftSwitch);
+	m_chooser.AddObject(kszAutoRightSwitch, kszAutoRightSwitch);
+	m_chooser.AddObject(kszAutoTestMode, kszAutoTestMode);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -74,7 +77,6 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-//	m_drivetrain->Loop();
 	m_lifter->Loop();
 	m_intake->AutoLoop();
 	m_climber->Loop();
@@ -115,36 +117,8 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
-	SmartDashboard::PutBoolean("DriverControl",m_drivepid->GetEnabled());
-	static double pid[3] = {0.009, 0.0005, 0.07};
 	if (automode == kAutoTest)
 	{
-		pid[0] = SmartDashboard::GetNumber("P",pid[0]);
-		m_drivepid->SetP(pid[0]);
-		pid[1] = SmartDashboard::GetNumber("I",pid[1]);
-		m_drivepid->SetI(pid[1]);
-		pid[2] = SmartDashboard::GetNumber("D",pid[2]);
-		m_drivepid->SetD(pid[2]);
-		if(m_operatorinputs->xBoxRightTrigger(OperatorInputs::ToggleChoice::kToggle,0))
-			m_turn = kInit;
-		switch(m_turn)
-		{
-		case kInit:
-			m_drivepid->Enable();
-			m_drivepid->Init(pid[0], pid[1], pid[2], true);
-			m_drivepid->SetRelativeAngle(90);
-			m_turn = kTurning;
-		case kTurning:
-			m_drivepid->Drive(0,false);
-			SmartDashboard::PutNumber("DriveAngle Setpoint",m_drivepid->GetSetpoint());
-			if(m_drivepid->OnTarget())
-				m_turn = kIdle;
-			break;
-		case kIdle:
-		default:
-			m_drivepid->Stop();
-			m_drivetrain->Loop();
-		}
 		m_lifter->TestLoop();
 		m_intake->TestLoop();
 		m_climber->TestLoop();
@@ -163,7 +137,6 @@ void Robot::TeleopPeriodic()
 
 void Robot::DisabledInit()
 {
-	NetworkTableInstance::GetDefault().GetTable("OpenCV");
 	DriverStation::ReportError("DisabledInit");
 
 	if (m_compressor != nullptr)
@@ -179,16 +152,43 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
-	//DriverStation::ReportError("DisabledPeriodic");
+	m_autoSelected = m_chooser.GetSelected();
+	string gamedata = DriverStation::GetInstance().GetGameSpecificMessage();
+	if (gamedata.length() < 3)
+		gamedata = "   ";
+
+	automode = kAutoDefault;
+	if (m_autoSelected == kszAutoCenterSwitch)
+	{
+		if (gamedata[0] == 'L')
+			automode = kAutoCenterSwitchLeft;
+		else
+		if (gamedata[0] == 'R')
+			automode = kAutoCenterSwitchRight;
+	}
+	else
+	if (m_autoSelected == kszAutoLeftSwitch)
+	{
+		if (gamedata[0] == 'L')
+			automode = kAutoStraight;
+		else
+		if (gamedata[0] == 'R')
+			automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoRightSwitch)
+	{
+		if (gamedata[0] == 'L')
+			automode = kAutoStraight;
+		else
+		if (gamedata[0] == 'R')
+			automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoTestMode)
+		automode = kAutoTest;
 
 	m_drivepid->Loop();
-
-	m_autoSelected = m_chooser.GetSelected();
-	if (m_autoSelected == kAutoAutoMode)
-		automode = kAutoAuto;
-	else
-	if (m_autoSelected == kAutoTestMode)
-		automode = kAutoTest;
 
 	SmartDashboard::PutNumber("AU1_automode", automode);
 }
