@@ -19,6 +19,7 @@ public:
 	virtual ~Autonomous();
 	void Init();
 	void Loop();
+	void SwitchAuto();
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
 	bool TurnAngle(double angle);
 	void Stop();
