@@ -28,7 +28,7 @@ public:
 	void TestLoop();
 	void Stop();
 	void ResetPosition();
-	void AutoEnable();
+	void AutoEject();
 
 protected:
 	DriverStation *m_ds;

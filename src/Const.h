@@ -94,9 +94,10 @@
 #define LIF_RAISESPEED -1.0
 #define LIF_LOWERSPEED 0.75
 #define LIF_LIFTERMIN 300				/// minimum cutoff
-#define LIF_LIFTERMINSPD 4100			/// 10% of 41000 (max height)
-#define LIF_LIFTERSTART 13600			/// starting position
-#define LIF_LIFTERMAXSPD 25650			/// 90% of 41000 (max height)
+#define LIF_LIFSMIDGE 1900				/// 7% of max height
+#define LIF_LIFTERMINSPD 2850			/// 10% of max height
+#define LIF_LIFTERSTART 9400			/// 33% of max height
+#define LIF_LIFTERMAXSPD 25650			/// 90% of max height
 #define LIF_LIFTERMAX 28500
 
 

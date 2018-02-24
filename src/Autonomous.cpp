@@ -104,7 +104,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
-		m_drivepid->Init();
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kEncoder);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
@@ -180,7 +180,7 @@ bool Autonomous::TurnAngle(double angle)
 	switch (m_turnstate)
 	{
 	case kInit:
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], true);
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_turnstate = kTurning;
@@ -212,7 +212,7 @@ void Autonomous::AutoCenterSwitchLeft()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(68, 0.5, 0.5, 24.0))		// targetdistance = 68", ramp = .5s, power = 50%, deceldistance = 24"
+		if (DriveStraight(64, 0.5, 0.5, 24.0))		// targetdistance = 64", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage = 3;
 		break;
 	case 3:
@@ -224,7 +224,7 @@ void Autonomous::AutoCenterSwitchLeft()
 			m_autostage = 5;
 		break;
 	case 5:
-		m_intake->AutoEnable();
+		m_intake->AutoEject();
 		m_autostage = 6;
 		break;
 	case 6:
@@ -247,7 +247,7 @@ void Autonomous::AutoCenterSwitchRight()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(68, 0.5, 0.5, 24.0))		// targetdistance = 68", ramp = .5s, power = 50%, deceldistance = 24"
+		if (DriveStraight(64, 0.5, 0.5, 24.0))		// targetdistance = 64", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage = 3;
 		break;
 	case 3:
@@ -259,7 +259,7 @@ void Autonomous::AutoCenterSwitchRight()
 			m_autostage = 5;
 		break;
 	case 5:
-		m_intake->AutoEnable();
+		m_intake->AutoEject();
 		m_autostage = 6;
 		break;
 	case 6:

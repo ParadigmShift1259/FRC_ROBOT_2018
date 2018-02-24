@@ -43,7 +43,7 @@ private:
 	const std::string kszAutoDefault = "NO AUTO";
 	const std::string kszAutoCenterSwitch = "Center Switch";
 	const std::string kszAutoLeftSwitch = "Left Switch";
-	const std::string kszAutoRightSwitch = "Right` Switch";
+	const std::string kszAutoRightSwitch = "Right Switch";
 	const std::string kszAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
 };

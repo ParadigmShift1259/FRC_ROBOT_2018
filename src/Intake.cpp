@@ -126,10 +126,8 @@ void Intake::Loop()
 		{
 			m_leftmotor->StopMotor();				/// ingestion is complete stop motors
 			m_rightmotor->StopMotor();
-			if(m_lifter->MoveSmidgeUp())
-			{
+			if (m_lifter->MoveSmidgeUp())
 				m_stage = kBox;							/// we have the box
-			}
 		}
 		else
 		{
@@ -290,7 +288,7 @@ void Intake::ResetPosition()
 }
 
 
-void Intake::AutoEnable()
+void Intake::AutoEject()
 {
 	m_stage = kBox;
 }

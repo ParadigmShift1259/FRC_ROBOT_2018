@@ -21,6 +21,7 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_ramp = false;
 	m_angle = 0.0;
 	m_pigeon = new PigeonIMU(0);
+	m_feedback = kDisabled;
 	m_gyroval[0] = 0;
 	m_gyroval[1] = 0;
 	m_gyroval[2] = 0;
@@ -32,17 +33,18 @@ DrivePID::~DrivePID()
 }
 
 
-void DrivePID::Init(double p, double i, double d, bool enable)
+void DrivePID::Init(double p, double i, double d, Feedback feedback)
 {
 	m_p = p;
 	m_i = i;
 	m_d = d;
+	m_feedback = feedback;
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	SetSetpoint(0);
 	SetAbsoluteTolerance(0.5);
 	SetOutputRange(-0.7,0.7);
 	m_pigeon->SetFusedHeading(0,0);
-	if (enable)
+	if (feedback != kDisabled)
 		EnablePID();
 }
 
@@ -143,23 +145,31 @@ void DrivePID::DisablePID()
 
 double DrivePID::ReturnPIDInput()
 {
-/*
-	double m_leftpos = m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0);
-	m_leftpos = m_leftpos / CODES_PER_REV;
+	if (m_feedback == kEncoder)
+	{
+		double m_leftpos = m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0);
+		m_leftpos = m_leftpos / CODES_PER_REV;
 
-	double m_rightpos = m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0);
-	m_rightpos = m_rightpos / CODES_PER_REV;
+		double m_rightpos = m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0);
+		m_rightpos = m_rightpos / CODES_PER_REV;
 
-	double retval = (360 / (2 * 3.1415926535)) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;
+		double retval = (360 / (2 * 3.1415926535)) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;
 
-	SmartDashboard::PutNumber("ReturnPosition(Enc)", m_leftpos + m_rightpos);
-	SmartDashboard::PutNumber("ReturnCurrentPosition(Enc)", retval);
-*/
-	double retval = m_pigeon->GetFusedHeading();
+		SmartDashboard::PutNumber("ReturnPosition(Enc)", m_leftpos + m_rightpos);
+		SmartDashboard::PutNumber("ReturnCurrentPosition(Enc)", retval);
 
-	SmartDashboard::PutNumber("ReturnPIDInput(Gyro)", retval);
+		return retval;
+	}
+	else
+	if (m_feedback == kGyro)
+	{
+		double retval = m_pigeon->GetFusedHeading();
 
-	return retval;
+		SmartDashboard::PutNumber("ReturnPIDInput(Gyro)", retval);
+
+		return retval;
+	}
+	return 0;
 }
 
 
