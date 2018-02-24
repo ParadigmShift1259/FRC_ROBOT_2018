@@ -104,7 +104,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kEncoder);
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
