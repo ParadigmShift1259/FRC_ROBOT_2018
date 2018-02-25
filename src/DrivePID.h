@@ -52,7 +52,6 @@ protected:
 	double m_d;
 	double m_y;
 	double m_ramp;
-	double m_angle;
 };
 
 

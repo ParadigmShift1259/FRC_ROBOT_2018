@@ -28,15 +28,16 @@ void Robot::RobotInit()
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
-	m_operatorinputs = new OperatorInputs();
-	m_drivetrain = new DriveTrain(m_operatorinputs);
 	m_compressor = nullptr;
 	if (PCM_COMPRESSOR_SOLENOID != -1)
 		m_compressor = new Compressor(PCM_COMPRESSOR_SOLENOID);
-	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
-	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter);
-	m_climber = new Climber(m_operatorinputs);
+
+	m_operatorinputs = new OperatorInputs();
+	m_drivetrain = new DriveTrain(m_operatorinputs);
 	m_drivepid = new DrivePID(m_drivetrain, m_operatorinputs);
+	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
+	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter, m_drivepid);
+	m_climber = new Climber(m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake);
 }
 
@@ -126,9 +127,11 @@ void Robot::TeleopPeriodic()
 	}
 	else
 	{
-		m_drivetrain->Loop();
 		m_lifter->Loop();
 		m_intake->Loop();
+		m_intake->VisionLoop();
+		if (!m_intake->IsVisioning())
+			m_drivetrain->Loop();
 		m_climber->Loop();
 		m_drivepid->Loop();
 	}

@@ -19,7 +19,6 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_d = 0.0;
 	m_y = 0.0;
 	m_ramp = false;
-	m_angle = 0.0;
 	m_pigeon = new PigeonIMU(0);
 	m_feedback = kDisabled;
 	m_gyroval[0] = 0;
@@ -113,15 +112,13 @@ void DrivePID::SetY(double y)
 
 void DrivePID::SetRelativeAngle(double angle)
 {
-	m_angle += angle;
-	SetSetpointRelative(m_angle);
+	SetSetpointRelative(angle);
 }
 
 
 void DrivePID::SetAbsoluteAngle(double angle)
 {
-	m_angle = angle;
-	SetSetpointRelative(m_angle);
+	SetSetpoint(angle);
 }
 
 
@@ -130,7 +127,6 @@ void DrivePID::EnablePID()
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	GetPIDController()->Reset();
 	Enable();
-
 }
 
 

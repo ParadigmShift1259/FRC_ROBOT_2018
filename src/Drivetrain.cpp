@@ -62,7 +62,6 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 	m_timerramp = new Timer();
 	m_rampmax = RAMPING_RATE_MAX;
-	m_vision = new VisionTarget();
 }
 
 
@@ -159,7 +158,7 @@ void DriveTrain::Init(DriveMode mode)
 	m_ishighgear = true;
 	// Starts in high gear
 	if (m_shifter != nullptr)
-	  m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
+		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
 	m_isdownshifting = false;
 	m_lowspeedmode = false;
 	m_shift = false;
@@ -198,14 +197,7 @@ void DriveTrain::Loop()
 		y = y * LOWSPEED_MODIFIER_Y;
 	}
 
-	if ((INP_DUAL && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 0)) || (INP_DUAL == 0 && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 0)))
-	{
-			Drive(m_vision->GetVisionX(), y, true);
-	}
-	else
-	{
-		Drive(x, y, true);
-	}
+	Drive(x, y, true);
 
 	if (m_shift)
 	{
@@ -472,4 +464,3 @@ double DriveTrain::GetMaxDistance()
 	double maxright = GetRightDistance();
 	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
 }
-
