@@ -105,7 +105,7 @@ void Lifter::Loop()
 			m_motor->Set(m_lowerspeed);
 	}
 	else
-	/// stop lift if less than or at min position
+	/// if x and less than or at min position stop lift
 	if (m_inputs->xBoxXButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position <= m_liftermin))
 	{
 		m_motor->StopMotor();
@@ -117,7 +117,7 @@ void Lifter::Loop()
 		switch (m_stage)
 		{
 		case kIdle:
-			if (m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL) && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))
+			if (m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL) && m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 			{
 				m_motor->SetSelectedSensorPosition(0, 0, 0);
 				m_stage = kRaise;
@@ -138,10 +138,10 @@ void Lifter::Loop()
 		}
 	}
 
-	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// angle lifter - deploy - true
+	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// straighten lifter forward - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// straighten lifter - retract - false (default)
+	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// angle lifter back - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
@@ -171,10 +171,10 @@ void Lifter::TestLoop()
 		m_motor->StopMotor();
 	}
 
-	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// angle lifter - deploy - true
+	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))			/// straighten lifter forward - deploy - true
 		m_solenoid->Set(true);
 	else
-	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// straighten lifter - retract - false (default)
+	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL))		/// angle lifter back - retract - false (default)
 		m_solenoid->Set(false);
 
 	SmartDashboard::PutNumber("LI1_liftermin", m_liftermin);
@@ -213,7 +213,7 @@ bool Lifter::IsBottom()
 
 bool Lifter::MoveSmidgeUp()
 {
-	if (m_motor->GetSelectedSensorPosition(0) < 2200)
+	if (m_motor->GetSelectedSensorPosition(0) < LIF_LIFSMIDGE)
 	{
 		m_motor->Set(m_raisespeed);
 		return false;

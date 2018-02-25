@@ -19,28 +19,33 @@ public:
 	virtual ~Autonomous();
 	void Init();
 	void Loop();
-	void SwitchAuto();
+	void Stop();
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
 	bool TurnAngle(double angle);
-	void Stop();
+	void AutoCenterSwitchRight();
+	void AutoCenterSwitchLeft();
+	void AutoStraight();
+	void AutoTest();
 
 protected:
 	DriveTrain *m_drivetrain;
-	Intake* m_intake;
-	Timer *m_timerstraight;
 	OperatorInputs *m_inputs;
 	DrivePID *m_drivepid;
-	double pid[3] = {0.009, 0.0005, 0.07};
+	Intake* m_intake;
 
+	double m_pid[3] = {0.009, 0.0005, 0.07};
+
+	Timer m_timer;
 	DriveStraightState m_straightstate;
-	TurnState m_turn;
+	TurnState m_turnstate;
+	int m_autostage;
+
 	double m_acceldistance;
 	double m_timermod;
-	double m_timervalue;
 	double m_distance;
 	double m_target;
-	int m_stage;
 };
 
 
 #endif //SRC_AUTONOMOUS_H_
+
