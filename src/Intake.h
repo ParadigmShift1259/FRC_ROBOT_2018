@@ -57,7 +57,9 @@ protected:
 	bool m_autoingest;
 	Vision m_visioning;
 
-	double m_pid[3] = {0.009, 0.0005, 0.07};
+	//double m_pid[3] = {0.02, 0.01, 0.1};
+	//double m_pid[3] = {0.009, 0.0005, 0.07};
+	double m_pid[3] = {0.015, 0.0, 0.0};
 	shared_ptr<NetworkTable> m_nettable;
 	int m_counter;
 };

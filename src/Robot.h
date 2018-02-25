@@ -46,6 +46,8 @@ private:
 	const std::string kszAutoRightSwitch = "Right Switch";
 	const std::string kszAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
+
+	void ReadChooser();
 };
 
 

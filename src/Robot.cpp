@@ -67,7 +67,7 @@ void Robot::AutonomousInit()
 
 	if (m_compressor != nullptr)
 		m_compressor->Start();
-
+	ReadChooser();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
 	m_intake->Init();
@@ -155,6 +155,13 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
+	ReadChooser();
+	m_drivepid->Loop();
+}
+
+
+void Robot::ReadChooser()
+{
 	m_autoSelected = m_chooser.GetSelected();
 	string gamedata = DriverStation::GetInstance().GetGameSpecificMessage();
 	if (gamedata.length() < 3)
@@ -190,8 +197,6 @@ void Robot::DisabledPeriodic()
 	else
 	if (m_autoSelected == kszAutoTestMode)
 		automode = kAutoTest;
-
-	m_drivepid->Loop();
 
 	SmartDashboard::PutNumber("AU1_automode", automode);
 }
