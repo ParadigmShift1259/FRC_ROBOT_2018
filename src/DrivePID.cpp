@@ -122,6 +122,12 @@ void DrivePID::SetAbsoluteAngle(double angle)
 }
 
 
+void DrivePID::ResetGyro()
+{
+	m_pigeon->SetFusedHeading(0, 0);
+}
+
+
 void DrivePID::EnablePID()
 {
 	GetPIDController()->SetPID(m_p, m_i, m_d);

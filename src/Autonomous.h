@@ -33,7 +33,7 @@ protected:
 	DrivePID *m_drivepid;
 	Intake* m_intake;
 
-	double m_pid[3] = {0.009, 0.0005, 0.07};
+	double m_pid[3] = {0.02, 0.0005, 0.07};
 
 	Timer m_timer;
 	DriveStraightState m_straightstate;

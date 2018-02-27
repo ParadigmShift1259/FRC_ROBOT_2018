@@ -203,17 +203,19 @@ void Intake::VisionLoop()
 {
 	int counter = m_nettable->GetNumber("visioncounter", 0);
 	double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
+	double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
 	bool valid = false;
 	if (counter > m_counter)
 	{
 		m_counter = counter;
-		valid = true;
+		if (distance > 0.0)
+			valid = true;
 	}
 
 	switch (m_visioning)
 	{
 	case kIdle:
-		if (m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+		if (valid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 		{
 			m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
@@ -237,17 +239,19 @@ void Intake::VisionLoop()
 			//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
 			//m_drivepid->SetAbsoluteAngle(x);
 
-			double y = m_inputs->xBoxLeftY(0 * INP_DUAL);
-			m_drivepid->Drive(y, true);
+			double scale = (distance / (96.0 * 2.0) + 0.5);
+			double y = m_inputs->xBoxLeftY(0 * INP_DUAL) * (scale > 1) ? 1 : scale;
 
-			if (valid)
-				m_drivepid->SetAbsoluteAngle(angle);
+			m_drivepid->Drive(y, true);
+			m_drivepid->ResetGyro();
+			m_drivepid->SetAbsoluteAngle(angle);
 		}
 		break;
 	}
 
 	SmartDashboard::PutNumber("IN6_visioncounter", counter);
 	SmartDashboard::PutNumber("IN7_visionangle", angle);
+	SmartDashboard::PutNumber("IN8_distance", distance);
 }
 
 

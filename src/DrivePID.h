@@ -35,6 +35,7 @@ public:
 	void SetY(double y);
 	void SetRelativeAngle(double angle);
 	void SetAbsoluteAngle(double angle);
+	void ResetGyro();
 
 	void EnablePID();
 	void DisablePID();
