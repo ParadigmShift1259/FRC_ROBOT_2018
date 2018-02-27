@@ -205,6 +205,8 @@ void Intake::VisionLoop()
 	double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
 	double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
 	bool valid = false;
+
+	double scale = distance / (96 * 2) + 0.25;
 	if (counter > m_counter)
 	{
 		m_counter = counter;
@@ -239,8 +241,7 @@ void Intake::VisionLoop()
 			//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
 			//m_drivepid->SetAbsoluteAngle(x);
 
-			double scale = (distance / (96.0 * 2.0) + 0.5);
-			double y = m_inputs->xBoxLeftY(0 * INP_DUAL) * (scale > 1) ? 1 : scale;
+			double y = m_inputs->xBoxLeftY(0 * INP_DUAL) * (scale > 1 ? 1 : scale);
 
 			m_drivepid->Drive(y, true);
 			m_drivepid->ResetGyro();
@@ -248,7 +249,7 @@ void Intake::VisionLoop()
 		}
 		break;
 	}
-
+	SmartDashboard::PutNumber("IN999_scale", scale);
 	SmartDashboard::PutNumber("IN6_visioncounter", counter);
 	SmartDashboard::PutNumber("IN7_visionangle", angle);
 	SmartDashboard::PutNumber("IN8_distance", distance);
