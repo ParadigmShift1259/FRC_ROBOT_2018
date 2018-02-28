@@ -45,6 +45,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DriveP
 
 	m_nettable = NetworkTableInstance::GetDefault().GetTable("OpenCV");
 	m_counter = 0;
+	m_visionvalid = false;
 }
 
 
@@ -75,6 +76,9 @@ void Intake::Init()
 	m_allowingest = false;
 	m_autoingest = false;
 	m_counter = 0;
+	m_visiontimer.Reset();
+	m_visiontimer.Start();
+	m_visionvalid = false;
 }
 
 
@@ -204,20 +208,27 @@ void Intake::VisionLoop()
 	int counter = m_nettable->GetNumber("visioncounter", 0);
 	double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
 	double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
-	bool valid = false;
 
 	double scale = distance / (96 * 2) + 0.25;
 	if (counter > m_counter)
 	{
 		m_counter = counter;
 		if (distance > 0.0)
-			valid = true;
+		{
+			m_visiontimer.Reset();
+			m_visionvalid = true;
+		}
+	}
+	else
+	if (m_visiontimer.Get() > 0.5)
+	{
+		m_visionvalid = false;
 	}
 
 	switch (m_visioning)
 	{
 	case kIdle:
-		if (valid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+		if (m_visionvalid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 		{
 			m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
@@ -230,7 +241,7 @@ void Intake::VisionLoop()
 		break;
 
 	case kVision:
-		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+		if (!m_visionvalid || m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 		{
 			m_drivepid->DisablePID();
 			m_autoingest = false;
@@ -241,7 +252,7 @@ void Intake::VisionLoop()
 			//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
 			//m_drivepid->SetAbsoluteAngle(x);
 
-			double y = m_inputs->xBoxLeftY(0 * INP_DUAL) * (scale > 1 ? 1 : scale);
+			double y = /*m_inputs->xBoxLeftY(0 * INP_DUAL) * */-1*(scale > 1 ? 1 : scale);
 
 			m_drivepid->Drive(y, true);
 			m_drivepid->ResetGyro();
@@ -338,6 +349,8 @@ void Intake::Stop()
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
 	m_timer.Stop();
+	m_visiontimer.Stop();
+	m_visionvalid = false;
 }
 
 

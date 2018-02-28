@@ -62,6 +62,8 @@ protected:
 	double m_pid[3] = {0.015, 0.0, 0.0};
 	shared_ptr<NetworkTable> m_nettable;
 	int m_counter;
+	Timer m_visiontimer;
+	bool m_visionvalid;
 };
 
 
