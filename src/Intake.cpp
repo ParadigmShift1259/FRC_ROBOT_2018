@@ -232,8 +232,8 @@ void Intake::VisionLoop()
 		{
 			m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
-			m_visioning = kVision;
 			m_autoingest = true;
+			m_visioning = kVision;
 		}
 		else
 			m_drivepid->DisablePID();
@@ -248,6 +248,7 @@ void Intake::VisionLoop()
 			m_visioning = kIdle;
 		}
 		else
+		if (m_lifter->IsBottom())
 		{
 			//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
 			//m_drivepid->SetAbsoluteAngle(x);
@@ -258,6 +259,8 @@ void Intake::VisionLoop()
 			m_drivepid->ResetGyro();
 			m_drivepid->SetAbsoluteAngle(angle);
 		}
+		else
+			m_lifter->MoveBottom();
 		break;
 	}
 	SmartDashboard::PutNumber("IN999_scale", scale);

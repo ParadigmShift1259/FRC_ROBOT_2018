@@ -75,13 +75,13 @@ void Lifter::Loop()
 	m_position = m_motor->GetSelectedSensorPosition(0);
 
 	/// if left bumper and Y override position sensor and raise lift
-	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && !m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 	{
 		m_motor->Set(m_raisespeed * 0.5);
 	}
 	else
 	/// if Y raise list only if not at max position
-	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position < m_liftermax))		/// raise lifter - positive
+	if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && (m_position < m_liftermax)  && !m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))		/// raise lifter - positive
 	{
 		if (m_position > m_liftermaxspd)
 			m_motor->Set(m_raisespeed * 0.5);
@@ -117,7 +117,7 @@ void Lifter::Loop()
 		switch (m_stage)
 		{
 		case kIdle:
-			if (m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL) && m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+			if (m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 			{
 				m_motor->SetSelectedSensorPosition(0, 0, 0);
 				m_stage = kRaise;
@@ -215,7 +215,25 @@ bool Lifter::MoveSmidgeUp()
 {
 	if (m_motor->GetSelectedSensorPosition(0) < LIF_LIFSMIDGE)
 	{
-		m_motor->Set(m_raisespeed);
+		m_motor->Set(m_raisespeed);		/// raise lifter - positive
+		return false;
+	}
+	else
+	{
+		m_motor->Set(0);
+		return true;
+	}
+}
+
+
+bool Lifter::MoveBottom()
+{
+	if (m_position > m_liftermin)		/// lower lifter - negative
+	{
+		if (m_position < m_lifterminspd)
+			m_motor->Set(m_lowerspeed * 0.5);
+		else
+			m_motor->Set(m_lowerspeed);
 		return false;
 	}
 	else

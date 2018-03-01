@@ -28,6 +28,7 @@ public:
 	void ResetPosition();
 	bool IsBottom();
 	bool MoveSmidgeUp();
+	bool MoveBottom();
 
 protected:
 	DriverStation *m_ds;
@@ -42,7 +43,6 @@ protected:
 	double m_liftermax;
 	double m_lifterminspd;
 	double m_liftermaxspd;
-
 };
 
 
