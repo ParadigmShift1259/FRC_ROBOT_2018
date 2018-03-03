@@ -164,7 +164,7 @@ void Robot::ReadChooser()
 {
 	m_autoSelected = m_chooser.GetSelected();
 	string gamedata = DriverStation::GetInstance().GetGameSpecificMessage();
-	if (gamedata.length() < 3)
+	if (gamedata.length() < 1)
 		gamedata = "   ";
 
 	automode = kAutoDefault;
