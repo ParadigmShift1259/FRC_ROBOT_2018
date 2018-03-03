@@ -39,9 +39,13 @@ public:
 	bool xBoxStartButton(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxBackButton(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxDPadUp(ToggleChoice choice = kToggle, unsigned int i = 0);
+	bool xBoxDPadUpRight(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxDPadRight(ToggleChoice choice = kToggle, unsigned int i = 0);
+	bool xBoxDPadDownRight(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxDPadDown(ToggleChoice choice = kToggle, unsigned int i = 0);
+	bool xBoxDPadDownLeft(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxDPadLeft(ToggleChoice choice = kToggle, unsigned int i = 0);
+	bool xBoxDPadUpLeft(ToggleChoice choice = kToggle, unsigned int i = 0);
 	bool xBoxR3(ToggleChoice choice = kToggle, unsigned int i = 0);
 	// joystick
 	double joystickX();

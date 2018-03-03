@@ -47,11 +47,14 @@ void Climber::Loop()
 	if (m_motor == nullptr)
 		return;
 
-	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) &&
-		m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))				/// lower robot - negative
+	if (m_inputs->xBoxDPadDown(OperatorInputs::ToggleChoice::kHold, 1))				/// lower robot - negative
 		m_motor->Set(-1.0);
 	else
-	if (m_inputs->xBoxStartButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))				/// climb - raise robot - positive
+	if (m_inputs->xBoxDPadUp(OperatorInputs::ToggleChoice::kHold, 1) ||
+		m_inputs->xBoxDPadUpRight(OperatorInputs::ToggleChoice::kHold, 1) ||
+		m_inputs->xBoxDPadUpLeft(OperatorInputs::ToggleChoice::kHold, 1) ||
+		m_inputs->xBoxDPadRight(OperatorInputs::ToggleChoice::kHold, 1) ||
+		m_inputs->xBoxDPadLeft(OperatorInputs::ToggleChoice::kHold, 1))				/// climb - raise robot - positive
 		m_motor->Set(1.0);
 	else
 		m_motor->StopMotor();

@@ -229,6 +229,21 @@ bool OperatorInputs::xBoxDPadUp(ToggleChoice choice, unsigned int i)
 }
 
 
+bool OperatorInputs::xBoxDPadUpRight(ToggleChoice choice, unsigned int i)
+{
+	if (i < m_xbox.size())
+	{
+		bool button = (m_xbox[i]->GetPOV() == 45);
+
+		if (choice == kToggle)
+			return toggle("xBoxDPadUpRight", button);
+		if (choice == kHold)
+			return button;
+	}
+	return false;
+}
+
+
 bool OperatorInputs::xBoxDPadRight(ToggleChoice choice, unsigned int i)
 {
 	if (i < m_xbox.size())
@@ -236,9 +251,24 @@ bool OperatorInputs::xBoxDPadRight(ToggleChoice choice, unsigned int i)
 		bool button = (m_xbox[i]->GetPOV() == 90);
 
 		if (choice == kToggle)
-			return toggle("xBoxDPadLeft", button);
+			return toggle("xBoxDPadRight", button);
 		if (choice == kHold)
 			return button;
+	}
+	return false;
+}
+
+
+bool OperatorInputs::xBoxDPadDownRight(ToggleChoice choice, unsigned int i)
+{
+	if (i < m_xbox.size())
+	{
+	bool button = (m_xbox[i]->GetPOV() == 135);
+
+	if (choice == kToggle)
+		return toggle("xBoxDPadDownRight", button);
+	if (choice == kHold)
+		return button;
 	}
 	return false;
 }
@@ -259,6 +289,21 @@ bool OperatorInputs::xBoxDPadDown(ToggleChoice choice, unsigned int i)
 }
 
 
+bool OperatorInputs::xBoxDPadDownLeft(ToggleChoice choice, unsigned int i)
+{
+	if (i < m_xbox.size())
+	{
+		bool button = (m_xbox[i]->GetPOV() == 225);
+
+		if (choice == kToggle)
+			return toggle("xBoxDPadDownLeft", button);
+		if (choice == kHold)
+			return button;
+	}
+	return false;
+}
+
+
 bool OperatorInputs::xBoxDPadLeft(ToggleChoice choice, unsigned int i)
 {
 	if (i < m_xbox.size())
@@ -266,7 +311,22 @@ bool OperatorInputs::xBoxDPadLeft(ToggleChoice choice, unsigned int i)
 		bool button = (m_xbox[i]->GetPOV() == 270);
 
 		if (choice == kToggle)
-			return toggle("xBoxDPadRight", button);
+			return toggle("xBoxDPadLeft", button);
+		if (choice == kHold)
+			return button;
+	}
+	return false;
+}
+
+
+bool OperatorInputs::xBoxDPadUpLeft(ToggleChoice choice, unsigned int i)
+{
+	if (i < m_xbox.size())
+	{
+		bool button = (m_xbox[i]->GetPOV() == 315);
+
+		if (choice == kToggle)
+			return toggle("xBoxDPadUpLeft", button);
 		if (choice == kHold)
 			return button;
 	}
