@@ -129,7 +129,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		}
 		else
 		{
-			m_drivepid->Drive(-autopower);
+			m_drivepid->Drive(-1 * autopower);
 		}
 		break;
 
