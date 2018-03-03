@@ -239,7 +239,7 @@ void Autonomous::AutoCenterSwitchRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+		if (DriveStraight(44, 0.5, 0.5, 24.0))		// targetdistance = 44", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage = 1;
 		break;
 	case 1:
@@ -247,7 +247,7 @@ void Autonomous::AutoCenterSwitchRight()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(64, 0.5, 0.5, 24.0))		// targetdistance = 64", ramp = .5s, power = 50%, deceldistance = 24"
+		if (DriveStraight(52, 0.5, 0.5, 24.0))		// targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage = 3;
 		break;
 	case 3:
