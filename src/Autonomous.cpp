@@ -82,8 +82,8 @@ void Autonomous::Loop()
 	SmartDashboard::PutNumber("AU02_rightinches", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	SmartDashboard::PutNumber("AU03_leftposition", m_drivetrain->GetLeftPosition());
 	SmartDashboard::PutNumber("AU04_leftposition", m_drivetrain->GetRightPosition());
-	SmartDashboard::PutNumber("AU05_distance", m_drivetrain->GetMaxDistance());
-	SmartDashboard::PutNumber("AU05_deceldistance", m_drivetrain->GetMaxDistance() - SmartDashboard::GetNumber("StartDecel",0));
+	SmartDashboard::PutNumber("AU05_distance", abs(m_drivetrain->GetMaxDistance()));
+	SmartDashboard::PutNumber("AU06_deceldistance", abs(m_drivetrain->GetMaxDistance()) - SmartDashboard::GetNumber("StartDecel",0));
 }
 
 
@@ -303,7 +303,7 @@ void Autonomous::AutoRightScaleRight()
 		break;
 	case 3:
 		m_intake->AutoEject();
-		m_autostage = 6;
+		m_autostage = 4;
 		break;
 	case 4:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
@@ -317,7 +317,7 @@ void Autonomous::AutoRightScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(209, 0.7, 1.0, 62.3))		//Goes 235, trust me
+		if (DriveStraight(209, 0.7, 1.0, 62.3))		//Goes 235, with the turn, trust me
 			m_autostage = 1;
 		break;
 	case 1:
@@ -325,7 +325,7 @@ void Autonomous::AutoRightScaleLeft()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(230, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
+		if (DriveStraight(204, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
 			m_autostage = 3;
 		break;
 	case 3:
@@ -334,6 +334,41 @@ void Autonomous::AutoRightScaleLeft()
 		break;
 	case 4:
 		if (DriveStraight(52, 0.5, 0.25, 12.0))		// targetdistance = 30", ramp = .5s, power = 25%, deceldistance = 12"
+			m_autostage = 5;
+		break;
+	case 5:
+		m_intake->AutoEject();
+		m_autostage = 6;
+		break;
+	case 6:
+		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+}
+
+
+void Autonomous::AutoLeftScaleRight()
+{
+	switch (m_autostage)
+	{
+	case 0:
+		if (DriveStraight(209, 0.7, 1.0, 62.3))		// Goes 235, with the turn, trust me
+			m_autostage = 1;
+		break;
+	case 1:
+		if (TurnAngle(-90))							// angle = -90, clockwise
+			m_autostage = 2;
+		break;
+	case 2:
+		if (DriveStraight(204, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
+			m_autostage = 3;
+		break;
+	case 3:
+		if (TurnAngle(105))							// angle = 105 (counter clockwise)
+			m_autostage = 4;
+		break;
+	case 4:
+		if (DriveStraight(52, 0.5, 0.25, 12.0))		// targetdistance = 30", everything else needs tuning
 			m_autostage = 5;
 		break;
 	case 5:
@@ -365,44 +400,9 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 3:
 		m_intake->AutoEject();
-		m_autostage = 6;
+		m_autostage = 4;
 		break;
 	case 4:
-		m_drivetrain->Drive(0, 0);					// turn off drive motors
-		break;
-	}
-}
-
-
-void Autonomous::AutoLeftScaleRight()
-{
-	switch (m_autostage)
-	{
-	case 0:
-		if (DriveStraight(209, 0.7, 1.0, 62.3))		// Goes 235, trust me
-			m_autostage = 1;
-		break;
-	case 1:
-		if (TurnAngle(-90))							// angle = -90, clockwise
-			m_autostage = 2;
-		break;
-	case 2:
-		if (DriveStraight(235, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
-			m_autostage = 3;
-		break;
-	case 3:
-		if (TurnAngle(105))							// angle = 105 (counter clockwise)
-			m_autostage = 4;
-		break;
-	case 4:
-		if (DriveStraight(52, 0.5, 0.25, 12.0))		// targetdistance = 30", everything else needs tuning
-			m_autostage = 5;
-		break;
-	case 5:
-		m_intake->AutoEject();
-		m_autostage = 6;
-		break;
-	case 6:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}
@@ -414,12 +414,22 @@ void Autonomous::AutoTest()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(209, 0.7, 1.0, 62.3))
+		if (DriveStraight(207, 0.7, 1.0, 62.3)) 	// DriveStraight(200, 0.7, 1.0, 62.3)    23in on the 105 turn
+		{
 			m_autostage = 1;
+			m_timer.Reset();
+		}
 		break;
 	case 1:
-		if (TurnAngle(90))							// angle = 90, counter clockwise
+		if (m_timer.Get() > 0.2)					// angle = -90, clockwise
 			m_autostage = 2;
+		break;
+	case 2:
+		if (TurnAngle(-105))
+			m_autostage = 3;
+		break;
+	case 3:
+		m_drivetrain->Drive(0, 0);
 		break;
 	}
 }

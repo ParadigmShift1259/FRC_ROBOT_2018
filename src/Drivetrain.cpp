@@ -132,12 +132,12 @@ void DriveTrain::Init(DriveMode mode)
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	m_lefttalonlead->SetSensorPhase(false);
-	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
+	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 1000);
 	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	m_righttalonlead->SetSensorPhase(false);
-	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
+	m_righttalonlead->SetSelectedSensorPosition(0, 0, 1000);
 	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);

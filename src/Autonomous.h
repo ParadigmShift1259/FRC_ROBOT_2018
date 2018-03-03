@@ -25,11 +25,11 @@ public:
 	void AutoCenterSwitchRight();
 	void AutoCenterSwitchLeft();
 	void AutoStraight();
-	void AutoTest();
 	void AutoRightScaleRight();
 	void AutoRightScaleLeft();
-	void AutoLeftScaleLeft();
 	void AutoLeftScaleRight();
+	void AutoLeftScaleLeft();
+	void AutoTest();
 
 protected:
 	DriveTrain *m_drivetrain;
