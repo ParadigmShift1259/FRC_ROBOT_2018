@@ -83,6 +83,7 @@ void Autonomous::Loop()
 	SmartDashboard::PutNumber("AU03_leftposition", m_drivetrain->GetLeftPosition());
 	SmartDashboard::PutNumber("AU04_leftposition", m_drivetrain->GetRightPosition());
 	SmartDashboard::PutNumber("AU05_distance", m_drivetrain->GetMaxDistance());
+	SmartDashboard::PutNumber("AU05_deceldistance", m_drivetrain->GetMaxDistance() - SmartDashboard::GetNumber("StartDecel",0));
 }
 
 
@@ -289,7 +290,7 @@ void Autonomous::AutoRightScaleRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(300, 0.5, 0.5, 24.0))		// targetdistance = 300", everything else needs tuning
+		if (DriveStraight(300, 0.7, 1.0, 24.0))		// targetdistance = 300", everything else needs tuning
 			m_autostage = 1;
 		break;
 	case 1:
@@ -316,7 +317,7 @@ void Autonomous::AutoRightScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(255, 0.5, 0.5, 24.0))		// targetdistance = 255" everything else needs tuning
+		if (DriveStraight(209, 0.7, 1.0, 62.3))		//Goes 235, trust me
 			m_autostage = 1;
 		break;
 	case 1:
@@ -324,7 +325,7 @@ void Autonomous::AutoRightScaleLeft()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(230, 0.5, 0.5, 24.0))		// targetdistance = 230", everything else needs tuning
+		if (DriveStraight(230, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
 			m_autostage = 3;
 		break;
 	case 3:
@@ -378,7 +379,7 @@ void Autonomous::AutoLeftScaleRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(255, 0.5, 0.5, 24.0))		// targetdistance = 255" everything else needs tuning
+		if (DriveStraight(209, 0.7, 1.0, 62.3))		// Goes 235, trust me
 			m_autostage = 1;
 		break;
 	case 1:
@@ -386,7 +387,7 @@ void Autonomous::AutoLeftScaleRight()
 			m_autostage = 2;
 		break;
 	case 2:
-		if (DriveStraight(230, 0.5, 0.5, 24.0))		// targetdistance = 230", everything else needs tuning
+		if (DriveStraight(235, 0.7, 1.0, 62.3))		// targetdistance = 230", tuned ish
 			m_autostage = 3;
 		break;
 	case 3:
@@ -413,11 +414,12 @@ void Autonomous::AutoTest()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(100, 0.5, 0.5, 24.0))
+		if (DriveStraight(209, 0.7, 1.0, 62.3))
 			m_autostage = 1;
 		break;
 	case 1:
-		m_drivetrain->Drive(0, 0);
+		if (TurnAngle(90))							// angle = 90, counter clockwise
+			m_autostage = 2;
 		break;
 	}
 }
