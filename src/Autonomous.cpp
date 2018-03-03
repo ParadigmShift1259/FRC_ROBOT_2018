@@ -82,7 +82,7 @@ void Autonomous::Loop()
 	SmartDashboard::PutNumber("AU02_rightinches", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	SmartDashboard::PutNumber("AU03_leftposition", m_drivetrain->GetLeftPosition());
 	SmartDashboard::PutNumber("AU04_leftposition", m_drivetrain->GetRightPosition());
-	SmartDashboard::PutNumber("AU05_distance", m_drivetrain->GetMaxDistance());
+	SmartDashboard::PutNumber("AU05_distance", abs(m_drivetrain->GetMaxDistance()));
 }
 
 
@@ -153,7 +153,8 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		}
 		else
 		{
-			m_drivepid->Drive(-1 * ((acceltime - timervalue) / acceltime) * autopower);
+			double power = (acceltime - timervalue) < 0 ? 0.1 : (acceltime - timervalue) / acceltime * autopower;
+			m_drivepid->Drive(-1 * power);
 		}
 		break;
 	}
@@ -163,20 +164,6 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 
 bool Autonomous::TurnAngle(double angle)
 {
-//	if (m_drivepid->OnTarget())
-//	{
-//		SmartDashboard::PutNumber("Ontarget", 1111);
-//	}
-//	else
-//		SmartDashboard::PutNumber("Ontarget", 0000);
-
-//	pid[0] = SmartDashboard::GetNumber("P",pid[0]);
-//	m_drivepid->SetP(pid[0]);
-//	pid[1] = SmartDashboard::GetNumber("I",pid[1]);
-//	m_drivepid->SetI(pid[1]);
-//	pid[2] = SmartDashboard::GetNumber("D",pid[2]);
-//	m_drivepid->SetD(pid[2]);
-
 	switch (m_turnstate)
 	{
 	case kInit:
@@ -184,7 +171,8 @@ bool Autonomous::TurnAngle(double angle)
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_turnstate = kTurning;
-		/* no break */
+		break;
+
 	case kTurning:
 		m_drivepid->Drive(0, false);
 		if (m_drivepid->OnTarget())
