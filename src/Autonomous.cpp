@@ -21,10 +21,8 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 	m_turnstate = kInit;
 	m_autostage = 0;
 
-	m_acceldistance = 0;
 	m_timermod = 0;
 	m_distance = 0;
-	m_target = 0;
 }
 
 
@@ -44,10 +42,8 @@ void Autonomous::Init()
 	m_turnstate = kInit;
 	m_autostage = 0;
 
-	m_acceldistance = 0;
 	m_timermod = 0;
 	m_distance = 0;
-	m_target = 0;
 
 	m_drivepid->Init();
 }
@@ -94,7 +90,6 @@ void Autonomous::Stop()
 
 bool Autonomous::DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
 {
-	m_target = targetdistance;
 	double timervalue = m_timer.Get();
 	m_distance = abs(m_drivetrain->GetMaxDistance());
 
@@ -108,7 +103,6 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
-		m_straightstate = kAccel;
 		m_timermod = acceltime;
 		m_straightstate = kAccel;
 		break;
@@ -117,9 +111,8 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		// if acceleration has reached max time
 		if (timervalue > acceltime)
 		{
-			m_acceldistance = m_distance;
-			m_straightstate = kMaintain;
 			m_timer.Reset();
+			m_straightstate = kMaintain;
 		}
 		else
 		{
@@ -131,9 +124,8 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		// maintain until decel distance
 		if ((targetdistance - m_distance) <= deceldistance)
 		{
-			m_straightstate = kDecel;
 			m_timer.Reset();
-			SmartDashboard::PutNumber("StartDecel", m_distance);
+			m_straightstate = kDecel;
 		}
 		else
 		{
@@ -143,7 +135,8 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 
 	case kDecel:
 		// decelerate until target distance minus some fudge factor
-		if (m_distance > (targetdistance - 5.0))
+		// abort decelerate if decelerate time + 1s has passed
+		if ((m_distance > (targetdistance - 5.0)) || (timervalue > (acceltime+1)))
 		{
 			m_drivepid->Drive(0);
 			m_drivepid->DisablePID();
@@ -153,6 +146,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		}
 		else
 		{
+			// make sure power never goes negative if time is longer than decel time
 			double power = (acceltime - timervalue) < 0 ? 0.1 : (acceltime - timervalue) / acceltime * autopower;
 			m_drivepid->Drive(-1 * power);
 		}

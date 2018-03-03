@@ -40,10 +40,8 @@ protected:
 	TurnState m_turnstate;
 	int m_autostage;
 
-	double m_acceldistance;
 	double m_timermod;
 	double m_distance;
-	double m_target;
 };
 
 
