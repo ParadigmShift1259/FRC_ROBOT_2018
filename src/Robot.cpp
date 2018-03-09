@@ -25,6 +25,8 @@ void Robot::RobotInit()
 	m_chooser.AddObject(kszAutoLeftSwitch, kszAutoLeftSwitch);
 	m_chooser.AddObject(kszAutoRightSwitch, kszAutoRightSwitch);
 	m_chooser.AddObject(kszAutoTestMode, kszAutoTestMode);
+	m_chooser.AddObject(kszAutoRightScale, kszAutoRightScale);
+	m_chooser.AddObject(kszAutoLeftScale, kszAutoLeftScale);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -38,7 +40,7 @@ void Robot::RobotInit()
 	m_lifter = new Lifter(m_driverstation, m_operatorinputs);
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter, m_drivepid);
 	m_climber = new Climber(m_operatorinputs);
-	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake);
+	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake, m_lifter);
 }
 
 
@@ -192,6 +194,26 @@ void Robot::ReadChooser()
 			automode = kAutoStraight;
 		else
 		if (gamedata[0] == 'R')
+			automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoRightScale)
+	{
+		if (gamedata [0] == 'L')
+			//automode = kAutoRightScaleLeft;
+			automode = kAutoStraight;
+		else
+		if (gamedata [0] == 'R')
+			automode = kAutoRightScaleRight;
+	}
+	else
+	if (m_autoSelected == kszAutoLeftScale)
+	{
+		if (gamedata [0] == 'L')
+			automode = kAutoLeftScaleLeft;
+		else
+		if (gamedata [0] == 'R')
+			//automode = kAutoLeftScaleRight;
 			automode = kAutoStraight;
 	}
 	else

@@ -242,3 +242,28 @@ bool Lifter::MoveBottom()
 		return true;
 	}
 }
+
+
+bool Lifter::AutoRaise()
+{
+	if (m_position < m_liftermax)		/// raise lifter - positive
+	{
+		if (m_position > m_liftermaxspd)
+			m_motor->Set(m_raisespeed * 0.5);
+		else
+			m_motor->Set(m_raisespeed);
+		return false;
+	}
+	else
+	{
+		m_motor->Set(0);
+		return true;
+	}
+}
+
+
+bool Lifter::AutoDeploy()
+{
+	m_solenoid->Set(true);
+	return true;
+}

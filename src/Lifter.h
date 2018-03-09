@@ -29,6 +29,8 @@ public:
 	bool IsBottom();
 	bool MoveSmidgeUp();
 	bool MoveBottom();
+	bool AutoRaise();
+	bool AutoDeploy();
 
 protected:
 	DriverStation *m_ds;

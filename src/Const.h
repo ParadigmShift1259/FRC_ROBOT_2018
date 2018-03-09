@@ -97,8 +97,8 @@
 #define LIF_LIFSMIDGE 1900				/// 7% of max height
 #define LIF_LIFTERMINSPD 2850			/// 10% of max height
 #define LIF_LIFTERSTART 14100			/// ~50% of max height
-#define LIF_LIFTERMAXSPD 25650			/// 90% of max height
-#define LIF_LIFTERMAX 28500
+#define LIF_LIFTERMAXSPD 26100			/// 90% of max height
+#define LIF_LIFTERMAX 29000
 
 
 // Intake
@@ -117,7 +117,7 @@
 
 
 // Autonomous
-enum AutoMode {kAutoDefault, kAutoCenterSwitchLeft, kAutoCenterSwitchRight, kAutoStraight, kAutoTest};
+enum AutoMode {kAutoDefault, kAutoCenterSwitchLeft, kAutoCenterSwitchRight, kAutoStraight, kAutoRightScaleRight, kAutoRightScaleLeft, kAutoLeftScaleRight, kAutoLeftScaleLeft, kAutoTest};
 extern AutoMode automode;
 
 

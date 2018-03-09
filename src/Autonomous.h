@@ -7,6 +7,7 @@
 #include "OperatorInputs.h"
 #include "DrivePID.h"
 #include "Intake.h"
+#include "Lifter.h"
 
 
 class Autonomous
@@ -15,7 +16,7 @@ public:
 	enum DriveStraightState {kStart, kAccel, kMaintain, kDecel};
 	enum TurnState {kInit, kTurning};
 
-	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid, Intake* intake);
+	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid, Intake *intake, Lifter *lifter);
 	virtual ~Autonomous();
 	void Init();
 	void Loop();
@@ -25,15 +26,20 @@ public:
 	void AutoCenterSwitchRight();
 	void AutoCenterSwitchLeft();
 	void AutoStraight();
+	void AutoRightScaleRight();
+	void AutoRightScaleLeft();
+	void AutoLeftScaleRight();
+	void AutoLeftScaleLeft();
 	void AutoTest();
 
 protected:
 	DriveTrain *m_drivetrain;
 	OperatorInputs *m_inputs;
 	DrivePID *m_drivepid;
-	Intake* m_intake;
+	Intake *m_intake;
+	Lifter *m_lifter;
 
-	double m_pid[3] = {0.02, 0.0005, 0.07};
+	double m_pid[3] = {0.035, 0.0012, 0.07};
 
 	Timer m_timer;
 	DriveStraightState m_straightstate;
