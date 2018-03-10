@@ -292,7 +292,7 @@ void Autonomous::AutoRightScaleRight()
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(60))							// angle = 60 (counter clockwise)
+		if (TurnAngle(45))							// angle = 45 (counter clockwise)
 			m_autostage++;
 		break;
 	case 2:
@@ -307,11 +307,11 @@ void Autonomous::AutoRightScaleRight()
 		m_intake->AutoEject();
 		m_autostage++;
 		break;
-	case 6:
+	case 5:
 		if (m_lifter->MoveBottom())
 			m_autostage++;
 		break;
-	case 7:
+	case 6:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}
@@ -331,15 +331,15 @@ void Autonomous::AutoRightScaleLeft()
 			m_autostage++;
 		break;
 	case 2:
-		if (DriveStraight(209, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
+		if (DriveStraight(233, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
 			m_autostage++;
 		break;
 	case 3:
-		if (TurnAngle(-105))						// angle = -105 (clockwise)
+		if (TurnAngle(-135))						// angle = -105 (clockwise)
 			m_autostage++;
 		break;
 	case 4:
-		if (DriveStraight(36, 0.1, 0.25, 18.0))		// targetdistance = 36", ramp = .1s, power = 25%, deceldistance = 18"
+		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
 			m_autostage++;
 		break;
 	case 5:
@@ -378,15 +378,15 @@ void Autonomous::AutoLeftScaleRight()
 			m_autostage++;
 		break;
 	case 2:
-		if (DriveStraight(209, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
+		if (DriveStraight(233, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
 			m_autostage++;
 		break;
 	case 3:
-		if (TurnAngle(105))							// angle = 105 (counter clockwise)
+		if (TurnAngle(135))							// angle = 105 (counter clockwise)
 			m_autostage++;
 		break;
 	case 4:
-		if (DriveStraight(36, 0.1, 0.25, 18.0))		// targetdistance = 36", ramp = .1s, power = 25%, deceldistance = 18"
+		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
 			m_autostage++;
 		break;
 	case 5:
@@ -421,7 +421,7 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(-60))							// angle = -60 (clockwise)
+		if (TurnAngle(-45))							// angle = -45 (clockwise)
 			m_autostage++;
 		break;
 	case 2:
@@ -436,11 +436,11 @@ void Autonomous::AutoLeftScaleLeft()
 		m_intake->AutoEject();
 		m_autostage++;
 		break;
-	case 6:
+	case 5:
 		if (m_lifter->MoveBottom())
 			m_autostage++;
 		break;
-	case 7:
+	case 6:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}

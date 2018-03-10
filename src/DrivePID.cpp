@@ -40,7 +40,7 @@ void DrivePID::Init(double p, double i, double d, Feedback feedback)
 	m_feedback = feedback;
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	SetSetpoint(0);
-	SetAbsoluteTolerance(0.5);
+	SetAbsoluteTolerance(2);
 	SetOutputRange(-0.7,0.7);
 	m_pigeon->SetFusedHeading(0,0);
 	if (feedback != kDisabled)

@@ -112,9 +112,6 @@ void Robot::TeleopInit()
 	m_lifter->Init();
 	m_intake->Init();
 	m_climber->Init();
-	SmartDashboard::PutNumber("P", SmartDashboard::GetNumber("P",0.018));
-	SmartDashboard::PutNumber("I", SmartDashboard::GetNumber("I", 0.0003));
-	SmartDashboard::PutNumber("D", SmartDashboard::GetNumber("D", 0.05));
 }
 
 
@@ -159,6 +156,7 @@ void Robot::DisabledPeriodic()
 {
 	ReadChooser();
 	m_drivepid->Loop();
+	m_intake->VisionLoop();
 }
 
 
@@ -166,7 +164,7 @@ void Robot::ReadChooser()
 {
 	m_autoSelected = m_chooser.GetSelected();
 	string gamedata = DriverStation::GetInstance().GetGameSpecificMessage();
-	if (gamedata.length() < 1)
+	if (gamedata.length() < 2)
 		gamedata = "   ";
 
 	automode = kAutoDefault;
@@ -199,22 +197,22 @@ void Robot::ReadChooser()
 	else
 	if (m_autoSelected == kszAutoRightScale)
 	{
-		if (gamedata [0] == 'L')
-			//automode = kAutoRightScaleLeft;
-			automode = kAutoStraight;
+		if (gamedata [1] == 'L')
+			automode = kAutoRightScaleLeft;
+			//automode = kAutoStraight;
 		else
-		if (gamedata [0] == 'R')
+		if (gamedata [1] == 'R')
 			automode = kAutoRightScaleRight;
 	}
 	else
 	if (m_autoSelected == kszAutoLeftScale)
 	{
-		if (gamedata [0] == 'L')
+		if (gamedata [1] == 'L')
 			automode = kAutoLeftScaleLeft;
 		else
-		if (gamedata [0] == 'R')
-			//automode = kAutoLeftScaleRight;
-			automode = kAutoStraight;
+		if (gamedata [1] == 'R')
+			automode = kAutoLeftScaleRight;
+			//automode = kAutoStraight;
 	}
 	else
 	if (m_autoSelected == kszAutoTestMode)

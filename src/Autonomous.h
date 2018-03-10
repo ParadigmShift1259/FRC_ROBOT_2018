@@ -39,7 +39,7 @@ protected:
 	Intake *m_intake;
 	Lifter *m_lifter;
 
-	double m_pid[3] = {0.035, 0.0012, 0.07};
+	double m_pid[3] = {0.04, 0.0012, 0.07}; //0.035, 0.0008, 0.07
 
 	Timer m_timer;
 	DriveStraightState m_straightstate;

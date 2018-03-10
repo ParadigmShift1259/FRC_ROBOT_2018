@@ -110,6 +110,7 @@
 #define INT_INGESTSPEED 0.5
 #define INT_EJECTHIGH -0.5
 #define INT_EJECTLOW -0.25
+#define INT_EJECTSWITCH -0.325
 
 
 // Climber
