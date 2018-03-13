@@ -285,7 +285,7 @@ void Intake::AutoLoop()
 		if ((automode == kAutoCenterSwitchLeft) || (automode ==  kAutoCenterSwitchRight))
 			m_ejectspeed = INT_EJECTSWITCH;
 		else
-			m_ejectspeed = INT_EJECTHIGH;
+			m_ejectspeed = INT_EJECTSCALE;
 		m_leftmotor->Set(m_ejectspeed);
 		m_rightmotor->Set(m_ejectspeed * -1.0);
 		m_timer.Reset();

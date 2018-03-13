@@ -339,11 +339,11 @@ void Autonomous::AutoRightScaleLeft()
 			m_autostage++;
 		break;
 	case 4:
-		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
+		if (m_lifter->AutoDeploy())
 			m_autostage++;
 		break;
 	case 5:
-		if (m_lifter->AutoDeploy())
+		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
 			m_autostage++;
 		break;
 	case 6:
@@ -374,7 +374,7 @@ void Autonomous::AutoLeftScaleRight()
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(-90))							// angle = -90, clockwise
+		if (TurnAngle(-88))							// angle = -90, clockwise
 			m_autostage++;
 		break;
 	case 2:
@@ -386,11 +386,11 @@ void Autonomous::AutoLeftScaleRight()
 			m_autostage++;
 		break;
 	case 4:
-		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
+		if (m_lifter->AutoDeploy())
 			m_autostage++;
 		break;
 	case 5:
-		if (m_lifter->AutoDeploy())
+		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
 			m_autostage++;
 		break;
 	case 6:
@@ -452,10 +452,14 @@ void Autonomous::AutoTest()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(100, 0.5, 0.5, 24.0))
-			m_autostage = 1;
+		if (DriveStraight(100, 0.25, 0.5, 24.0))
+			m_autostage++;
 		break;
 	case 1:
+		if (DriveStraight(100, 0.25, -0.5, 24.0))
+			m_autostage++;
+		break;
+	case 2:
 		m_drivetrain->Drive(0, 0);
 		break;
 	}
