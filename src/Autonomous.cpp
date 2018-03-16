@@ -262,8 +262,18 @@ void Autonomous::AutoCenterSwitchRight()
 		m_autostage++;
 		break;
 	case 6:
-		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		m_lifter->AutoDeploy();
+		m_autostage++;
 		break;
+	case 8:
+		m_lifter->MoveBottom();
+		if (DriveStraight(12, 0.1, -0.25, 8.0))
+			m_autostage++;
+		break;
+	case 7:
+		m_lifter->MoveBottom();
+		if (TurnAngle(45) && m_lifter->MoveBottom())
+			m_autostage++;
 	}
 }
 
