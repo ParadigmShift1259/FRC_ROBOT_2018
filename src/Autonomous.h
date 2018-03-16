@@ -13,7 +13,7 @@
 class Autonomous
 {
 public:
-	enum DriveStraightState {kStart, kAccel, kMaintain, kDecel};
+	enum DriveStraightState {kStart, kAngle, kAccel, kMaintain, kDecel};
 	enum TurnState {kInit, kTurning};
 
 	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid, Intake *intake, Lifter *lifter);
@@ -24,6 +24,7 @@ public:
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
 	bool TurnAngle(double angle);
 	bool MiniStraight(double targetdistance, double acceltime, double autopower);
+	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
 	void AutoCenterSwitchRight();
 	void AutoCenterSwitchLeft();
 	void AutoStraight();

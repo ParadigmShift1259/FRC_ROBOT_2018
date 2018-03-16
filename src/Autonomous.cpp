@@ -124,6 +124,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		m_straightstate = kAccel;
 		break;
 
+	case kAngle:
 	case kAccel:
 		// if acceleration has reached max time
 		if (timervalue > acceltime)
@@ -216,6 +217,7 @@ bool Autonomous::MiniStraight(double targetdistance, double acceltime, double au
 		m_straightstate = kMaintain;
 		break;
 
+	case kAngle:
 	case kAccel:
 	case kMaintain:
 	case kDecel:
@@ -232,6 +234,81 @@ bool Autonomous::MiniStraight(double targetdistance, double acceltime, double au
 		else
 		{
 			m_drivepid->Drive(-1 * autopower);
+		}
+		break;
+	}
+	return false;
+}
+
+
+bool Autonomous::AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance)
+{
+	double timervalue = m_timer.Get();
+	m_distance = abs(m_drivetrain->GetMaxDistance());
+
+	switch (m_straightstate)
+	{
+	case kStart:
+		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
+		m_drivetrain->ResetLeftPosition();
+		m_drivetrain->ResetRightPosition();
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->EnablePID();
+		m_drivepid->SetAbsoluteAngle(angle);
+		m_straightstate = kAngle;
+		break;
+
+	case kAngle:
+		if (m_drivepid->OnTarget())
+		{
+			m_timer.Reset();
+			m_timermod = acceltime;
+			m_straightstate = kAccel;
+		}
+		break;
+
+	case kAccel:
+		// if acceleration has reached max time
+		if (timervalue > acceltime)
+		{
+			m_timer.Reset();
+			m_straightstate = kMaintain;
+		}
+		else
+		{
+			m_drivepid->Drive(-1 * timervalue / acceltime * autopower);
+		}
+		break;
+
+	case kMaintain:
+		// maintain until decel distance
+		if ((targetdistance - m_distance) <= deceldistance)
+		{
+			m_timer.Reset();
+			m_straightstate = kDecel;
+		}
+		else
+		{
+			m_drivepid->Drive(-1 * autopower);
+		}
+		break;
+
+	case kDecel:
+		// decelerate until target distance minus some fudge factor
+		// abort decelerate if decelerate time + 1s has passed
+		if ((m_distance > (targetdistance - 5.0)) || (timervalue > (acceltime+1)))
+		{
+			m_drivepid->Drive(0);
+			m_drivepid->DisablePID();
+			m_drivetrain->Drive(0, 0, false);
+			m_straightstate = kStart;
+			return true;
+		}
+		else
+		{
+			// make sure power never goes negative if time is longer than decel time
+			double power = (acceltime - timervalue) < 0 ? (autopower > 0 ? 0.1 : -0.1) : (acceltime - timervalue) / acceltime * autopower;
+			m_drivepid->Drive(-1 * power);
 		}
 		break;
 	}
