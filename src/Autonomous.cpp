@@ -255,25 +255,31 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 	case 4:
 		if (DriveStraight(32, 0.1, 0.25, 18.0))		// targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
+		{
 			m_autostage++;
+			m_timer.Reset();
+			m_timer.Start();
+		}
+
 		break;
 	case 5:
 		m_intake->AutoEject();
-		m_autostage++;
-		break;
-	case 6:
-		m_lifter->AutoDeploy();
-		m_autostage++;
-		break;
-	case 8:
-		m_lifter->MoveBottom();
-		if (DriveStraight(12, 0.1, -0.25, 8.0))
+		if (m_timer.Get() > 2)
 			m_autostage++;
 		break;
-	case 7:
-		m_lifter->MoveBottom();
-		if (TurnAngle(45) && m_lifter->MoveBottom())
-			m_autostage++;
+//	case 6:
+//		m_lifter->AutoDeploy();
+//		m_autostage++;
+//		break;
+//	case 8:
+//		m_lifter->MoveBottom();
+//		if (DriveStraight(32, 0.1, -0.25, 20.0))
+//			m_autostage++;
+//		break;
+//	case 7:
+//		m_lifter->MoveBottom();
+//		if (TurnAngle(45) && m_lifter->MoveBottom())
+//			m_autostage++;
 	}
 }
 
