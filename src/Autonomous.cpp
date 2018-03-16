@@ -315,7 +315,7 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 	return false;
 }
 
-
+/*
 void Autonomous::AutoCenterSwitchLeft()
 {
 	switch (m_autostage)
@@ -349,8 +349,35 @@ void Autonomous::AutoCenterSwitchLeft()
 		break;
 	}
 }
+*/
 
+void Autonomous::AutoCenterSwitchLeft()
+{
+	switch (m_autostage)
+	{
+	case 0:
+		if (DriveStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 1:
+		if (AngleStraight(60, 64, 0.5, 0.5, 24.0))		// angle = 60 (counterclockwise), targetdistance = 64", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 2:
+		if (AngleStraight(-60, 30, 0.1, 0.25, 18.0))		// angle = -60 (clockwise), targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
+			m_autostage++;
+		break;
+	case 3:
+		m_intake->AutoEject();
+		m_autostage++;
+		break;
+	case 4:
+		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+}
 
+/*
 void Autonomous::AutoCenterSwitchRight()
 {
 	switch (m_autostage)
@@ -380,6 +407,33 @@ void Autonomous::AutoCenterSwitchRight()
 		m_autostage++;
 		break;
 	case 6:
+		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+}
+*/
+
+void Autonomous::AutoCenterSwitchRight()
+{
+	switch (m_autostage)
+	{
+	case 0:
+		if (DriveStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 1:
+		if (AngleStraight(-60, 52, 0.5, 0.5, 24.0))		// angle = -60 (clockwise), targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 2:
+		if (AngleStraight(60, 32, 0.1, 0.25, 18.0))		// angle = 60 (counterclockwise), targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
+			m_autostage++;
+		break;
+	case 3:
+		m_intake->AutoEject();
+		m_autostage++;
+		break;
+	case 4:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}
