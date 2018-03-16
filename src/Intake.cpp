@@ -155,7 +155,7 @@ void Intake::Loop()
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
-		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
 			m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
 			m_leftmotor->Set(m_ejectspeed);
@@ -164,8 +164,18 @@ void Intake::Loop()
 			m_stage = kEject;
 		}
 		else
+		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxLeftBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+		{
+			m_ejectspeed = INT_EJECTMED;			/// eject the box low speed mode
+			m_leftmotor->Set(m_ejectspeed);
+			m_rightmotor->Set(m_ejectspeed * -1.0);
+			m_timer.Reset();
+			m_stage = kEject;
+		}
+		else
 		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
+			m_ejectspeed = INT_EJECTHIGH;
 			m_leftmotor->Set(m_ejectspeed);			/// eject the box
 			m_rightmotor->Set(m_ejectspeed * -1.0);
 			m_timer.Reset();
