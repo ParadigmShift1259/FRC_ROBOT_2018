@@ -123,7 +123,13 @@ void Lifter::Loop()
 				m_stage = kRaise;
 			}
 			else
-				m_motor->StopMotor();
+			{
+				if (m_position > m_liftermin)
+					m_motor->Set(-0.05);
+				else
+					m_motor->StopMotor();
+				//m_motor->StopMotor();
+			}
 			break;
 
 		case kRaise:

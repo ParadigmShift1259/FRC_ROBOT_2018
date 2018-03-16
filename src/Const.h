@@ -92,13 +92,13 @@
 #define PCM_LIFTER_MODULE 0
 #define PCM_LIFTER_SOLENOID 2
 #define LIF_RAISESPEED -1.0
-#define LIF_LOWERSPEED 0.75
-#define LIF_LIFTERMIN 300				/// minimum cutoff
-#define LIF_LIFSMIDGE 1900				/// 7% of max height
-#define LIF_LIFTERMINSPD 2850			/// 10% of max height
-#define LIF_LIFTERSTART 14100			/// ~50% of max height
-#define LIF_LIFTERMAXSPD 26100			/// 90% of max height
-#define LIF_LIFTERMAX 29000
+#define LIF_LOWERSPEED 1.0//0.75
+#define LIF_LIFTERMAX 24000
+#define LIF_LIFTERMIN 300								/// minimum cutoff
+#define LIF_LIFSMIDGE (LIF_LIFTERMAX * 0.07)			/// 7% of max height
+#define LIF_LIFTERMINSPD (LIF_LIFTERMAX * 0.1)			/// 5% of max height
+#define LIF_LIFTERSTART (LIF_LIFTERMAX * 0.5)			/// ~50% of max height
+#define LIF_LIFTERMAXSPD (LIF_LIFTERMAX	* 0.95)			/// 5% of max height
 
 
 // Intake
@@ -111,6 +111,7 @@
 #define INT_EJECTHIGH -0.5
 #define INT_EJECTLOW -0.25
 #define INT_EJECTSWITCH -0.325
+#define INT_EJECTSCALE -0.75
 
 
 // Climber
