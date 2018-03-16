@@ -198,6 +198,47 @@ bool Autonomous::TurnAngle(double angle)
 }
 
 
+bool Autonomous::MiniStraight(double targetdistance, double acceltime, double autopower)
+{
+	double timervalue = m_timer.Get();
+	m_distance = abs(m_drivetrain->GetMaxDistance());
+
+	switch (m_straightstate)
+	{
+	case kStart:
+		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
+		m_drivetrain->ResetLeftPosition();
+		m_drivetrain->ResetRightPosition();
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->EnablePID();
+		m_drivepid->SetAbsoluteAngle(0);
+		m_timer.Reset();
+		m_straightstate = kMaintain;
+		break;
+
+	case kAccel:
+	case kMaintain:
+	case kDecel:
+		// decelerate until target distance minus some fudge factor
+		// abort decelerate if decelerate time + 1s has passed
+		if ((m_distance > (targetdistance - 5.0)) || (timervalue > acceltime))
+		{
+			m_drivepid->Drive(0);
+			m_drivepid->DisablePID();
+			m_drivetrain->Drive(0, 0, false);
+			m_straightstate = kStart;
+			return true;
+		}
+		else
+		{
+			m_drivepid->Drive(-1 * autopower);
+		}
+		break;
+	}
+	return false;
+}
+
+
 void Autonomous::AutoCenterSwitchLeft()
 {
 	switch (m_autostage)
