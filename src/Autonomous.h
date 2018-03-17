@@ -48,6 +48,8 @@ protected:
 	CurveState m_curvestate;
 	TurnState m_turnstate;
 	int m_autostage;
+	int m_seg;
+	bool m_accelskip;
 
 	double m_timermod;
 	double m_distance;

@@ -25,6 +25,8 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 
 	m_timermod = 0;
 	m_distance = 0;
+	m_seg = 1;
+	m_accelskip = false;
 }
 
 
@@ -178,25 +180,60 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 bool Autonomous::CurveAuto(double a, double b, double s, double chu, double accel, double deceldist, double autopower)
 {
 	double timervalue = m_timer.Get();
+	/*
 	double r;
 	double pi = 3.14159265359;
-	double ang = 0;
-	double tdist = 0;
-	double x, y = 0;
-	double prevx, prevy = 0;
-	double rang = 0;
-	double dist1 = 0;
-	double dist2 = 0;
-	double rdist = 0;
+	double ang;
+	double tdist = m_tdist;
+	double x, y;
+	double prevx, prevy;
+	double rang = m_rang;
+	double dist1;
+	double dist2;
+	double rdist = m_rdist;
 	//double rdist1 = 0;
 	//double rdist2 = 0;
-	double seg = 1;
-	double xp = 0;
-	double yp = 0;
-	double acceltime = autopower/2;
-	double segtime = 0;
-	bool accelskip = false;
-
+	double xp;
+	double yp;
+	double acceltime = autopower / 2;
+	double segtime = m_segtime;
+	*/
+	s = s / 360;
+	double pi = 3.14159265359;
+	double seg = m_seg;
+	bool accelskip = m_accelskip;
+	double ang = s * seg * (2 * pi) / (chu + 1);
+	double r = (abs(a) * abs(b)) / sqrt(abs(a) * abs(a) * sin(ang) * sin(ang) + abs(b) * abs(b) * cos(ang) * cos(ang));
+	double xp;
+	double yp;
+	double prevx;
+	double prevy;
+	if (seg > 1)
+	{
+		xp = r * cos(ang * seg);
+		yp = r * sin(ang * (seg - 1));
+		prevx = r * cos(ang * (seg - 1));
+		prevy = r * sin(ang * (seg - 1));
+	}
+	else
+	{
+		xp = 0;
+		yp = 0;
+		prevx = 0;
+		prevy = 0;
+	}
+	double tdist = pi * s * (abs(a) + abs(b)) * (3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b)) * (sqrt(-3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b))) + 14))) + 1);
+	double x = r * cos(ang * seg);
+	double y = r * sin(ang * seg);
+	double acceltime = autopower / 2;
+	double dist1 = sqrt((r - r * cos(ang) + (a > 0 ? - xp : + xp))*(r - r * cos(ang) + (a > 0 ? - xp : + xp))+(r * sin(ang) + (b > 0 ? - yp : + yp))*(r * sin(ang) + (b > 0 ? - yp : + yp)));		// sqrt(x^2 + y^2)
+	double dist2 = tdist * ((x / y) / (abs(a) / abs(b)) - (prevx / prevy) / (abs(a) / abs(b)));	// circumference * portion of circle / total angle segments
+	double rdist = ((dist1 + dist2) / 2) /*+ (2 * pi * ang) * WHEEL_TRACK / (2) * (360)*/;
+	//rdist1 = rdist;
+	//rdist2 = rdist - (2 * pi * ang) * WHEEL_TRACK / 360;
+	double segtime = 100;			// change
+	double rang = atan((r * sin(ang) + (b > 0 ? - yp : + yp))/(r - r * cos(ang) + (a > 0 ? - xp : + xp)));
+	rang = a > 0 ? rang * -1 : rang;
 	m_distance = abs(m_drivetrain->GetAverageMaxDistance());
 
 	switch (m_curvestate)
@@ -212,34 +249,8 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 		break;
 
 	case kCalculate:
-		ang = s * seg * (360) / (chu + 1);
-		r = (abs(a) * abs(b)) / sqrt(abs(a) * abs(a) * sin(ang) * sin(ang) + abs(b) * abs(b) * cos(ang) * cos(ang));
-		if (seg > 1)
-		{
-			xp = r * cos(ang * seg);
-			yp = r * sin(ang * (seg - 1));
-			prevx = r * cos(ang * (seg - 1));
-			prevy = r * sin(ang * (seg - 1));
-		}
-		else
-		{
-			xp = 0;
-			yp = 0;
-			prevx = 0;
-			prevy = 0;
-		}
-		tdist = pi * s * (abs(a) + abs(b)) * (3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b)) * (sqrt(-3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b))) + 14))) + 1);
-		x = r * cos(ang * seg);
-		y = r * sin(ang * seg);
-		dist1 = sqrt((r - r * cos(ang) + (a > 0 ? - xp : + xp))*(r - r * cos(ang) + (a > 0 ? - xp : + xp))+(r * sin(ang) + (b > 0 ? - yp : + yp))*(r * sin(ang) + (b > 0 ? - yp : + yp)));		// sqrt(x^2 + y^2)
-		dist2 = tdist * ((x / y) / (abs(a) / abs(b)) - (prevx / prevy) / (abs(a) / abs(b)));	// circumference * portion of circle / total angle segments
-		rdist = ((dist1 + dist2) / 2) /*+ (2 * pi * ang) * WHEEL_TRACK / (2) * (360)*/;
-		//rdist1 = rdist;
-		//rdist2 = rdist - (2 * pi * ang) * WHEEL_TRACK / 360;
-		segtime = autopower * rdist;			// change
-		rang = atan((r * sin(ang) + (b > 0 ? - yp : + yp))/(r - r * cos(ang) + (a > 0 ? - xp : + xp)));
-		rang = a > 0 ? rang * -1 : rang;
-		m_drivepid->SetAbsoluteAngle(rang);
+
+		m_drivepid->SetAbsoluteAngle(rang * 180 / (2 * pi));
 		m_curvestate = kDrive;
 		break;
 
@@ -264,42 +275,6 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 */
 
 	case kDrive:
-		// maintain until decel distance
-		if ((tdist - m_distance) < (deceldist) || (timervalue > (segtime + 1)))			/// maintain
-		{
-			if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
-			{
-				m_timer.Reset();
-				seg++;
-				if (chu + 1 == seg)
-					m_curvestate = kStop;
-				else
-					m_curvestate = kCalculate;
-			}
-			else
-			{
-				m_drivepid->Drive(-1 * autopower);
-			}
-		}
-		else
-		{
-			if (m_distance > (tdist - 5.0 - deceldist) || (timervalue > (acceltime + 1)))			/// deceleration
-			{
-				if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
-				{
-					seg++;
-					if (chu + 1 == seg)
-						m_curvestate = kStop;
-					else
-						m_curvestate = kCalculate;
-				}
-				else
-				{
-					double power = ((acceltime) - timervalue) < 0 ? (autopower > 0 ? 0.1 : -0.1) : (acceltime - timervalue) / acceltime * autopower;
-					m_drivepid->Drive(-1 * power);
-				}
-			}
-		}
 		if (accel == true || accelskip == false)			/// acceleration
 		{
 			// if acceleration has reached max time
@@ -314,6 +289,8 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 				{
 					seg++;
 					m_curvestate = kCalculate;
+					m_drivetrain->ResetLeftPosition();
+					m_drivetrain->ResetRightPosition();
 				}
 				else
 				{
@@ -321,6 +298,48 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 				}
 			}
 		}
+		// maintain until decel distance
+		if ((tdist - m_distance) > (deceldist) || (timervalue > (segtime + 1)))			/// maintain
+		{
+			if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
+			{
+				m_timer.Reset();
+				seg++;
+				if (chu + 1 == seg)
+					m_curvestate = kStop;
+				else
+					m_curvestate = kCalculate;
+					m_drivetrain->ResetLeftPosition();
+					m_drivetrain->ResetRightPosition();
+			}
+			else
+			{
+				m_drivepid->Drive(-1 * autopower);
+			}
+		}
+		else
+		{
+			if ((m_distance > tdist) || (timervalue > (acceltime + 1)))			/// deceleration
+			{
+				if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
+				{
+					seg++;
+					if (chu + 1 == seg)
+						m_curvestate = kStop;
+					else
+						m_curvestate = kCalculate;
+						m_drivetrain->ResetLeftPosition();
+						m_drivetrain->ResetRightPosition();
+				}
+				else
+				{
+					double power = ((acceltime) - timervalue) < 0 ? (autopower > 0 ? 0.1 : -0.1) : (acceltime - timervalue) / acceltime * autopower;
+					m_drivepid->Drive(-1 * power);
+				}
+			}
+		}
+		m_seg = seg;
+		m_accelskip = accelskip;
 
 		break;
 
@@ -329,6 +348,8 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 		m_drivepid->DisablePID();
 		m_drivetrain->Drive(0, 0, false);
 		m_curvestate = kCurveStart;
+		seg = 1;
+		m_seg = seg;
 		return true;
 		break;
 /*
@@ -359,6 +380,11 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 		*/
 	}
 	return false;
+	SmartDashboard::PutNumber("CurveDistance", rdist);
+	SmartDashboard::PutNumber("CurveAngle", rang);
+	SmartDashboard::PutNumber("CurveRadius", r);
+	SmartDashboard::PutNumber("TotalCurve", rang * 180 / (2 * pi));
+	SmartDashboard::PutNumber("SegmentNumber", m_seg);
 }
 
 
@@ -384,11 +410,13 @@ bool Autonomous::TurnAngle(double angle)
 		break;
 	}
 	return false;
+
 }
 
 
 void Autonomous::AutoCenterSwitchLeft()
 {
+	/*
 	switch (m_autostage)
 	{
 	case 0:
@@ -417,6 +445,17 @@ void Autonomous::AutoCenterSwitchLeft()
 		break;
 	case 6:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+	*/
+	switch (m_autostage)
+	{
+	case 0:
+		if(CurveAuto(-40.0, 40.0, -90, 5, 0.5, 24.0, 0.5))	// 40 left, 40 up, 90 degrees left, 5 portions, 0.5 acceltime, 24 decel distance, 0.5 power
+			m_autostage++;
+		break;
+	case 1:
+		m_drivetrain->Drive(0, 0);
 		break;
 	}
 }
@@ -459,7 +498,7 @@ void Autonomous::AutoCenterSwitchRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if(CurveAuto(30.0, 30.0, 0.25, 5, 0.5, 24.0, 0.5))	// 30 left, 30 right, 1/4 of circle (90), 5 portions, 0.5 acceltime, 24 decel distance, 0.5 power
+		if(CurveAuto(40.0, 40.0, 90, 5, 0.5, 24.0, 0.5))	// 40 right, 40 up, 90 degrees right, 5 portions, 0.5 acceltime, 24 decel distance, 0.5 power
 			m_autostage++;
 		break;
 	case 1:
