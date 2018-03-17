@@ -20,6 +20,7 @@ Autonomous::Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID 
 
 	m_straightstate = kStart;
 	m_turnstate = kInit;
+	m_curvestate = kCurveStart;
 	m_autostage = 0;
 
 	m_timermod = 0;
@@ -40,6 +41,7 @@ void Autonomous::Init()
 	m_timer.Start();
 
 	m_straightstate = kStart;
+	m_curvestate = kCurveStart;
 	m_turnstate = kInit;
 	m_autostage = 0;
 
@@ -173,6 +175,193 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 }
 
 
+bool Autonomous::CurveAuto(double a, double b, double s, double chu, double accel, double deceldist, double autopower)
+{
+	double timervalue = m_timer.Get();
+	double r;
+	double pi = 3.14159265359;
+	double ang = 0;
+	double tdist = 0;
+	double x, y = 0;
+	double prevx, prevy = 0;
+	double rang = 0;
+	double dist1 = 0;
+	double dist2 = 0;
+	double rdist = 0;
+	//double rdist1 = 0;
+	//double rdist2 = 0;
+	double seg = 1;
+	double xp = 0;
+	double yp = 0;
+	double acceltime = autopower/2;
+	double segtime = 0;
+	bool accelskip = false;
+
+	m_distance = abs(m_drivetrain->GetAverageMaxDistance());
+
+	switch (m_curvestate)
+	{
+	case kCurveStart:
+		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
+		m_drivetrain->ResetLeftPosition();
+		m_drivetrain->ResetRightPosition();
+		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->EnablePID();
+		m_timer.Reset();
+		m_curvestate = kCalculate;
+		break;
+
+	case kCalculate:
+		ang = s * seg * (360) / (chu + 1);
+		r = (abs(a) * abs(b)) / sqrt(abs(a) * abs(a) * sin(ang) * sin(ang) + abs(b) * abs(b) * cos(ang) * cos(ang));
+		if (seg > 1)
+		{
+			xp = r * cos(ang * seg);
+			yp = r * sin(ang * (seg - 1));
+			prevx = r * cos(ang * (seg - 1));
+			prevy = r * sin(ang * (seg - 1));
+		}
+		else
+		{
+			xp = 0;
+			yp = 0;
+			prevx = 0;
+			prevy = 0;
+		}
+		tdist = pi * s * (abs(a) + abs(b)) * (3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b)) * (sqrt(-3 * ((abs(a) - abs(b)) * (abs(a) - abs(b)) / (abs(a) + abs(b)) * (abs(a) + abs(b))) + 14))) + 1);
+		x = r * cos(ang * seg);
+		y = r * sin(ang * seg);
+		dist1 = sqrt((r - r * cos(ang) + (a > 0 ? - xp : + xp))*(r - r * cos(ang) + (a > 0 ? - xp : + xp))+(r * sin(ang) + (b > 0 ? - yp : + yp))*(r * sin(ang) + (b > 0 ? - yp : + yp)));		// sqrt(x^2 + y^2)
+		dist2 = tdist * ((x / y) / (abs(a) / abs(b)) - (prevx / prevy) / (abs(a) / abs(b)));	// circumference * portion of circle / total angle segments
+		rdist = ((dist1 + dist2) / 2) /*+ (2 * pi * ang) * WHEEL_TRACK / (2) * (360)*/;
+		//rdist1 = rdist;
+		//rdist2 = rdist - (2 * pi * ang) * WHEEL_TRACK / 360;
+		segtime = autopower * rdist;			// change
+		rang = atan((r * sin(ang) + (b > 0 ? - yp : + yp))/(r - r * cos(ang) + (a > 0 ? - xp : + xp)));
+		rang = a > 0 ? rang * -1 : rang;
+		m_drivepid->SetAbsoluteAngle(rang);
+		m_curvestate = kDrive;
+		break;
+
+/*
+	case kAccel:
+		if (accel == true || accelskip == false)
+		{
+			// if acceleration has reached max time
+			if (timervalue > (acceltime))
+			{
+				m_timer.Reset();
+				m_straightstate = kMaintain;
+			}
+			else
+			{
+				m_drivepid->Drive(-1 * timervalue / acceltime * autopower); // change
+			}
+		}
+		else
+			m_straightstate = kMaintain;
+		break;
+*/
+
+	case kDrive:
+		// maintain until decel distance
+		if ((tdist - m_distance) > (deceldist) || (timervalue > (segtime + 1)))			/// maintain
+		{
+			if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
+			{
+				m_timer.Reset();
+				seg++;
+				if (chu + 1 == seg)
+					m_curvestate = kStop;
+				else
+					m_curvestate = kCalculate;
+			}
+			else
+			{
+				m_drivepid->Drive(-1 * autopower);
+			}
+		}
+		else
+		{
+			if (m_distance > (tdist - 5.0 - deceldist) || (timervalue > (acceltime + 1)))			/// deceleration
+			{
+				if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
+				{
+					seg++;
+					if (chu + 1 == seg)
+						m_curvestate = kStop;
+					else
+						m_curvestate = kCalculate;
+				}
+				else
+				{
+					double power = ((acceltime) - timervalue) < 0 ? (autopower > 0 ? 0.1 : -0.1) : (acceltime - timervalue) / acceltime * autopower;
+					m_drivepid->Drive(-1 * power);
+				}
+			}
+		}
+		if (accel == true || accelskip == false)			/// acceleration
+		{
+			// if acceleration has reached max time
+			if (timervalue > (acceltime))
+			{
+				m_timer.Reset();
+				accelskip = true;
+			}
+			else
+			{
+				if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
+				{
+					seg++;
+					m_curvestate = kCalculate;
+				}
+				else
+				{
+					m_drivepid->Drive(-1 * timervalue / acceltime * autopower); // change
+				}
+			}
+		}
+
+		break;
+
+	case kStop:
+		m_drivepid->Drive(0);
+		m_drivepid->DisablePID();
+		m_drivetrain->Drive(0, 0, false);
+		m_curvestate = kCurveStart;
+		return true;
+		break;
+/*
+	case kDecel:
+		if (decel == true)
+		{
+			// decelerate until target distance minus some fudge factor
+			// abort decelerate if decelerate time + 1s has passed
+			if ((m_distance > (rdist - 5.0)) || (timervalue > (acceltime+1)))
+			{
+				m_drivepid->Drive(0);
+				m_drivepid->DisablePID();
+				m_drivetrain->Drive(0, 0, false);
+				m_straightstate = kStart;
+				return true;
+			}
+			else
+			{
+				// make sure power never goes negative if time is longer than decel time
+				double power = ((acceltime) - timervalue) < 0 ? (autopower > 0 ? 0.1 : -0.1) : (acceltime - timervalue) / acceltime * autopower;
+				m_drivepid->Drive(-1 * power);
+			}
+		}
+		else
+			m_straightstate = kStart;
+			return true;
+		break;
+		*/
+	}
+	return false;
+}
+
+
 bool Autonomous::TurnAngle(double angle)
 {
 	switch (m_turnstate)
@@ -235,6 +424,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 void Autonomous::AutoCenterSwitchRight()
 {
+	/*
 	switch (m_autostage)
 	{
 	case 0:
@@ -263,6 +453,17 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 	case 6:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+	*/
+	switch (m_autostage)
+	{
+	case 0:
+		if(CurveAuto(30.0, 30.0, 0.25, 5, 0.5, 24.0, 0.5))	// 30 left, 30 right, 1/4 of circle (90), 5 portions, 0.5 acceltime, 24 decel distance, 0.5 power
+			m_autostage++;
+		break;
+	case 1:
+		m_drivetrain->Drive(0, 0);
 		break;
 	}
 }

@@ -464,3 +464,11 @@ double DriveTrain::GetMaxDistance()
 	double maxright = GetRightDistance();
 	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
 }
+
+
+double DriveTrain::GetAverageMaxDistance()
+{
+	double maxleft = GetLeftDistance();
+	double maxright = GetRightDistance();
+	return (abs(maxleft) + abs(maxright)) / 2;
+}

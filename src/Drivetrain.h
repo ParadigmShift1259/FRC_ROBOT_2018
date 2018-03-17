@@ -45,6 +45,7 @@ public:
 	double GetLeftDistance();
 	double GetRightDistance();
 	double GetMaxDistance();
+	double GetAverageMaxDistance();
 
 	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
 	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
