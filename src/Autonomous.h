@@ -23,7 +23,7 @@ public:
 	void Stop();
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
 	bool TurnAngle(double angle);
-	bool MiniStraight(double targetdistance, double acceltime, double autopower);
+	bool MiniStraight(double targetdistance, double autopower);
 	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
 	void AutoCenterSwitchRight();
 	void AutoCenterSwitchLeft();

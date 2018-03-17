@@ -464,3 +464,10 @@ double DriveTrain::GetMaxDistance()
 	double maxright = GetRightDistance();
 	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
 }
+
+double DriveTrain::GetMaxVelocity()
+{
+	double maxleft = m_lefttalonlead->GetSelectedSensorVelocity(0);
+	double maxright = m_righttalonlead->GetSelectedSensorVelocity(0);
+	return abs(abs(maxleft) > abs(maxright) ? maxleft : maxright);
+}

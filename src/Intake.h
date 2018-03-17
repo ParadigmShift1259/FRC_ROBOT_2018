@@ -37,6 +37,7 @@ public:
 	void Stop();
 	void ResetPosition();
 	void AutoEject();
+	void AutoIngest();
 	bool IsVisioning();
 
 protected:
@@ -64,6 +65,7 @@ protected:
 	int m_counter;
 	Timer m_visiontimer;
 	bool m_visionvalid;
+	bool m_auto;
 };
 
 

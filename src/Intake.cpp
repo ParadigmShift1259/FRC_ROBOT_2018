@@ -46,6 +46,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DriveP
 	m_nettable = NetworkTableInstance::GetDefault().GetTable("OpenCV");
 	m_counter = 0;
 	m_visionvalid = false;
+	m_auto = false;
 }
 
 
@@ -70,7 +71,13 @@ void Intake::Init()
 	m_leftmotor->StopMotor();
 	m_rightmotor->StopMotor();
 	m_solenoid->Set(false);
-	m_stage = kIngest;
+	if (DriverStation::GetInstance().IsAutonomous())
+	{
+		m_stage = kIngest;
+		m_auto = true;
+	}
+	if (!m_auto || (m_stage == kIngestWait))
+		m_stage = kBox;
 	m_timer.Reset();
 	m_timer.Start();
 	m_allowingest = false;
@@ -79,6 +86,7 @@ void Intake::Init()
 	m_visiontimer.Reset();
 	m_visiontimer.Start();
 	m_visionvalid = false;
+	m_auto = false;
 }
 
 
@@ -189,7 +197,7 @@ void Intake::Loop()
 		break;
 
 	case kEject:
-		if (m_timer.HasPeriodPassed(1.0))
+		if (m_timer.HasPeriodPassed(0.5))
 		{
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
@@ -286,9 +294,39 @@ void Intake::AutoLoop()
 	{
 	case kBottom:
 	case kIngest:
+		if (m_cubesensor->Get())
+		{
+			m_solenoid->Set(false);					/// we have cube, close intake arms
+			m_timer.Reset();
+			m_leftmotor->Set(m_ingestspeed);		/// turn on motors to ingest cube
+			m_rightmotor->Set(m_ingestspeed * -1.0);
+			m_allowingest = false;
+			m_autoingest = false;
+			m_visioning = kIdle;
+			m_stage = kIngestWait;					/// wait for box to ingest
+		}
+		else
+		if (m_autoingest)
+		{
+			m_solenoid->Set(true);					/// open intake arms
+			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
+			m_rightmotor->Set(m_ingestspeed * -1.0);
+		}
+		break;
+
 	case kIngestWait:
-		m_leftmotor->StopMotor();				/// stop motors until auto start
-		m_rightmotor->StopMotor();
+		if (m_timer.Get() > 0.2)		/// wait for 200ms
+		{
+			m_leftmotor->StopMotor();				/// ingestion is complete stop motors
+			m_rightmotor->StopMotor();
+			if (m_lifter->MoveSmidgeUp())
+				m_stage = kIngestWait;				/// we have the box
+		}
+		else
+		{
+			m_leftmotor->Set(m_ingestspeed);		/// run the motors to ensure we have the box
+			m_rightmotor->Set(m_ingestspeed * -1.0);
+		}
 		break;
 
 	case kBox:
@@ -303,7 +341,7 @@ void Intake::AutoLoop()
 		break;
 
 	case kEject:
-		if (m_timer.HasPeriodPassed(1.0))
+		if (m_timer.HasPeriodPassed(0.5))
 		{
 			m_solenoid->Set(true);					/// open arms
 			m_leftmotor->StopMotor();
@@ -383,6 +421,13 @@ void Intake::ResetPosition()
 void Intake::AutoEject()
 {
 	m_stage = kBox;
+}
+
+
+void Intake::AutoIngest()
+{
+	m_stage = kIngest;
+	m_autoingest = true;
 }
 
 
