@@ -535,7 +535,7 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(252, 1.0, 0.5, 60.0))		// targetdistance = 290", everything else needs tuning
+		if (DriveStraight(240, 1.0, 0.5, 60.0))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
 	case 1:
