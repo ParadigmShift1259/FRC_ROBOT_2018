@@ -265,7 +265,7 @@ bool Autonomous::CurveAuto(double a, double b, double s, double chu, double acce
 
 	case kDrive:
 		// maintain until decel distance
-		if ((tdist - m_distance) > (deceldist) || (timervalue > (segtime + 1)))			/// maintain
+		if ((tdist - m_distance) < (deceldist) || (timervalue > (segtime + 1)))			/// maintain
 		{
 			if (((rdist - m_distance) < 0) && m_drivepid->OnTarget())
 			{
