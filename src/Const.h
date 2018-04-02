@@ -93,7 +93,7 @@
 #define PCM_LIFTER_SOLENOID 2
 #define LIF_RAISESPEED -1.0
 #define LIF_LOWERSPEED 1.0//0.75
-#define LIF_LIFTERMAX 24000
+#define LIF_LIFTERMAX 24050
 #define LIF_LIFTERMIN 300								/// minimum cutoff
 #define LIF_LIFSMIDGE (LIF_LIFTERMAX * 0.07)			/// 7% of max height
 #define LIF_LIFTERMINSPD (LIF_LIFTERMAX * 0.1)			/// 5% of max height
@@ -112,7 +112,7 @@
 #define INT_EJECTMED -0.375
 #define INT_EJECTLOW -0.25
 #define INT_EJECTSWITCH -0.325
-#define INT_EJECTSCALE -0.75
+#define INT_EJECTSCALE -0.5
 
 
 // Climber
