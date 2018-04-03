@@ -24,7 +24,7 @@ using namespace nt;
 class Intake
 {
 public:
-	enum Stage {kBottom, kIngest, kIngestWait, kBox, kEject};
+	enum Stage {kBottom, kIngest, kIngestWait, kBox, kFix, kEject};
 	enum Vision {kIdle, kVision};
 
 	Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DrivePID *drivepid);

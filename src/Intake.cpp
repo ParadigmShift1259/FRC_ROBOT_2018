@@ -163,6 +163,14 @@ void Intake::Loop()
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 		}
 		else
+		if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kToggle, 0))
+		{
+			m_leftmotor->Set(m_ingestspeed * 0.5);					/// sets the motor in reverse directions to handle the cube getting stuck
+			m_rightmotor->Set(m_ingestspeed * 0.5);
+			m_timer.Reset();
+			m_timer.Start();
+			m_stage = kFix;
+		}
 		if (m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL) && m_inputs->xBoxRightBumper(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
 			m_ejectspeed = INT_EJECTLOW;			/// eject the box low speed mode
@@ -193,6 +201,18 @@ void Intake::Loop()
 		{
 			m_leftmotor->StopMotor();				/// stop motors until button is pressed
 			m_rightmotor->StopMotor();
+		}
+		break;
+
+	case kFix:
+		if (m_timer.HasPeriodPassed(0.5))
+		{
+			m_stage = kBox;
+		}
+		else
+		{
+			m_leftmotor->Set(m_ingestspeed * 0.5);
+			m_rightmotor->Set(m_ingestspeed * 0.5);
 		}
 		break;
 
@@ -340,6 +360,7 @@ void Intake::AutoLoop()
 		m_stage = kEject;
 		break;
 
+	case kFix:
 	case kEject:
 		if (m_timer.HasPeriodPassed(0.5))
 		{
