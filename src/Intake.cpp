@@ -437,3 +437,70 @@ bool Intake::IsVisioning()
 		return false;
 	return true;
 }
+
+
+void Intake::AutoVision()
+{
+	int counter = m_nettable->GetNumber("visioncounter", 0);
+		double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
+		double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
+
+		double scale = distance / (96 * 2) + 0.25;
+		if (counter > m_counter)
+		{
+			m_counter = counter;
+			if (distance > 0.0)
+			{
+				m_visiontimer.Reset();
+				m_visionvalid = true;
+			}
+		}
+		else
+		if (m_visiontimer.Get() > 0.5)
+		{
+			m_visionvalid = false;
+		}
+
+		switch (m_visioning)
+		{
+		case kIdle:
+			if (m_visionvalid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+			{
+				m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+				m_drivepid->EnablePID();
+				m_autoingest = true;
+				m_visioning = kVision;
+			}
+			else
+				m_drivepid->DisablePID();
+			m_counter = 0;
+			break;
+
+		case kVision:
+			if (!m_visionvalid || m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+			{
+				m_drivepid->DisablePID();
+				m_autoingest = false;
+				m_visioning = kIdle;
+			}
+			else
+			if (m_lifter->IsBottom())
+			{
+				//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
+				//m_drivepid->SetAbsoluteAngle(x);
+
+				double y = /*m_inputs->xBoxLeftY(0 * INP_DUAL) * */-1*(scale > 1 ? 1 : scale);
+
+				m_drivepid->Drive(y, true);
+				m_drivepid->ResetGyro();
+				m_drivepid->SetAbsoluteAngle(angle);
+			}
+			else
+				m_lifter->MoveBottom();
+			break;
+		}
+		SmartDashboard::PutNumber("IN999_scale", scale);
+		SmartDashboard::PutNumber("IN6_visioncounter", counter);
+		SmartDashboard::PutNumber("IN7_visionangle", angle);
+		SmartDashboard::PutNumber("IN8_distance", distance);
+}

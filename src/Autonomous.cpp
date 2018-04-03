@@ -663,19 +663,21 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(230, 1.0, 0.5, 60.0))		// targetdistance = 290", everything else needs tuning
+		if (MiniStraight(200, 0.9))
+		//if (DriveStraight(290, 1.8, 1, 250))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(-35))							// angle = -45 (clockwise)
+		if (TurnAngle(-32))							// angle = -45 (clockwise)
 			m_autostage++;
+			m_timer.Reset();
 		break;
 	case 2:
-		if (m_lifter->AutoDeploy())
+		if (m_lifter->AutoDeploy() && m_timer.Get() > 1.5)
 			m_autostage++;
 		break;
 	case 3:
-		if (m_lifter->AutoRaise())
+		//if (m_lifter->AutoRaise())
 			m_autostage++;
 		break;
 	case 4:
@@ -688,16 +690,18 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 6:
-		m_lifter->MoveBottom();
+		//m_lifter->MoveBottom();
 		if (MiniStraight(24,-0.3))
 			m_autostage++;
 		break;
 	case 7:
-		if (m_lifter->MoveBottom())
+//		m_lifter->MoveBottom();
+		if (TurnAngle(-98))
 			m_autostage++;
 		break;
 	case 8:
-		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		if(MiniStraight(15,0.9))					// turn off drive motors
+			m_autostage++;
 		break;
 	}
 }

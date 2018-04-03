@@ -39,6 +39,7 @@ public:
 	void AutoEject();
 	void AutoIngest();
 	bool IsVisioning();
+	void AutoVision();
 
 protected:
 	DriverStation *m_ds;
