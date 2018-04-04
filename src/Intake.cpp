@@ -290,11 +290,12 @@ void Intake::VisionLoop()
 
 void Intake::AutoLoop()
 {
+
 	switch (m_stage)
 	{
 	case kBottom:
 	case kIngest:
-		if (m_cubesensor->Get())
+		if (m_cubesensor->Get() || m_finishingest)
 		{
 			m_solenoid->Set(false);					/// we have cube, close intake arms
 			m_timer.Reset();
@@ -347,6 +348,7 @@ void Intake::AutoLoop()
 			m_leftmotor->StopMotor();
 			m_rightmotor->StopMotor();
 			m_stage = kIngest;						/// go back to beginning (reset loop)
+			m_finishingest = false;
 			m_ejectspeed = INT_EJECTHIGH;
 		}
 		else
@@ -503,4 +505,10 @@ void Intake::AutoVision()
 		SmartDashboard::PutNumber("IN6_visioncounter", counter);
 		SmartDashboard::PutNumber("IN7_visionangle", angle);
 		SmartDashboard::PutNumber("IN8_distance", distance);
+}
+
+
+void Intake::FinishAutoIngest()
+{
+	m_finishingest = true;
 }

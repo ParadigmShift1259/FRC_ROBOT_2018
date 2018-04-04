@@ -222,7 +222,7 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower)
 	case kDecel:
 		// decelerate until target distance minus some fudge factor
 		// abort decelerate if decelerate time + 1s has passed
-		if (m_distance > (targetdistance - 5.0))
+		if (m_distance > (targetdistance))
 		{
 			m_drivepid->Drive(0);
 			m_drivepid->DisablePID();
@@ -663,7 +663,7 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (MiniStraight(200, 0.9))
+		if (MiniStraight(195, 0.9))
 		//if (DriveStraight(290, 1.8, 1, 250))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
@@ -673,11 +673,11 @@ void Autonomous::AutoLeftScaleLeft()
 			m_timer.Reset();
 		break;
 	case 2:
-		if (m_lifter->AutoDeploy() && m_timer.Get() > 1.5)
+		if (m_lifter->AutoDeploy()/* && m_timer.Get() > 1.5*/)
 			m_autostage++;
 		break;
 	case 3:
-		//if (m_lifter->AutoRaise())
+		if (m_lifter->AutoRaise())
 			m_autostage++;
 		break;
 	case 4:
@@ -690,17 +690,62 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 6:
-		//m_lifter->MoveBottom();
+		m_lifter->MoveBottom();
 		if (MiniStraight(24,-0.3))
 			m_autostage++;
 		break;
 	case 7:
-//		m_lifter->MoveBottom();
-		if (TurnAngle(-98))
+		m_lifter->MoveBottom();
+		if (TurnAngle(-103))
 			m_autostage++;
 		break;
 	case 8:
-		if(MiniStraight(15,0.9))					// turn off drive motors
+		m_lifter->MoveBottom();
+		m_intake->AutoIngest();
+		if(MiniStraight(20,0.9))
+		{
+			m_timer.Reset();
+			m_autostage++;
+		}
+		break;
+	case 9:
+		if (m_timer.Get() > 1)
+		{
+			m_intake->FinishAutoIngest();
+			m_autostage++;
+		}
+		break;
+	case 10:
+		m_lifter->AutoRaise();
+		if (MiniStraight(20, -0.9))
+			m_autostage++;
+		break;
+	case 11:
+		m_lifter->AutoRaise();
+		if (TurnAngle(103))
+			m_autostage++;
+		break;
+	case 12:
+		m_lifter->AutoRaise();
+		if (MiniStraight(15, 0.9))
+			m_autostage++;
+		break;
+	case 13:
+		if (m_lifter->AutoRaise())
+			m_autostage++;
+		break;
+	case 14:
+		m_intake->AutoEject();
+		m_timer.Reset();
+		m_autostage++;
+		break;
+	case 15:
+		if (m_timer.Get() > 0.25)
+			m_autostage++;
+		break;
+	case 16:
+		m_lifter->MoveBottom();
+		if (MiniStraight(24,-0.3))
 			m_autostage++;
 		break;
 	}

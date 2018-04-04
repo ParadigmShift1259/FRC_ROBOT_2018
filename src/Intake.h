@@ -40,6 +40,7 @@ public:
 	void AutoIngest();
 	bool IsVisioning();
 	void AutoVision();
+	void FinishAutoIngest();
 
 protected:
 	DriverStation *m_ds;
@@ -67,6 +68,7 @@ protected:
 	Timer m_visiontimer;
 	bool m_visionvalid;
 	bool m_auto;
+	bool m_finishingest;
 };
 
 
