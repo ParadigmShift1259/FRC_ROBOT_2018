@@ -726,12 +726,12 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 12:
-		m_lifter->AutoRaise();
-		if (MiniStraight(15, 0.9))
+		if (m_lifter->AutoRaise())
 			m_autostage++;
 		break;
 	case 13:
-		if (m_lifter->AutoRaise())
+
+		if (MiniStraight(15, 0.9))
 			m_autostage++;
 		break;
 	case 14:
@@ -744,9 +744,12 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 16:
-		m_lifter->MoveBottom();
 		if (MiniStraight(24,-0.3))
 			m_autostage++;
+		m_lifter->MoveBottom();
+		break;
+	case 17:
+		m_lifter->MoveBottom();
 		break;
 	}
 }
