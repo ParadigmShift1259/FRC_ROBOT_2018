@@ -201,14 +201,13 @@ bool Autonomous::TurnAngle(double angle)
 
 bool Autonomous::MiniStraight(double targetdistance, double autopower)
 {
-	m_distance = abs(m_drivetrain->GetMaxDistance());
+	m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
 
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivetrain->ResetLeftPosition();
-		m_drivetrain->ResetRightPosition();
+		m_drivetrain->ResetDeltaDistance();
 		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
@@ -236,6 +235,7 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower)
 		}
 		break;
 	}
+	SmartDashboard::PutNumber("MiniDistance", m_distance);
 	return false;
 }
 
@@ -696,7 +696,7 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 7:
 		m_lifter->MoveBottom();
-		if (TurnAngle(-103))
+		if (TurnAngle(-98))
 			m_autostage++;
 		break;
 	case 8:
@@ -722,7 +722,7 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 11:
 		m_lifter->AutoRaise();
-		if (TurnAngle(103))
+		if (TurnAngle(98))
 			m_autostage++;
 		break;
 	case 12:

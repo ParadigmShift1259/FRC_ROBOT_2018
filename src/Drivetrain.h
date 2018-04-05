@@ -46,6 +46,8 @@ public:
 	double GetLeftDistance();
 	double GetRightDistance();
 	double GetMaxDistance();
+	void ResetDeltaDistance();
+	double GetMaxDeltaDistance();
 
 	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
 	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
@@ -77,6 +79,9 @@ protected:
 	double m_rightposition;
 	double m_coasting;
 	double m_rampmax;
+
+	double m_prevleftdistance;
+	double m_prevrightdistance;
 
 	double m_invertleft;
 	double m_invertright;
