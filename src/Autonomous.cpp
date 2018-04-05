@@ -201,14 +201,13 @@ bool Autonomous::TurnAngle(double angle)
 
 bool Autonomous::MiniStraight(double targetdistance, double autopower)
 {
-	m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
-	SmartDashboard::PutNumber("MiniDistance", m_distance);
-
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetDeltaDistance();
+		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+		SmartDashboard::PutNumber("MiniDistance", m_distance);
 		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
@@ -222,6 +221,8 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower)
 	case kDecel:
 		// decelerate until target distance minus some fudge factor
 		// abort decelerate if decelerate time + 1s has passed
+		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+		SmartDashboard::PutNumber("MiniDistance", m_distance);
 		if (m_distance > (targetdistance))
 		{
 			m_drivepid->Drive(0);
