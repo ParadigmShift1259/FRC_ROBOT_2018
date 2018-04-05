@@ -56,6 +56,7 @@ protected:
 	double m_ejectspeed;
 	bool m_allowingest;
 	bool m_autoingest;
+	int m_fixstage;
 	Vision m_visioning;
 
 	//double m_pid[3] = {0.02, 0.01, 0.1};

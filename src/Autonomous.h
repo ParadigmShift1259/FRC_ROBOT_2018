@@ -14,6 +14,7 @@ class Autonomous
 {
 public:
 	enum DriveStraightState {kStart, kAngle, kAccel, kMaintain, kDecel};
+	enum CurveState {kCurveStart, kCalculate, kDrive, kStop};
 	enum TurnState {kInit, kTurning};
 
 	Autonomous(OperatorInputs *inputs, DriveTrain *drivetrain, DrivePID *drivepid, Intake *intake, Lifter *lifter);
@@ -22,6 +23,8 @@ public:
 	void Loop();
 	void Stop();
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
+	double ellipse(double a, double b);
+	bool CurveAuto(double a, double b, double s, double chu, bool accel, bool decelskip, double autopower);
 	bool TurnAngle(double angle);
 	bool MiniStraight(double targetdistance, double autopower);
 	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
@@ -45,8 +48,11 @@ protected:
 
 	Timer m_timer;
 	DriveStraightState m_straightstate;
+	CurveState m_curvestate;
 	TurnState m_turnstate;
 	int m_autostage;
+	int m_seg;
+	bool m_accelskip;
 
 	double m_timermod;
 	double m_distance;

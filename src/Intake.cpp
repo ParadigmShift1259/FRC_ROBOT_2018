@@ -37,6 +37,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DriveP
 	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
 
 	m_stage = kIngest;
+	m_fixstage = 0;
 	m_ingestspeed = INT_INGESTSPEED;
 	m_ejectspeed = INT_EJECTHIGH;
 	m_allowingest = false;
@@ -155,9 +156,9 @@ void Intake::Loop()
 		break;
 
 	case kBox:
-		if (xboxabuttontoggle)					/// allow ingest motor only when A button released and pressed again
-			m_allowingest = true;
-		if (m_allowingest && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
+		//if (xboxabuttontoggle)					/// allow ingest motor only when A button released and pressed again
+		//	m_allowingest = true;
+		if (/*m_allowingest && */m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kHold, 1 * INP_DUAL))
 		{
 			m_leftmotor->Set(m_ingestspeed);		/// turn on motors if button pressed
 			m_rightmotor->Set(m_ingestspeed * -1.0);
@@ -165,8 +166,8 @@ void Intake::Loop()
 		else
 		if (m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kToggle, 0))
 		{
-			m_leftmotor->Set(m_ingestspeed * 0.5);					/// sets the motor in reverse directions to handle the cube getting stuck
-			m_rightmotor->Set(m_ingestspeed * 0.5);
+			m_leftmotor->Set(m_ingestspeed);					/// sets the motor in reverse directions to handle the cube getting stuck
+			m_rightmotor->Set(m_ingestspeed);
 			m_timer.Reset();
 			m_timer.Start();
 			m_stage = kFix;
@@ -205,15 +206,50 @@ void Intake::Loop()
 		break;
 
 	case kFix:
-		if (m_timer.HasPeriodPassed(0.5))
+		m_lifter->MoveBottom();
+		switch (m_fixstage)
 		{
-			m_stage = kBox;
-		}
-		else
-		{
-			m_leftmotor->Set(m_ingestspeed * 0.5);
-			m_rightmotor->Set(m_ingestspeed * 0.5);
-		}
+		case 0:
+			if (m_lifter->MoveBottom())
+				m_timer.Reset();
+				m_timer.Start();
+				m_fixstage++;
+			break;
+
+		case 1:
+			if (m_timer.HasPeriodPassed(0.5))
+			{
+				m_timer.Reset();
+				m_timer.Start();
+				m_fixstage++;
+			}
+			else
+			{
+				m_leftmotor->Set(m_ingestspeed);
+				m_rightmotor->Set(m_ingestspeed);
+			}
+			break;
+
+		case 2:
+			if (m_timer.HasPeriodPassed(0.5))
+			{
+				m_timer.Reset();
+				m_timer.Start();
+				m_fixstage++;
+			}
+			else
+			{
+				m_ejectspeed = INT_EJECTLOW;
+				m_leftmotor->Set(m_ejectspeed);
+				m_rightmotor->Set(m_ejectspeed * -1.0);
+			}
+			break;
+
+		case 3:
+			m_stage = kIngest;
+			m_fixstage = 0;
+			break;
+		};
 		break;
 
 	case kEject:
