@@ -62,6 +62,9 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 	m_timerramp = new Timer();
 	m_rampmax = RAMPING_RATE_MAX;
+
+	m_prevleftdistance = 0;
+	m_prevrightdistance = 0;
 }
 
 
@@ -132,12 +135,12 @@ void DriveTrain::Init(DriveMode mode)
 
 	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	m_lefttalonlead->SetSensorPhase(false);
-	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 0);
+	m_lefttalonlead->SetSelectedSensorPosition(0, 0, 1000);
 	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
 	m_righttalonlead->SetSensorPhase(false);
-	m_righttalonlead->SetSelectedSensorPosition(0, 0, 0);
+	m_righttalonlead->SetSelectedSensorPosition(0, 0, 1000);
 	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
 
 	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
@@ -163,6 +166,9 @@ void DriveTrain::Init(DriveMode mode)
 	m_lowspeedmode = false;
 	m_shift = false;
 	m_direction = DT_DEFAULT_DIRECTION;
+
+	m_prevleftdistance = 0;
+	m_prevrightdistance = 0;
 }
 
 
@@ -465,6 +471,7 @@ double DriveTrain::GetMaxDistance()
 	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
 }
 
+
 double DriveTrain::GetMaxVelocity()
 {
 	double maxleft = m_lefttalonlead->GetSelectedSensorVelocity(0);
@@ -473,16 +480,16 @@ double DriveTrain::GetMaxVelocity()
 }
 
 
+void DriveTrain::ResetDeltaDistance()
+{
+	m_prevleftdistance = GetLeftDistance();
+	m_prevrightdistance = GetRightDistance();
+}
+
+
 double DriveTrain::GetMaxDeltaDistance()
 {
 	double maxleft = GetLeftDistance()- m_prevleftdistance;
 	double maxright = GetRightDistance() - m_prevrightdistance;
 	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
-}
-
-
-void DriveTrain::ResetDeltaDistance()
-{
-	m_prevleftdistance = GetLeftDistance();
-	m_prevrightdistance = GetRightDistance();
 }

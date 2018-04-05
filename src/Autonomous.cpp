@@ -202,6 +202,7 @@ bool Autonomous::TurnAngle(double angle)
 bool Autonomous::MiniStraight(double targetdistance, double autopower)
 {
 	m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+	SmartDashboard::PutNumber("MiniDistance", m_distance);
 
 	switch (m_straightstate)
 	{
@@ -235,7 +236,6 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower)
 		}
 		break;
 	}
-	SmartDashboard::PutNumber("MiniDistance", m_distance);
 	return false;
 }
 
@@ -663,12 +663,12 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (MiniStraight(195, 0.9))
+		if (MiniStraight(171, 0.9))
 		//if (DriveStraight(290, 1.8, 1, 250))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(-32))							// angle = -45 (clockwise)
+		if (TurnAngle(-15))							// angle = -45 (clockwise)
 			m_autostage++;
 			m_timer.Reset();
 		break;
@@ -691,18 +691,18 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 6:
 		m_lifter->MoveBottom();
-		if (MiniStraight(24,-0.3))
+		if (MiniStraight(12,-0.3))
 			m_autostage++;
 		break;
 	case 7:
 		m_lifter->MoveBottom();
-		if (TurnAngle(-98))
+		if (TurnAngle(-110))
 			m_autostage++;
 		break;
 	case 8:
 		m_lifter->MoveBottom();
 		m_intake->AutoIngest();
-		if(MiniStraight(20,0.9))
+		if(MiniStraight(15,0.9))
 		{
 			m_timer.Reset();
 			m_autostage++;
@@ -717,12 +717,12 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 10:
 		m_lifter->AutoRaise();
-		if (MiniStraight(20, -0.9))
+		if (MiniStraight(15, -0.9))
 			m_autostage++;
 		break;
 	case 11:
 		m_lifter->AutoRaise();
-		if (TurnAngle(98))
+		if (TurnAngle(95))
 			m_autostage++;
 		break;
 	case 12:
