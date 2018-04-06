@@ -35,6 +35,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DriveP
 		m_solenoid = new Solenoid(PCM_INTAKE_MODULE, PCM_INTAKE_SOLENOID);
 
 	m_cubesensor = new DigitalInput(DIO_INTAKE_CUBESENSOR);
+	m_finishingest = false;
 
 	m_stage = kIngest;
 	m_fixstage = 0;
@@ -350,7 +351,7 @@ void Intake::AutoLoop()
 	{
 	case kBottom:
 	case kIngest:
-		if (m_cubesensor->Get())
+		if (m_cubesensor->Get() || m_finishingest)
 		{
 			m_solenoid->Set(false);					/// we have cube, close intake arms
 			m_timer.Reset();
@@ -484,6 +485,7 @@ void Intake::AutoEject()
 void Intake::AutoIngest()
 {
 	m_stage = kIngest;
+	m_finishingest = false;
 	m_autoingest = true;
 }
 
@@ -493,4 +495,10 @@ bool Intake::IsVisioning()
 	if (m_visioning == kIdle)
 		return false;
 	return true;
+}
+
+
+void Intake::FinishAutoIngest()
+{
+	m_finishingest = true;
 }

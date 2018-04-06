@@ -39,6 +39,7 @@ public:
 	void AutoEject();
 	void AutoIngest();
 	bool IsVisioning();
+	void FinishAutoIngest();
 
 protected:
 	DriverStation *m_ds;
@@ -57,6 +58,7 @@ protected:
 	bool m_allowingest;
 	bool m_autoingest;
 	int m_fixstage;
+	bool m_finishingest;
 	Vision m_visioning;
 
 	//double m_pid[3] = {0.02, 0.01, 0.1};
