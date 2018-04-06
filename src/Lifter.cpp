@@ -269,7 +269,7 @@ bool Lifter::AutoRaise()
 
 bool Lifter::AutoAuto()
 {
-	if (m_position < LIF_LIFTERSTART * 1.5)		/// raise lifter - positive
+	if (m_position < LIF_LIFTERSTART)		/// raise lifter - positive
 	{
 		m_motor->Set(m_raisespeed);
 		return false;

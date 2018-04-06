@@ -871,16 +871,19 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 
 	case 14:
+		m_lifter->AutoAuto();
 		if (TurnAngle(-90))
 			m_autostage++;
 		break;
 
 	case 15:
+		m_lifter->AutoAuto();
 		if (MiniStraight(6, 0.6))
 			m_autostage++;
 		break;
 
 	case 16:
+		m_lifter->AutoAuto();
 		if (AngleStraight(45, 50, 0.5, 0.75, 30))
 			m_autostage++;
 		break;
@@ -960,16 +963,19 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 
 	case 30:
+		m_lifter->AutoAuto();
 		if (TurnAngle(-75))
 			m_autostage++;
 		break;
 
 	case 31:
+		m_lifter->AutoAuto();
 		if (MiniStraight(6, 0.6))
 			m_autostage++;
 		break;
 
 	case 32:
+		m_lifter->AutoAuto();
 		if (AngleStraight(45, 50, 0.5, 0.75, 30))
 			m_autostage++;
 		break;
