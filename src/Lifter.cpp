@@ -267,6 +267,19 @@ bool Lifter::AutoRaise()
 	}
 }
 
+bool Lifter::AutoAuto()
+{
+	if (m_position < LIF_LIFTERSTART * 1.5)		/// raise lifter - positive
+	{
+		m_motor->Set(m_raisespeed);
+		return false;
+	}
+	else
+	{
+		m_motor->Set(0);
+		return true;
+	}
+}
 
 bool Lifter::AutoDeploy()
 {
