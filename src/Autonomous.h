@@ -25,6 +25,7 @@ public:
 	bool TurnAngle(double angle);
 	bool MiniStraight(double targetdistance, double autopower);
 	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
+	bool MiniAngleStraight(double angle, double targetdistance, double autopower);
 	void AutoCenterSwitchRight();
 	void AutoCenterSwitchLeft();
 	void AutoStraight();

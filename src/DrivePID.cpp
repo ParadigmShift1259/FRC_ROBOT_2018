@@ -24,6 +24,7 @@ DrivePID::DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs): PIDSubsystem
 	m_gyroval[0] = 0;
 	m_gyroval[1] = 0;
 	m_gyroval[2] = 0;
+	m_ontarget = 0;
 }
 
 
@@ -45,6 +46,7 @@ void DrivePID::Init(double p, double i, double d, Feedback feedback)
 	m_pigeon->SetFusedHeading(0,0);
 	if (feedback != kDisabled)
 		EnablePID();
+	m_ontarget = 0;
 }
 
 
@@ -128,10 +130,36 @@ void DrivePID::ResetGyro()
 }
 
 
+bool DrivePID::IsOnTarget(double count)
+{
+	if (OnTarget())
+	{
+		if (count == 0)
+		{
+			m_ontarget = 0;
+			return true;
+		}
+		else
+		{
+			m_ontarget++;
+			if (m_ontarget > count)
+			{
+				m_ontarget = 0;
+				return true;
+			}
+			return false;
+		}
+	}
+	m_ontarget = 0;
+	return false;
+}
+
+
 void DrivePID::EnablePID()
 {
 	GetPIDController()->SetPID(m_p, m_i, m_d);
 	GetPIDController()->Reset();
+	m_ontarget = 0;
 	Enable();
 }
 

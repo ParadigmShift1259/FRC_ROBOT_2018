@@ -36,6 +36,7 @@ public:
 	void SetRelativeAngle(double angle);
 	void SetAbsoluteAngle(double angle);
 	void ResetGyro();
+	bool IsOnTarget(double count = 0);
 
 	void EnablePID();
 	void DisablePID();
@@ -53,6 +54,7 @@ protected:
 	double m_d;
 	double m_y;
 	double m_ramp;
+	int m_ontarget;
 };
 
 
