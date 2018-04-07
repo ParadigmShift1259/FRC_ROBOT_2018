@@ -47,6 +47,7 @@ Intake::Intake(DriverStation *ds, OperatorInputs *inputs, Lifter *lifter, DriveP
 	m_counter = 0;
 	m_visionvalid = false;
 	m_auto = false;
+	m_finishingest = false;
 }
 
 
@@ -82,6 +83,7 @@ void Intake::Init()
 	m_timer.Start();
 	m_allowingest = false;
 	m_autoingest = false;
+	m_finishingest = false;
 	m_counter = 0;
 	m_visiontimer.Reset();
 	m_visiontimer.Start();
@@ -98,6 +100,8 @@ void Intake::Loop()
 	/// check A Button to record state of button toggle (used in kBox)
 	bool xboxabuttontoggle = m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 1 * INP_DUAL);
 
+	bool xboxybuttontoggle = m_inputs->xBoxYButton(OperatorInputs::ToggleChoice::kToggle, 0);
+
 	switch (m_stage)
 	{
 	case kBottom:
@@ -113,6 +117,14 @@ void Intake::Loop()
 	case kIngest:
 		if (xboxabuttontoggle)
 			m_autoingest = true;
+		if (xboxybuttontoggle)
+		{
+			m_leftmotor->StopMotor();				/// motors are off by default
+			m_rightmotor->StopMotor();
+			m_timer.Reset();
+			m_stage = kFix;
+		}
+		else
 		if (m_cubesensor->Get() || m_inputs->xBoxBackButton() || m_inputs->xBoxBackButton(OperatorInputs::kToggle, 1))
 		{
 			m_solenoid->Set(false);					/// we have cube, close intake arms
@@ -121,6 +133,7 @@ void Intake::Loop()
 			m_rightmotor->Set(m_ingestspeed * -1.0);
 			m_allowingest = false;
 			m_autoingest = false;
+
 			m_visioning = kIdle;
 			m_stage = kIngestWait;					/// wait for box to ingest
 		}
@@ -190,9 +203,34 @@ void Intake::Loop()
 			m_stage = kEject;
 		}
 		else
+		if (xboxybuttontoggle)
+		{
+			m_leftmotor->StopMotor();				/// motors are off by default
+			m_rightmotor->StopMotor();
+			m_timer.Reset();
+			m_stage = kFix;
+		}
+		else
 		{
 			m_leftmotor->StopMotor();				/// stop motors until button is pressed
 			m_rightmotor->StopMotor();
+		}
+		break;
+
+	case kFix:
+		if (m_timer.HasPeriodPassed(0.5))
+		{
+			m_leftmotor->StopMotor();
+			m_rightmotor->StopMotor();
+			m_solenoid->Set(true);					/// open arms
+			if (m_lifter->MoveBottom())
+				m_stage = kIngest;
+		}
+		else
+		{
+			m_lifter->MoveBottom();
+			m_leftmotor->Set(m_ingestspeed);
+			m_rightmotor->Set(m_ingestspeed);
 		}
 		break;
 
@@ -331,6 +369,7 @@ void Intake::AutoLoop()
 		break;
 
 	case kBox:
+	case kFix:
 		if ((automode == kAutoCenterSwitchLeft) || (automode ==  kAutoCenterSwitchRight))
 			m_ejectspeed = INT_EJECTSWITCH;
 		else
@@ -444,67 +483,67 @@ bool Intake::IsVisioning()
 void Intake::AutoVision()
 {
 	int counter = m_nettable->GetNumber("visioncounter", 0);
-		double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
-		double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
+	double angle = m_nettable->GetNumber("XOffAngle", 0) * -1;
+	double distance = m_nettable->GetNumber("Forward_Distance_Inch", 0);
 
-		double scale = distance / (96 * 2) + 0.25;
-		if (counter > m_counter)
+	double scale = distance / (96 * 2) + 0.25;
+	if (counter > m_counter)
+	{
+		m_counter = counter;
+		if (distance > 0.0)
 		{
-			m_counter = counter;
-			if (distance > 0.0)
-			{
-				m_visiontimer.Reset();
-				m_visionvalid = true;
-			}
+			m_visiontimer.Reset();
+			m_visionvalid = true;
+		}
+	}
+	else
+	if (m_visiontimer.Get() > 0.5)
+	{
+		m_visionvalid = false;
+	}
+
+	switch (m_visioning)
+	{
+	case kIdle:
+		if (m_visionvalid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
+		{
+			m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+			m_drivepid->EnablePID();
+			m_autoingest = true;
+			m_visioning = kVision;
 		}
 		else
-		if (m_visiontimer.Get() > 0.5)
+			m_drivepid->DisablePID();
+		m_counter = 0;
+		break;
+
+	case kVision:
+		if (!m_visionvalid || m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
 		{
-			m_visionvalid = false;
+			m_drivepid->DisablePID();
+			m_autoingest = false;
+			m_visioning = kIdle;
 		}
-
-		switch (m_visioning)
+		else
+		if (m_lifter->IsBottom())
 		{
-		case kIdle:
-			if (m_visionvalid && m_inputs->xBoxAButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
-			{
-				m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
-				m_drivepid->EnablePID();
-				m_autoingest = true;
-				m_visioning = kVision;
-			}
-			else
-				m_drivepid->DisablePID();
-			m_counter = 0;
-			break;
+			//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
+			//m_drivepid->SetAbsoluteAngle(x);
 
-		case kVision:
-			if (!m_visionvalid || m_inputs->xBoxBButton(OperatorInputs::ToggleChoice::kToggle, 0 * INP_DUAL))
-			{
-				m_drivepid->DisablePID();
-				m_autoingest = false;
-				m_visioning = kIdle;
-			}
-			else
-			if (m_lifter->IsBottom())
-			{
-				//double x = m_inputs->xBoxLeftX(0 * INP_DUAL) * 90;
-				//m_drivepid->SetAbsoluteAngle(x);
+			double y = /*m_inputs->xBoxLeftY(0 * INP_DUAL) * */-1*(scale > 1 ? 1 : scale);
 
-				double y = /*m_inputs->xBoxLeftY(0 * INP_DUAL) * */-1*(scale > 1 ? 1 : scale);
-
-				m_drivepid->Drive(y, true);
-				m_drivepid->ResetGyro();
-				m_drivepid->SetAbsoluteAngle(angle);
-			}
-			else
-				m_lifter->MoveBottom();
-			break;
+			m_drivepid->Drive(y, true);
+			m_drivepid->ResetGyro();
+			m_drivepid->SetAbsoluteAngle(angle);
 		}
-		SmartDashboard::PutNumber("IN999_scale", scale);
-		SmartDashboard::PutNumber("IN6_visioncounter", counter);
-		SmartDashboard::PutNumber("IN7_visionangle", angle);
-		SmartDashboard::PutNumber("IN8_distance", distance);
+		else
+			m_lifter->MoveBottom();
+		break;
+	}
+	SmartDashboard::PutNumber("IN999_scale", scale);
+	SmartDashboard::PutNumber("IN6_visioncounter", counter);
+	SmartDashboard::PutNumber("IN7_visionangle", angle);
+	SmartDashboard::PutNumber("IN8_distance", distance);
 }
 
 

@@ -268,6 +268,21 @@ bool Lifter::AutoRaise()
 }
 
 
+bool Lifter::AutoRaiseSwitch()
+{
+	if (m_position < LIF_LIFTERSWITCH)		/// raise lifter - positive
+	{
+		m_motor->Set(m_raisespeed);
+		return false;
+	}
+	else
+	{
+		m_motor->Set(0);
+		return true;
+	}
+}
+
+
 bool Lifter::AutoDeploy()
 {
 	m_solenoid->Set(true);

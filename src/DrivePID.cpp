@@ -33,17 +33,20 @@ DrivePID::~DrivePID()
 }
 
 
-void DrivePID::Init(double p, double i, double d, Feedback feedback)
+void DrivePID::Init(double p, double i, double d, Feedback feedback, bool reset)
 {
 	m_p = p;
 	m_i = i;
 	m_d = d;
 	m_feedback = feedback;
 	GetPIDController()->SetPID(m_p, m_i, m_d);
-	SetSetpoint(0);
 	SetAbsoluteTolerance(2);
 	SetOutputRange(-0.7,0.7);
-	m_pigeon->SetFusedHeading(0,0);
+	if (reset)
+	{
+		SetSetpoint(0);
+		m_pigeon->SetFusedHeading(0,0);
+	}
 	if (feedback != kDisabled)
 		EnablePID();
 	m_ontarget = 0;

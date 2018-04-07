@@ -22,8 +22,8 @@ public:
 	void Loop();
 	void Stop();
 	bool DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance);
-	bool TurnAngle(double angle);
-	bool MiniStraight(double targetdistance, double autopower);
+	bool TurnAngle(double angle, bool reset = true);
+	bool MiniStraight(double targetdistance, double autopower, bool reset = true);
 	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
 	bool MiniAngleStraight(double angle, double targetdistance, double autopower);
 	void AutoCenterSwitchRight();
@@ -42,9 +42,9 @@ protected:
 	Intake *m_intake;
 	Lifter *m_lifter;
 
-	double m_pidstraight[3] = {0.04, 0.0012, 0.07}; //0.035, 0.0008, 0.07
-	double m_pidturn[3] = {0.013, 0.0002, 0.045};
-
+	double m_pidstraight[3] = {0.04, 0.0012, 0.07}; 		//0.035, 0.0008, 0.07
+	double m_pidturn[3] = {0.013, 0.0002, 0.045};			// scale pid
+	//double m_pidturn[3] = {0.04, 0.004, 0.15};				// switch pid
 	Timer m_timer;
 	DriveStraightState m_straightstate;
 	TurnState m_turnstate;

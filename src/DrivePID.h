@@ -22,7 +22,7 @@ public:
 
 	DrivePID(DriveTrain *drivetrain, OperatorInputs *inputs);
 	~DrivePID();
-	void Init(double p = 0, double i = 0, double d = 0, Feedback feedback = kDisabled);
+	void Init(double p = 0, double i = 0, double d = 0, Feedback feedback = kDisabled, bool reset = true);
 	void Loop();
 	void Drive(double y, bool ramp = false);
 	void Stop();

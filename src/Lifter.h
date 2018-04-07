@@ -30,6 +30,7 @@ public:
 	bool MoveSmidgeUp();
 	bool MoveBottom();
 	bool AutoRaise();
+	bool AutoRaiseSwitch();
 	bool AutoDeploy();
 
 protected:
