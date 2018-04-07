@@ -42,7 +42,8 @@ protected:
 	Intake *m_intake;
 	Lifter *m_lifter;
 
-	double m_pid[3] = {0.01, 0.0012, 0.07}; //0.035, 0.0008, 0.07
+	double m_pidstraight[3] = {0.04, 0.0012, 0.07}; //0.035, 0.0008, 0.07
+	double m_pidturn[3] = {0.013, 0.0002, 0.045};
 
 	Timer m_timer;
 	DriveStraightState m_straightstate;

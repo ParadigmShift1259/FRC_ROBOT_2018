@@ -41,6 +41,9 @@ void Robot::RobotInit()
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter, m_drivepid);
 	m_climber = new Climber(m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake, m_lifter);
+	SmartDashboard::PutNumber("P", 0.01);
+	SmartDashboard::PutNumber("I", 0.0012);
+	SmartDashboard::PutNumber("D", 0.07);
 }
 
 

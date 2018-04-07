@@ -47,6 +47,7 @@ void Autonomous::Init()
 	m_distance = 0;
 
 	m_drivepid->Init();
+
 }
 
 
@@ -116,7 +117,7 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetLeftPosition();
 		m_drivetrain->ResetRightPosition();
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
@@ -176,10 +177,14 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 
 bool Autonomous::TurnAngle(double angle)
 {
+//	double p = SmartDashboard::GetNumber("P", 0);
+//	double i = SmartDashboard::GetNumber("I", 0);
+//	double d = SmartDashboard::GetNumber("D", 0);
 	switch (m_turnstate)
 	{
 	case kInit:
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro);
+//		m_drivepid->Init(p, i, d, DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_turnstate = kTurning;
@@ -187,7 +192,7 @@ bool Autonomous::TurnAngle(double angle)
 
 	case kTurning:
 		m_drivepid->Drive(0, false);
-		if (m_drivepid->IsOnTarget(5))
+		if (m_drivepid->IsOnTarget(3))
 		{
 			m_drivepid->DisablePID();
 			m_turnstate = kInit;
@@ -208,7 +213,7 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower)
 		m_drivetrain->ResetDeltaDistance();
 		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
 		SmartDashboard::PutNumber("MiniDistance", m_distance);
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
@@ -252,7 +257,7 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivepid->Init(m_pid[0], m_pid[1], m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_straightstate = kAngle;
@@ -267,6 +272,7 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 			m_drivetrain->ResetRightPosition();
 			m_timer.Reset();
 			m_timermod = acceltime;
+			m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
 			m_straightstate = kAccel;
 		}
@@ -327,7 +333,7 @@ bool Autonomous::MiniAngleStraight(double angle, double targetdistance, double a
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivepid->Init(0.002, 0.0006, m_pid[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_straightstate = kAngle;
@@ -339,6 +345,7 @@ bool Autonomous::MiniAngleStraight(double angle, double targetdistance, double a
 		{
 			m_drivepid->DisablePID();
 			m_drivetrain->ResetDeltaDistance();
+			m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
 			m_timer.Reset();
 			m_straightstate = kMaintain;
@@ -728,12 +735,12 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (MiniStraight(171, 0.9))
+		if (MiniStraight(200, 0.9))
 		//if (DriveStraight(290, 1.8, 1, 250))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
 	case 1:
-		if (TurnAngle(-15))							// angle = -45 (clockwise)
+		if (TurnAngle(-20))							// angle = -45 (clockwise)
 			m_autostage++;
 			m_timer.Reset();
 		break;
@@ -756,7 +763,7 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 6:
 		m_lifter->MoveBottom();
-		if (MiniStraight(12,-0.3))
+		if (MiniStraight(15,-0.3))
 			m_autostage++;
 		break;
 	case 7:
@@ -767,7 +774,7 @@ void Autonomous::AutoLeftScaleLeft()
 	case 8:
 		m_lifter->MoveBottom();
 		m_intake->AutoIngest();
-		if(MiniStraight(15,0.9))
+		if(MiniStraight(10,0.9))
 		{
 			m_timer.Reset();
 			m_autostage++;
@@ -791,12 +798,14 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 12:
-		if (m_lifter->AutoRaise())
+		m_lifter->AutoRaise();
+		if (MiniStraight(12, 0.9))
+//		if (m_lifter->AutoRaise())
 			m_autostage++;
 		break;
 	case 13:
-
-		if (MiniStraight(15, 0.9))
+		if (m_lifter->AutoRaise())
+//		if (MiniStraight(20, 0.9))
 			m_autostage++;
 		break;
 	case 14:
@@ -825,43 +834,10 @@ void Autonomous::AutoTest()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+		if (TurnAngle(90))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage++;
 		break;
-	case 1:
-		if (AngleStraight(-60, 52, 0.5, 0.5, 24.0))		// targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
-			m_autostage++;
-		break;
-	case 2:
-		if (AngleStraight(60, 32, 0.1, 0.25, 18.0))		// targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
-			m_autostage++;
-		break;
-	case 3:
-		m_intake->AutoEject();
-		m_timer.Reset();
-		m_autostage++;
-		break;
-	case 4:
-		if (m_timer.Get() > 0.25)
-			m_autostage++;
-		break;
-	case 5:
-		m_lifter->AutoDeploy();
-		m_lifter->MoveBottom();
-		if (MiniStraight(24, -0.5))
-			m_autostage++;
-		break;
-	case 6:
-		if (m_lifter->MoveBottom())
-			m_autostage++;
-		break;
-	case 7:
-		if (TurnAngle(45))
-			m_autostage++;
-		break;
-	case 8:
-		m_drivetrain->Drive(0, 0);					// turn off drive motors
-		break;
+
 	}
 //	switch (m_autostage)
 //	{
