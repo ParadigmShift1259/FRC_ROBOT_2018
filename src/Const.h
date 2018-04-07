@@ -98,6 +98,7 @@
 #define LIF_LIFSMIDGE (LIF_LIFTERMAX * 0.07)			/// 7% of max height
 #define LIF_LIFTERMINSPD (LIF_LIFTERMAX * 0.1)			/// 5% of max height
 #define LIF_LIFTERSTART (LIF_LIFTERMAX * 0.5)			/// ~50% of max height
+#define LIF_LIFTERSWITCH (LIF_LIFTERMAX * 0.4)			/// ~35% of max height
 #define LIF_LIFTERMAXSPD (LIF_LIFTERMAX	* 0.95)			/// 5% of max height
 
 
