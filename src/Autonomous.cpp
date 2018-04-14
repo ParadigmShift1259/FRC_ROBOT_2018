@@ -104,7 +104,7 @@ void Autonomous::Loop()
 	SmartDashboard::PutNumber("AU02_rightinches", m_drivetrain->GetRightPosition()/CODES_PER_INCH);
 	SmartDashboard::PutNumber("AU03_leftposition", m_drivetrain->GetLeftPosition());
 	SmartDashboard::PutNumber("AU04_leftposition", m_drivetrain->GetRightPosition());
-	SmartDashboard::PutNumber("AU05_distance", abs(m_drivetrain->GetMaxDistance()));
+	SmartDashboard::PutNumber("AU05_distance", abs(m_drivetrain->GetMaxDeltaDistance()));
 }
 
 
@@ -264,12 +264,14 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 
 bool Autonomous::MiniStraight(double targetdistance, double autopower, bool reset)
 {
+	double modifier;
+
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
 		m_drivetrain->ResetDeltaDistance();
-		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+		m_distance = m_drivetrain->GetMaxDeltaDistance();
 		SmartDashboard::PutNumber("MiniDistance", m_distance);
 		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro, reset);
 		m_drivepid->EnablePID();
@@ -285,9 +287,13 @@ bool Autonomous::MiniStraight(double targetdistance, double autopower, bool rese
 	case kDecel:
 		m_distance = 0;
 		if (m_timer.Get() > 0.1)
-			m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+			m_distance = m_drivetrain->GetMaxDeltaDistance();
 		SmartDashboard::PutNumber("MiniDistance", m_distance);
-		if (m_distance > (targetdistance))
+		modifier = (targetdistance > 0) ? 1 : -1;
+		m_distance *= modifier;
+		targetdistance *= modifier;
+
+		if (m_distance > targetdistance)
 		{
 			m_drivepid->Drive(0);
 			m_drivepid->DisablePID();
@@ -371,7 +377,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 5:
 			m_lifter->MoveBottom();
-			if (MiniStraight(24, -0.8, false))		/// original: 44.5
+			if (MiniStraight(-24, -0.8, false))		/// original: 44.5
 				m_autostage++;
 			break;
 
@@ -406,7 +412,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 10:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(10, -0.6, false))
+			if (MiniStraight(-10, -0.6, false))
 				m_autostage++;
 			break;
 
@@ -418,7 +424,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 12:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(63, 1, false))		/// added 7 inches to compensate for turning
+			if (MiniStraight(58, 1, false))		/// added 7 inches to compensate for turning
 				m_autostage++;
 			break;
 
@@ -437,7 +443,7 @@ void Autonomous::AutoCenterSwitchLeft()
 			break;
 
 		case 15:
-			if (MiniStraight(15, -1, false))
+			if (MiniStraight(-12, -1, false))
 				m_autostage++;
 			if (m_timer.Get() > 0.25)
 				m_lifter->MoveBottom();
@@ -474,7 +480,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 20:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(10, -0.6, false))
+			if (MiniStraight(-10, -0.6, false))
 				m_autostage++;
 			break;
 
@@ -540,7 +546,7 @@ void Autonomous::AutoCenterSwitchRight()
 
 	case 5:
 		m_lifter->MoveBottom();
-		if (MiniStraight(22, -0.8, false))		/// original: 44.5
+		if (MiniStraight(-22, -0.8, false))		/// original: 44.5
 			m_autostage++;
 		break;
 
@@ -575,7 +581,7 @@ void Autonomous::AutoCenterSwitchRight()
 
 	case 10:
 		m_lifter->AutoRaiseSwitch();
-		if (MiniStraight(15, -0.6, false))
+		if (MiniStraight(-15, -0.6, false))
 			m_autostage++;
 		break;
 
@@ -606,7 +612,7 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 
 	case 15:
-		if (MiniStraight(15, -1, false))
+		if (MiniStraight(-15, -1, false))
 			m_autostage++;
 		if (m_timer.Get() > 0.25)
 			m_lifter->MoveBottom();
@@ -643,7 +649,7 @@ void Autonomous::AutoCenterSwitchRight()
 
 	case 20:
 		m_lifter->AutoRaiseSwitch();
-		if (MiniStraight(5, -0.6, false))
+		if (MiniStraight(-5, -0.6, false))
 			m_autostage++;
 		break;
 
@@ -722,7 +728,7 @@ void Autonomous::AutoRightScaleRight()
 		break;
 	case 6:
 		m_lifter->MoveBottom();
-		if (MiniStraight(24,-0.3))
+		if (MiniStraight(-24,-0.3))
 			m_autostage++;
 		break;
 	case 7:
@@ -879,7 +885,7 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 6:
 		m_lifter->MoveBottom();
-		if (MiniStraight(12,-0.3, false))
+		if (MiniStraight(-15,-0.3, false))
 			m_autostage++;
 		break;
 	case 7:
@@ -905,7 +911,7 @@ void Autonomous::AutoLeftScaleLeft()
 		break;
 	case 10:
 		m_lifter->AutoRaise();
-		if (MiniStraight(20, -0.9, false))
+		if (MiniStraight(-20, -0.9, false))
 			m_autostage++;
 		break;
 	case 11:
@@ -934,7 +940,7 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 16:
-		if (MiniStraight(24,-0.8, false))
+		if (MiniStraight(-24,-0.8, false))
 			m_autostage++;
 		m_lifter->MoveBottom();
 		break;
@@ -976,7 +982,7 @@ void Autonomous::AutoOldCenterSwitchLeft()
 		break;
 	case 5:
 		m_lifter->AutoDeploy();
-		if (MiniStraight(24, -0.5))
+		if (MiniStraight(-24, -0.5))
 			m_autostage++;
 		break;
 	case 6:
@@ -1032,7 +1038,7 @@ void Autonomous::AutoOldCenterSwitchRight()
 		break;
 	case 5:
 		m_lifter->AutoDeploy();
-		if (MiniStraight(24, -0.5))
+		if (MiniStraight(-24, -0.5))
 			m_autostage++;
 		break;
 	case 6:

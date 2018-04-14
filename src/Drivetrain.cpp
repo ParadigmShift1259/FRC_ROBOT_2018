@@ -468,7 +468,7 @@ double DriveTrain::GetMaxDistance()
 {
 	double maxleft = GetLeftDistance();
 	double maxright = GetRightDistance();
-	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
+	return abs(maxleft) > abs(maxright) ? maxleft : -maxright;
 }
 
 
@@ -484,7 +484,7 @@ double DriveTrain::GetMaxVelocity()
 {
 	double maxleft = m_lefttalonlead->GetSelectedSensorVelocity(0);
 	double maxright = m_righttalonlead->GetSelectedSensorVelocity(0);
-	return abs(abs(maxleft) > abs(maxright) ? maxleft : maxright);
+	return abs(abs(maxleft) > abs(maxright) ? maxleft : -maxright);
 }
 
 
@@ -499,5 +499,5 @@ double DriveTrain::GetMaxDeltaDistance()
 {
 	double maxleft = GetLeftDistance()- m_prevleftdistance;
 	double maxright = GetRightDistance() - m_prevrightdistance;
-	return abs(maxleft) > abs(maxright) ? maxleft : maxright;
+	return abs(maxleft) > abs(maxright) ? maxleft : -maxright;
 }
