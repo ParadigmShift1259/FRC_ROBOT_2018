@@ -27,6 +27,7 @@ void Robot::RobotInit()
 	m_chooser.AddObject(kszAutoTestMode, kszAutoTestMode);
 	m_chooser.AddObject(kszAutoRightScale, kszAutoRightScale);
 	m_chooser.AddObject(kszAutoLeftScale, kszAutoLeftScale);
+	m_chooser.AddObject(kszAutoOldCenterSwitch, kszAutoOldCenterSwitch);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -216,6 +217,15 @@ void Robot::ReadChooser()
 		if (gamedata [1] == 'R')
 			automode = kAutoLeftScaleRight;
 			//automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoOldCenterSwitch)
+	{
+		if (gamedata[0] == 'L')
+			automode = kAutoOldCenterSwitchLeft;
+		else
+		if (gamedata[0] == 'R')
+			automode = kAutoOldCenterSwitchRight;
 	}
 	else
 	if (m_autoSelected == kszAutoTestMode)

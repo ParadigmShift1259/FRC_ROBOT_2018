@@ -46,6 +46,7 @@ private:
 	const std::string kszAutoRightSwitch = "Right Switch";
 	const std::string kszAutoRightScale = "Right Scale";
 	const std::string kszAutoLeftScale = "Left Scale";
+	const std::string kszAutoOldCenterSwitch = "Old Center Switch";
 	const std::string kszAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
 

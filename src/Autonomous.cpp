@@ -86,6 +86,14 @@ void Autonomous::Loop()
 		AutoLeftScaleLeft();
 		break;
 
+	case kAutoOldCenterSwitchLeft:
+		AutoOldCenterSwitchLeft();
+		break;
+
+	case kAutoOldCenterSwitchRight:
+		AutoOldCenterSwitchRight();
+		break;
+
 	case kAutoTest:
 		AutoTest();
 		break;
@@ -106,18 +114,19 @@ void Autonomous::Stop()
 }
 
 
-bool Autonomous::DriveStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
+
+// old straight code
+bool Autonomous::RampStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
 {
 	double timervalue = m_timer.Get();
-	m_distance = abs(m_drivetrain->GetMaxDistance());
+	m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
 
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		//m_drivetrain->ResetLeftPosition();
-		//m_drivetrain->ResetRightPosition();
-		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
+		m_drivetrain->ResetDeltaDistance();
+		m_drivepid->Init(m_pidold[0], m_pidold[1], m_pidold[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(0);
 		m_timer.Reset();
@@ -175,88 +184,17 @@ bool Autonomous::DriveStraight(double targetdistance, double acceltime, double a
 }
 
 
-bool Autonomous::TurnAngle(double angle, bool reset)
-{
-//	double p = SmartDashboard::GetNumber("P", 0);
-//	double i = SmartDashboard::GetNumber("I", 0);
-//	double d = SmartDashboard::GetNumber("D", 0);
-	switch (m_turnstate)
-	{
-	case kInit:
-		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro, reset);
-//		m_drivepid->Init(p, i, d, DrivePID::Feedback::kGyro);
-		m_drivepid->EnablePID();
-		m_drivepid->SetRelativeAngle(angle);
-		m_turnstate = kTurning;
-		break;
-
-	case kTurning:
-		m_drivepid->Drive(0, false);
-		if (m_drivepid->IsOnTarget(3))
-		{
-			m_drivepid->DisablePID();
-			m_turnstate = kInit;
-			return true;
-		}
-		break;
-	}
-	return false;
-}
-
-
-bool Autonomous::MiniStraight(double targetdistance, double autopower, bool reset)
-{
-	switch (m_straightstate)
-	{
-	case kStart:
-		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivetrain->ResetDeltaDistance();
-		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
-		SmartDashboard::PutNumber("MiniDistance", m_distance);
-		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro, reset);
-		m_drivepid->EnablePID();
-		if (reset)
-			m_drivepid->SetAbsoluteAngle(0);
-		m_timer.Reset();
-		m_straightstate = kMaintain;
-		break;
-
-	case kAngle:
-	case kAccel:
-	case kMaintain:
-	case kDecel:
-		m_distance = 0;
-		if (m_timer.Get() > 0.1)
-			m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
-		SmartDashboard::PutNumber("MiniDistance", m_distance);
-		if (m_distance > (targetdistance))
-		{
-			m_drivepid->Drive(0);
-			m_drivepid->DisablePID();
-			m_drivetrain->Drive(0, 0, false);
-			m_straightstate = kStart;
-			return true;
-		}
-		else
-		{
-			m_drivepid->Drive(-1 * autopower, true);
-		}
-		break;
-	}
-	return false;
-}
-
-
+// old angle straight code
 bool Autonomous::AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance)
 {
 	double timervalue = m_timer.Get();
-	m_distance = abs(m_drivetrain->GetMaxDistance());
+	m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
 
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro);
+		m_drivepid->Init(m_pidold[0], m_pidold[1], m_pidold[2], DrivePID::Feedback::kGyro);
 		m_drivepid->EnablePID();
 		m_drivepid->SetAbsoluteAngle(angle);
 		m_straightstate = kAngle;
@@ -264,14 +202,12 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 
 	case kAngle:
 		m_drivepid->Drive(0, false);
-		if (m_drivepid->IsOnTarget(3))
+		if (m_drivepid->IsOnTarget())
 		{
 			m_drivepid->DisablePID();
-			//m_drivetrain->ResetLeftPosition();
-			//m_drivetrain->ResetRightPosition();
+			m_drivetrain->ResetDeltaDistance();
 			m_timer.Reset();
 			m_timermod = acceltime;
-			m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
 			m_drivepid->EnablePID();
 			m_straightstate = kAccel;
 		}
@@ -326,35 +262,28 @@ bool Autonomous::AngleStraight(double angle, double targetdistance, double accel
 }
 
 
-bool Autonomous::MiniAngleStraight(double angle, double targetdistance, double autopower)
+bool Autonomous::MiniStraight(double targetdistance, double autopower, bool reset)
 {
 	switch (m_straightstate)
 	{
 	case kStart:
 		// accelerates during this case for a duration specified by ACCEL_TIME, feeds into kMaintain
-		m_drivepid->Init(m_pidturn[0], m_pidturn[1], m_pidturn[2], DrivePID::Feedback::kGyro);
+		m_drivetrain->ResetDeltaDistance();
+		m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
+		SmartDashboard::PutNumber("MiniDistance", m_distance);
+		m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro, reset);
 		m_drivepid->EnablePID();
-		m_drivepid->SetAbsoluteAngle(angle);
-		m_straightstate = kAngle;
+		if (reset)
+			m_drivepid->SetAbsoluteAngle(0);
+		m_timer.Reset();
+		m_straightstate = kMaintain;
 		break;
 
 	case kAngle:
-		m_drivepid->Drive(0, false);
-		if (m_drivepid->IsOnTarget(3))
-		{
-			m_drivepid->DisablePID();
-			m_drivetrain->ResetDeltaDistance();
-			m_drivepid->Init(m_pidstraight[0], m_pidstraight[1], m_pidstraight[2], DrivePID::Feedback::kGyro);
-			m_drivepid->EnablePID();
-			m_timer.Reset();
-			m_straightstate = kMaintain;
-		}
-		break;
-
 	case kAccel:
-	case kDecel:
 	case kMaintain:
-		m_distance = 0.0;
+	case kDecel:
+		m_distance = 0;
 		if (m_timer.Get() > 0.1)
 			m_distance = abs(m_drivetrain->GetMaxDeltaDistance());
 		SmartDashboard::PutNumber("MiniDistance", m_distance);
@@ -376,13 +305,46 @@ bool Autonomous::MiniAngleStraight(double angle, double targetdistance, double a
 }
 
 
+bool Autonomous::TurnAngle(double angle, bool reset)
+{
+//	double p = SmartDashboard::GetNumber("P", 0);
+//	double i = SmartDashboard::GetNumber("I", 0);
+//	double d = SmartDashboard::GetNumber("D", 0);
+	switch (m_turnstate)
+	{
+	case kInit:
+		m_drivepid->Init(m_pidangle[0], m_pidangle[1], m_pidangle[2], DrivePID::Feedback::kGyro, reset);
+//		m_drivepid->Init(p, i, d, DrivePID::Feedback::kGyro);
+		m_drivepid->EnablePID();
+		m_drivepid->SetRelativeAngle(angle);
+		m_turnstate = kTurning;
+		break;
+
+	case kTurning:
+		m_drivepid->Drive(0, false);
+		if (m_drivepid->IsOnTarget(3))
+		{
+			m_drivepid->DisablePID();
+			m_turnstate = kInit;
+			return true;
+		}
+		break;
+	}
+	return false;
+}
+
+
 void Autonomous::AutoCenterSwitchLeft()
 {
-	switch(m_autostage)
+	switch (m_autostage)
 		{
 		case 0:
+			m_pidangle[0] = m_pidswitch[0];
+			m_pidangle[1] = m_pidswitch[1];
+			m_pidangle[2] = m_pidswitch[2];
+
 			m_lifter->AutoDeploy();
-			if (MiniStraight(3, 0.6, true))		/// DriveStraight(10, 0.1, 0.3, 6)
+			if (MiniStraight(3, 0.6, true))		/// RampStraight(10, 0.1, 0.3, 6)
 				m_autostage++;
 			break;
 
@@ -392,7 +354,7 @@ void Autonomous::AutoCenterSwitchLeft()
 			break;
 
 		case 2:
-			if (MiniStraight(76, 0.6, false))		// original: 92
+			if (MiniStraight(78, 0.6, false))		// original: 92
 				m_autostage++;
 			break;
 
@@ -456,7 +418,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 12:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(50, 1, false))		/// added 7 inches to compensate for turning
+			if (MiniStraight(63, 1, false))		/// added 7 inches to compensate for turning
 				m_autostage++;
 			break;
 
@@ -483,7 +445,7 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 16:
 			m_lifter->MoveBottom();
-			if (TurnAngle(-45, false))
+			if (TurnAngle(-48, false))
 				m_autostage++;
 			break;
 
@@ -512,19 +474,19 @@ void Autonomous::AutoCenterSwitchLeft()
 
 		case 20:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(7, -0.6, false))
+			if (MiniStraight(10, -0.6, false))
 				m_autostage++;
 			break;
 
 		case 21:
 			m_lifter->AutoRaiseSwitch();
-			if (TurnAngle(45, false))
+			if (TurnAngle(48, false))
 				m_autostage++;
 			break;
 
 		case 22:
 			m_lifter->AutoRaiseSwitch();
-			if (MiniStraight(35, 1, false))		/// added 7 inches to compensate for turning
+			if (MiniStraight(38, 1, false))		/// added 7 inches to compensate for turning
 				m_autostage++;
 			break;
 
@@ -543,11 +505,15 @@ void Autonomous::AutoCenterSwitchLeft()
 
 void Autonomous::AutoCenterSwitchRight()
 {
-	switch(m_autostage)
+	switch (m_autostage)
 	{
 	case 0:
+		m_pidangle[0] = m_pidswitch[0];
+		m_pidangle[1] = m_pidswitch[1];
+		m_pidangle[2] = m_pidswitch[2];
+
 		m_lifter->AutoDeploy();
-		if (MiniStraight(5, 0.6, true))		/// DriveStraight(10, 0.1, 0.3, 6)
+		if (MiniStraight(5, 0.6, true))		/// RampStraight(10, 0.1, 0.3, 6)
 			m_autostage++;
 		break;
 
@@ -557,7 +523,7 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 
 	case 2:
-		if (MiniStraight(73, 0.6, false))		// original: 92
+		if (MiniStraight(80, 0.6, false))		// original: 92
 			m_autostage++;
 		break;
 
@@ -574,7 +540,7 @@ void Autonomous::AutoCenterSwitchRight()
 
 	case 5:
 		m_lifter->MoveBottom();
-		if (MiniStraight(20, -0.8, false))		/// original: 44.5
+		if (MiniStraight(22, -0.8, false))		/// original: 44.5
 			m_autostage++;
 		break;
 
@@ -621,7 +587,7 @@ void Autonomous::AutoCenterSwitchRight()
 
 	case 12:
 		m_lifter->AutoRaiseSwitch();
-		if (MiniStraight(50, 1, false))		/// added 7 inches to compensate for turning
+		if (MiniStraight(45, 1, false))		/// added 7 inches to compensate for turning
 			m_autostage++;
 		break;
 
@@ -640,7 +606,7 @@ void Autonomous::AutoCenterSwitchRight()
 		break;
 
 	case 15:
-		if (MiniStraight(12, -1, false))
+		if (MiniStraight(15, -1, false))
 			m_autostage++;
 		if (m_timer.Get() > 0.25)
 			m_lifter->MoveBottom();
@@ -703,36 +669,6 @@ void Autonomous::AutoCenterSwitchRight()
 		m_drivetrain->Drive(0, 0);
 		break;
 	}
-//	switch (m_autostage)
-//	{
-//	case 0:
-//		if (DriveStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
-//			m_autostage++;
-//		break;
-//	case 1:
-//		if (TurnAngle(-60))							// angle = -60 (clockwise)
-//			m_autostage++;
-//		break;
-//	case 2:
-//		if (DriveStraight(52, 0.5, 0.5, 24.0))		// targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
-//			m_autostage++;
-//		break;
-//	case 3:
-//		if (TurnAngle(60))							// angle = 60 (counterclockwise)
-//			m_autostage++;
-//		break;
-//	case 4:
-//		if (DriveStraight(32, 0.1, 0.25, 18.0))		// targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
-//			m_autostage++;
-//		break;
-//	case 5:
-//		m_intake->AutoEject();
-//		m_autostage++;
-//		break;
-//	case 6:
-//		m_drivetrain->Drive(0, 0);					// turn off drive motors
-//		break;
-//	}
 }
 
 
@@ -741,7 +677,7 @@ void Autonomous::AutoStraight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(88, 0.5, 0.5, 24.0))		// targetdistance = 88", ramp = .5s, power = 50%, deceldistance = 24"
+		if (RampStraight(88, 0.5, 0.5, 24.0))		// targetdistance = 88", ramp = .5s, power = 50%, deceldistance = 24"
 			m_autostage = 1;
 		break;
 	case 1:
@@ -756,7 +692,11 @@ void Autonomous::AutoRightScaleRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(230, 1.0, 0.5, 60.0))		// targetdistance = 290", everything else needs tuning
+		m_pidangle[0] = m_pidscale[0];
+		m_pidangle[1] = m_pidscale[1];
+		m_pidangle[2] = m_pidscale[2];
+
+		if (RampStraight(230, 1.0, 0.5, 60.0))		// targetdistance = 290", everything else needs tuning
 			m_autostage++;
 		break;
 	case 1:
@@ -801,7 +741,11 @@ void Autonomous::AutoRightScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (DriveStraight(209, 1.0, 0.5, 60.0))		//Goes 235, with the turn, trust me
+		m_pidangle[0] = m_pidscale[0];
+		m_pidangle[1] = m_pidscale[1];
+		m_pidangle[2] = m_pidscale[2];
+
+		if (RampStraight(209, 1.0, 0.5, 60.0))		//Goes 235, with the turn, trust me
 			m_autostage++;
 		break;
 	case 1:
@@ -809,7 +753,7 @@ void Autonomous::AutoRightScaleLeft()
 			m_autostage++;
 		break;
 	case 2:
-		if (DriveStraight(150, 1.0, 0.5, 60.0))//DriveStraight(233, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
+		if (RampStraight(150, 1.0, 0.5, 60.0))		//RampStraight(233, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
 			m_autostage++;
 		break;
 //	case 3:
@@ -858,65 +802,39 @@ void Autonomous::AutoLeftScaleRight()
 	switch (m_autostage)
 	{
 	case 0:
-		if (MiniStraight(175, 0.9))		//Goes 235, with the turn, trust me
+		m_pidangle[0] = m_pidscale[0];
+		m_pidangle[1] = m_pidscale[1];
+		m_pidangle[2] = m_pidscale[2];
+
+		if (MiniStraight(175, 0.9, true))
 			m_autostage++;
 		break;
 	case 1:
-		if (MiniAngleStraight(-88, 100, 0.9))							// angle = -90, clockwise
+		if (TurnAngle(-90, false))							// angle = -90, clockwise
 			m_autostage++;
 		break;
 	case 2:
-		if (m_lifter->AutoDeploy()/* && m_timer.Get() > 1.5*/)
+		if (MiniStraight(100, 0.9, false))
 			m_autostage++;
 		break;
 	case 3:
-		if (TurnAngle(90))		// targetdistance = 230", tuned ish
+		if (m_lifter->AutoDeploy())
 			m_autostage++;
 		break;
 	case 4:
-		if (m_lifter->AutoRaise())
+		if (TurnAngle(90))
 			m_autostage++;
 		break;
 	case 5:
+		if (m_lifter->AutoRaise())
+			m_autostage++;
+		break;
+	case 6:
 		m_intake->AutoEject();
 		m_timer.Reset();
 		m_autostage++;
 		break;
-//	case 3:
-//		if (TurnAngle(125))							// angle = 105 (counter clockwise)
-//			m_autostage++;
-//		break;
-//	case 4:
-//		if (m_lifter->AutoDeploy())
-//			m_autostage++;
-//		break;
-//	case 5:
-//		if (DriveStraight(30, 0.1, 0.25, 18.0))		// targetdistance = 30", ramp = .1s, power = 25%, deceldistance = 18"
-//			m_autostage++;
-//		break;
-//	case 6:
-//		if (m_lifter->AutoRaise())
-//			m_autostage++;
-//		break;
-//	case 7:
-//		m_intake->AutoEject();
-//		m_autostage++;
-//		m_timer.Reset();
-//		break;
-//	case 8:
-//		if (m_timer.Get() > 0.25)
-//			m_autostage++;
-//		break;
-//	case 9:
-//		m_lifter->MoveBottom();
-//		if (MiniStraight(24,-0.3))
-//			m_autostage++;
-//		break;
-//	case 10:
-//		if (m_lifter->MoveBottom())
-//			m_autostage++;
-//		break;
-	case 6:
+	case 7:
 		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}
@@ -928,9 +846,14 @@ void Autonomous::AutoLeftScaleLeft()
 	switch (m_autostage)
 	{
 	case 0:
-		if (MiniStraight(200, 0.9, true))
-		//if (DriveStraight(290, 1.8, 1, 250))		// targetdistance = 290", everything else needs tuning
+		m_pidangle[0] = m_pidscale[0];
+		m_pidangle[1] = m_pidscale[1];
+		m_pidangle[2] = m_pidscale[2];
+
+		if (MiniStraight(204, 0.9, true))
+		{
 			m_autostage++;
+		}
 		break;
 	case 1:
 		if (TurnAngle(-20, false))							// angle = -45 (clockwise)
@@ -1011,12 +934,124 @@ void Autonomous::AutoLeftScaleLeft()
 			m_autostage++;
 		break;
 	case 16:
-		if (MiniStraight(24,-0.3, false))
+		if (MiniStraight(24,-0.8, false))
 			m_autostage++;
 		m_lifter->MoveBottom();
 		break;
 	case 17:
 		m_lifter->MoveBottom();
+		break;
+	}
+}
+
+
+void Autonomous::AutoOldCenterSwitchLeft()
+{
+	switch (m_autostage)
+	{
+	case 0:
+		m_pidangle[0] = m_pidold[0];
+		m_pidangle[1] = m_pidold[1];
+		m_pidangle[2] = m_pidold[2];
+
+		if (RampStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 1:
+		if (AngleStraight(60, 62, 0.5, 0.5, 24.0))		// targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 2:
+		if (AngleStraight(-60, 32, 0.1, 0.25, 18.0))		// targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
+			m_autostage++;
+		break;
+	case 3:
+		m_intake->AutoEject();
+		m_timer.Reset();
+		m_autostage++;
+		break;
+	case 4:
+		if (m_timer.Get() > 0.25)
+			m_autostage++;
+		break;
+	case 5:
+		m_lifter->AutoDeploy();
+		if (MiniStraight(24, -0.5))
+			m_autostage++;
+		break;
+	case 6:
+		if (m_lifter->MoveBottom())
+			m_autostage++;
+		break;
+	case 7:
+		if (TurnAngle(-45))
+		{
+			m_intake->AutoIngest();
+			m_autostage++;
+		}
+		break;
+	case 8:
+		if (MiniStraight(34, 0.5))
+			m_autostage++;
+		break;
+	case 9:
+		m_drivetrain->Drive(0, 0);					// turn off drive motors
+		break;
+	}
+}
+
+
+void Autonomous::AutoOldCenterSwitchRight()
+{
+	switch (m_autostage)
+	{
+	case 0:
+		m_pidangle[0] = m_pidold[0];
+		m_pidangle[1] = m_pidold[1];
+		m_pidangle[2] = m_pidold[2];
+
+		if (RampStraight(40, 0.5, 0.5, 24.0))		// targetdistance = 40", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 1:
+		if (AngleStraight(-60, 52, 0.5, 0.5, 24.0))		// targetdistance = 52", ramp = .5s, power = 50%, deceldistance = 24"
+			m_autostage++;
+		break;
+	case 2:
+		if (AngleStraight(60, 32, 0.1, 0.25, 18.0))		// targetdistance = 32", ramp = .1s, power = 25%, deceldistance = 18"
+			m_autostage++;
+		break;
+	case 3:
+		m_intake->AutoEject();
+		m_timer.Reset();
+		m_autostage++;
+		break;
+	case 4:
+		if (m_timer.Get() > 0.25)
+			m_autostage++;
+		break;
+	case 5:
+		m_lifter->AutoDeploy();
+		if (MiniStraight(24, -0.5))
+			m_autostage++;
+		break;
+	case 6:
+		if (m_lifter->MoveBottom())
+			m_autostage++;
+		break;
+	case 7:
+		if (TurnAngle(45))
+		{
+			m_intake->AutoIngest();
+			m_autostage++;
+		}
+		break;
+	case 8:
+		if (MiniStraight(24, 0.5))
+			m_autostage++;
+		break;
+	case 9:
+		m_drivetrain->Drive(0, 0);					// turn off drive motors
 		break;
 	}
 }
@@ -1045,26 +1080,4 @@ void Autonomous::AutoTest()
 
 
 	}
-//	switch (m_autostage)
-//	{
-//	case 0:
-//		if (DriveStraight(209, 1.0, 0.5, 60.0))		//Goes 235, with the turn, trust me
-//			m_autostage++;
-//		break;
-//	case 1:
-//		if (AngleStraight(90, 100, 1.0, 0.5, 60.0))		// targetdistance = 230", tuned ish
-//			m_autostage++;
-//		break;
-//	case 2:
-//		if (DriveStraight(100, 1.0, -0.5, 60.0))		// targetdistance = 230", tuned ish
-//			m_autostage++;
-//		break;
-//	case 3:
-//		if (AngleStraight(-90, 209, 1.0, -0.5, 60.0))		// targetdistance = 230", tuned ish
-//			m_autostage++;
-//		break;
-//	case 4:
-//		m_drivetrain->Drive(0, 0);					// turn off drive motors
-//		break;
-//	}
 }
