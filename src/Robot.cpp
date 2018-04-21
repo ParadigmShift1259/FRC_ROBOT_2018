@@ -21,13 +21,16 @@ AutoMode automode = kAutoStraight;
 void Robot::RobotInit()
 {
 	m_chooser.AddDefault(kszAutoDefault, kszAutoDefault);
-	m_chooser.AddObject(kszAutoCenterSwitch, kszAutoCenterSwitch);
+	m_chooser.AddObject(kszAutoCenterSwitch1, kszAutoCenterSwitch1);
+	m_chooser.AddObject(kszAutoCenterSwitch3, kszAutoCenterSwitch3);
+	m_chooser.AddObject(kszAutoLeftScale2X, kszAutoLeftScale2X);
+	m_chooser.AddObject(kszAutoRightScale2X, kszAutoRightScale2X);
+	m_chooser.AddObject(kszAutoRightScale2X, kszAutoRightScale2X);
+	m_chooser.AddObject(kszAutoLeftScale1P, kszAutoLeftScale1P);
+	m_chooser.AddObject(kszAutoRightScale1P, kszAutoRightScale1P);
 	m_chooser.AddObject(kszAutoLeftSwitch, kszAutoLeftSwitch);
 	m_chooser.AddObject(kszAutoRightSwitch, kszAutoRightSwitch);
 	m_chooser.AddObject(kszAutoTestMode, kszAutoTestMode);
-	m_chooser.AddObject(kszAutoRightScale, kszAutoRightScale);
-	m_chooser.AddObject(kszAutoLeftScale, kszAutoLeftScale);
-	m_chooser.AddObject(kszAutoOldCenterSwitch, kszAutoOldCenterSwitch);
 	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 	m_driverstation = &DriverStation::GetInstance();
@@ -72,7 +75,7 @@ void Robot::AutonomousInit()
 	DriverStation::ReportError("AutonomousInit");
 
 	if (m_compressor != nullptr)
-		m_compressor->Start();
+		m_compressor->Stop();
 	ReadChooser();
 	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
 	m_lifter->Init();
@@ -172,13 +175,62 @@ void Robot::ReadChooser()
 		gamedata = "   ";
 
 	automode = kAutoDefault;
-	if (m_autoSelected == kszAutoCenterSwitch)
+	if (m_autoSelected == kszAutoCenterSwitch1)
 	{
 		if (gamedata[0] == 'L')
-			automode = kAutoCenterSwitchLeft;
+			automode = kAutoCenterSwitchLeft1;
 		else
 		if (gamedata[0] == 'R')
-			automode = kAutoCenterSwitchRight;
+			automode = kAutoCenterSwitchRight1;
+	}
+	else
+	if (m_autoSelected == kszAutoCenterSwitch3)
+	{
+		if (gamedata[0] == 'L')
+			automode = kAutoCenterSwitchLeft3;
+		else
+		if (gamedata[0] == 'R')
+			automode = kAutoCenterSwitchRight3;
+	}
+	else
+	if (m_autoSelected == kszAutoLeftScale2X)
+	{
+		if (gamedata [1] == 'L')
+			automode = kAutoLeftScaleLeft2;
+		else
+		if (gamedata [1] == 'R')
+			automode = kAutoLeftScaleRight1;
+			//automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoRightScale2X)
+	{
+		if (gamedata [1] == 'L')
+			automode = kAutoRightScaleLeft1;
+			//automode = kAutoStraight;
+		else
+		if (gamedata [1] == 'R')
+			automode = kAutoRightScaleRight2;
+	}
+	else
+	if (m_autoSelected == kszAutoLeftScale1P)
+	{
+		if (gamedata [1] == 'L')
+			automode = kAutoLeftScaleLeft1;
+		else
+		if (gamedata [1] == 'R')
+			automode = kAutoLeftScaleRight1;
+			//automode = kAutoStraight;
+	}
+	else
+	if (m_autoSelected == kszAutoRightScale1P)
+	{
+		if (gamedata [1] == 'L')
+			automode = kAutoRightScaleLeft1;
+			//automode = kAutoStraight;
+		else
+		if (gamedata [1] == 'R')
+			automode = kAutoRightScaleRight1;
 	}
 	else
 	if (m_autoSelected == kszAutoLeftSwitch)
@@ -197,35 +249,6 @@ void Robot::ReadChooser()
 		else
 		if (gamedata[0] == 'R')
 			automode = kAutoStraight;
-	}
-	else
-	if (m_autoSelected == kszAutoRightScale)
-	{
-		if (gamedata [1] == 'L')
-			automode = kAutoRightScaleLeft;
-			//automode = kAutoStraight;
-		else
-		if (gamedata [1] == 'R')
-			automode = kAutoRightScaleRight;
-	}
-	else
-	if (m_autoSelected == kszAutoLeftScale)
-	{
-		if (gamedata [1] == 'L')
-			automode = kAutoLeftScaleLeft;
-		else
-		if (gamedata [1] == 'R')
-			automode = kAutoLeftScaleRight;
-			//automode = kAutoStraight;
-	}
-	else
-	if (m_autoSelected == kszAutoOldCenterSwitch)
-	{
-		if (gamedata[0] == 'L')
-			automode = kAutoOldCenterSwitchLeft;
-		else
-		if (gamedata[0] == 'R')
-			automode = kAutoOldCenterSwitchRight;
 	}
 	else
 	if (m_autoSelected == kszAutoTestMode)

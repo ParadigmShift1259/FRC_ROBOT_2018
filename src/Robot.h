@@ -41,12 +41,14 @@ private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
 	frc::SendableChooser<std::string> m_chooser;
 	const std::string kszAutoDefault = "NO AUTO";
-	const std::string kszAutoCenterSwitch = "Center Switch";
-	const std::string kszAutoLeftSwitch = "Left Switch";
-	const std::string kszAutoRightSwitch = "Right Switch";
-	const std::string kszAutoRightScale = "Right Scale";
-	const std::string kszAutoLeftScale = "Left Scale";
-	const std::string kszAutoOldCenterSwitch = "Old Center Switch";
+	const std::string kszAutoCenterSwitch1 = "Center Switch 1 Cube";
+	const std::string kszAutoCenterSwitch3 = "Center Switch 3 Cube";
+	const std::string kszAutoLeftScale2X = "Left Scale 2 Cube Cross";
+	const std::string kszAutoRightScale2X = "Right Scale 2 Cube Cross";
+	const std::string kszAutoLeftScale1P = "Left Scale 1 Cube Pause";
+	const std::string kszAutoRightScale1P = "Right Scale 1 Cube Pause";
+	const std::string kszAutoLeftSwitch = "Left Switch Straight";
+	const std::string kszAutoRightSwitch = "Right Switch Straight";
 	const std::string kszAutoTestMode = "Test Mode";
 	std::string m_autoSelected;
 

@@ -121,13 +121,15 @@
 
 
 // Autonomous
-enum AutoMode {kAutoDefault,
-	kAutoCenterSwitchLeft, kAutoCenterSwitchRight,
+enum AutoMode {
+	kAutoDefault,
+	kAutoCenterSwitchLeft1, kAutoCenterSwitchRight1,
+	kAutoCenterSwitchLeft3, kAutoCenterSwitchRight3,
+	kAutoLeftScaleLeft2, kAutoLeftScaleLeft1, kAutoLeftScaleRight1,
+	kAutoRightScaleLeft1, kAutoRightScaleRight2, kAutoRightScaleRight1,
 	kAutoStraight,
-	kAutoRightScaleRight, kAutoRightScaleLeft,
-	kAutoLeftScaleRight, kAutoLeftScaleLeft,
-	kAutoOldCenterSwitchLeft, kAutoOldCenterSwitchRight,
-	kAutoTest};
+	kAutoTest
+};
 
 extern AutoMode automode;
 

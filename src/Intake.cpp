@@ -370,7 +370,8 @@ void Intake::AutoLoop()
 
 	case kBox:
 	case kFix:
-		if ((automode == kAutoCenterSwitchLeft) || (automode ==  kAutoCenterSwitchRight))
+		if ((automode == kAutoCenterSwitchLeft1) || (automode ==  kAutoCenterSwitchRight1) ||
+			(automode == kAutoCenterSwitchLeft3) || (automode == kAutoCenterSwitchRight3))
 			m_ejectspeed = INT_EJECTSWITCH;
 		else
 			m_ejectspeed = INT_EJECTSCALE;

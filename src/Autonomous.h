@@ -25,15 +25,17 @@ public:
 	bool TurnAngle(double angle, bool reset = true);
 	bool MiniStraight(double targetdistance, double autopower, bool reset = true);
 	bool AngleStraight(double angle, double targetdistance, double acceltime, double autopower, double deceldistance);
-	void AutoCenterSwitchRight();
-	void AutoCenterSwitchLeft();
+	void AutoCenterSwitchLeft1();
+	void AutoCenterSwitchRight1();
+	void AutoCenterSwitchLeft3();
+	void AutoCenterSwitchRight3();
+	void AutoLeftScaleLeft2();
+	void AutoLeftScaleRight1();
+	void AutoLeftScaleLeft1();
+	void AutoRightScaleLeft1();
+	void AutoRightScaleRight2();
+	void AutoRightScaleRight1();
 	void AutoStraight();
-	void AutoRightScaleRight();
-	void AutoRightScaleLeft();
-	void AutoLeftScaleRight();
-	void AutoLeftScaleLeft();
-	void AutoOldCenterSwitchRight();
-	void AutoOldCenterSwitchLeft();
 	void AutoTest();
 
 protected:
