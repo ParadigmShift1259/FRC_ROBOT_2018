@@ -93,12 +93,12 @@
 #define PCM_LIFTER_SOLENOID 2
 #define LIF_RAISESPEED -1.0
 #define LIF_LOWERSPEED 1.0//0.75
-#define LIF_LIFTERMAX 24050
+#define LIF_LIFTERMAX 24800//24050
 #define LIF_LIFTERMIN 300								/// minimum cutoff
 #define LIF_LIFSMIDGE (LIF_LIFTERMAX * 0.07)			/// 7% of max height
 #define LIF_LIFTERMINSPD (LIF_LIFTERMAX * 0.1)			/// 5% of max height
 #define LIF_LIFTERSWITCH (LIF_LIFTERMAX * 0.4)			/// ~40% of max height
-#define LIF_LIFTERSTART (LIF_LIFTERMAX * 0.5)			/// ~50% of max height
+#define LIF_LIFTERSTART (LIF_LIFTERMAX * 0.47)			/// ~50% of max height
 #define LIF_LIFTERMAXSPD (LIF_LIFTERMAX	* 0.95)			/// 5% of max height
 
 

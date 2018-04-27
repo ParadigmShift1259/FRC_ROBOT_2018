@@ -216,21 +216,23 @@ void Robot::ReadChooser()
 	if (m_autoSelected == kszAutoLeftScale1P)
 	{
 		if (gamedata [1] == 'L')
-			automode = kAutoLeftScaleLeft1;
+			//automode = kAutoLeftScaleLeft1;
+			automode = kAutoLeftScaleLeft2;
 		else
 		if (gamedata [1] == 'R')
-			automode = kAutoLeftScaleRight1;
-			//automode = kAutoStraight;
+			//automode = kAutoLeftScaleRight1;
+			automode = kAutoStraight;
 	}
 	else
 	if (m_autoSelected == kszAutoRightScale1P)
 	{
 		if (gamedata [1] == 'L')
-			automode = kAutoRightScaleLeft1;
-			//automode = kAutoStraight;
+			//automode = kAutoRightScaleLeft1;
+			automode = kAutoStraight;
 		else
 		if (gamedata [1] == 'R')
-			automode = kAutoRightScaleRight1;
+			//automode = kAutoRightScaleRight1;
+			automode = kAutoRightScaleRight2;
 	}
 	else
 	if (m_autoSelected == kszAutoLeftSwitch)

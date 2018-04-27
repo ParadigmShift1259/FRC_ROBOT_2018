@@ -49,7 +49,9 @@ protected:
 	double m_pidangle[3] = {0.0, 0.0, 0.0};					// pid angle values
 
 	double m_pidscale[3] = {0.013, 0.0002, 0.045};			// scale pid
-	double m_pidswitch[3] = {0.04, 0.004, 0.15};			// switch pid
+//	double m_pidswitch[3] = {0.013, 0.0012, 0.045};
+//	double m_pidswitch[3] = {0.04, 0.004, 0.15};			// switch pid
+	double m_pidswitch[3] = {0.01, 0.0012, 0.07};			// switch pid
 	double m_pidold[3] = {0.01, 0.0012, 0.07};				// Milwaukee Values
 
 	Timer m_timer;
