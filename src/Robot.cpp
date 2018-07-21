@@ -73,33 +73,39 @@ void Robot::RobotPeriodic()
  */
 void Robot::AutonomousInit()
 {
-	DriverStation::ReportError("AutonomousInit");
-
-	if (m_compressor != nullptr)
-		m_compressor->Stop();
-	ReadChooser();
-	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
-	m_lifter->Init();
-	m_intake->Init();
-	m_climber->Init();
-	m_autonomous->Init();
+//	DriverStation::ReportError("AutonomousInit");
+//
+//	if (m_compressor != nullptr)
+//		m_compressor->Stop();
+//	ReadChooser();
+//	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
+//	m_lifter->Init();
+//	m_intake->Init();
+//	m_climber->Init();
+//	m_autonomous->Init();
+	lidar->start();
+	lidar->SetScanPeriod(360);
+	lidar->SetMinMaxAngle(0, 360);
+	lidar->SetParkTrim(0);
+	lidar->SetSamplesPerScan(360);
 }
 
 
 void Robot::AutonomousPeriodic()
 {
-	m_lifter->Loop();
-	m_intake->AutoLoop();
-	m_climber->Loop();
-	m_autonomous->Loop();
-	m_drivepid->Loop();
+	lidar->Loop();
+//	m_lifter->Loop();
+//	m_intake->AutoLoop();
+//	m_climber->Loop();
+//	m_autonomous->Loop();
+//	m_drivepid->Loop();
 }
 
 
 void Robot::TestInit()
 {
 	DriverStation::ReportError("TestInit");
-	lidar->start();
+
 }
 
 
