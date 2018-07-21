@@ -45,6 +45,7 @@ void Robot::RobotInit()
 	m_intake = new Intake(m_driverstation, m_operatorinputs, m_lifter, m_drivepid);
 	m_climber = new Climber(m_operatorinputs);
 	m_autonomous = new Autonomous(m_operatorinputs, m_drivetrain, m_drivepid, m_intake, m_lifter);
+	lidar = new Lidar();
 	SmartDashboard::PutNumber("P", 0.01);
 	SmartDashboard::PutNumber("I", 0.0012);
 	SmartDashboard::PutNumber("D", 0.07);
@@ -98,49 +99,53 @@ void Robot::AutonomousPeriodic()
 void Robot::TestInit()
 {
 	DriverStation::ReportError("TestInit");
+	lidar->start();
 }
 
 
 void Robot::TestPeriodic()
 {
+//	lidar->stop();
 }
 
 
 void Robot::TeleopInit()
 {
-	if (automode == kAutoTest)
-		DriverStation::ReportError("TeleopInit Test Mode");
-	else
-		DriverStation::ReportError("TeleopInit");
-
-	if (m_compressor != nullptr)
-		m_compressor->Start();
-	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
-	m_lifter->Init();
-	m_intake->Init();
-	m_climber->Init();
+//	if (automode == kAutoTest)
+//		DriverStation::ReportError("TeleopInit Test Mode");
+//	else
+//		DriverStation::ReportError("TeleopInit");
+//
+//	if (m_compressor != nullptr)
+//		m_compressor->Start();
+//	m_drivetrain->Init(DriveTrain::DriveMode::kFollower);
+//	m_lifter->Init();
+//	m_intake->Init();
+//	m_climber->Init();
+	lidar->stop();
 }
 
 
 void Robot::TeleopPeriodic()
 {
-	if (automode == kAutoTest)
-	{
-		m_lifter->TestLoop();
-		m_intake->TestLoop();
-		m_climber->TestLoop();
-		m_drivepid->Loop();
-	}
-	else
-	{
-		m_lifter->Loop();
-		m_intake->Loop();
-		m_intake->VisionLoop();
-		if (!m_intake->IsVisioning())
-			m_drivetrain->Loop();
-		m_climber->Loop();
-		m_drivepid->Loop();
-	}
+//	if (automode == kAutoTest)
+//	{
+//		m_lifter->TestLoop();
+//		m_intake->TestLoop();
+//		m_climber->TestLoop();
+//		m_drivepid->Loop();
+//	}
+//	else
+//	{
+//		m_lifter->Loop();
+//		m_intake->Loop();
+//		m_intake->VisionLoop();
+//		if (!m_intake->IsVisioning())
+//			m_drivetrain->Loop();
+//		m_climber->Loop();
+//		m_drivepid->Loop();
+//	}
+
 }
 
 

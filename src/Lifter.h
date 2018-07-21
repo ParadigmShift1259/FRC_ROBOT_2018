@@ -1,10 +1,3 @@
-/*
- * Lifter.h
- *
- *  Created on: Jan 20, 2018
- *      Author: Yreffoeg
- */
-
 #ifndef SRC_LIFTER_H_
 #define SRC_LIFTER_H_
 
