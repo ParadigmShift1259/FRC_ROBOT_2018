@@ -62,96 +62,119 @@ char Lidar::CalcChecksum(const char *data, const uint16_t length)
 
 void Lidar::ReadSensor()
 {
-  std::vector<char> messageBuffer;
-  Read(1);
+	static std::vector<char> messageBuffer(500);
+	messageBuffer.clear();
+	bool endOfTransmission = false;
+	int step = 0;
+	uint16_t payloadLength = 0;
+	uint16_t command = 0;
+	uint16_t payloadBytesRead = 0;
+	char checksum = 0;
+	char msbSample = 0;
+	char lsbSample = 0;
+	while(!endOfTransmission)
+	{
+		// Read a byte
+		while (!serial->Read(command_buffer, 1));
+		char currentByte = command_buffer[0];
+		messageBuffer.push_back(currentByte);
+		switch (step)
+		{
+			// Synchronizing Bytes
+			case 0:
+			case 1:
+				if (currentByte != 0xff)
+				{
+					endOfTransmission = true;
+				}
+				else
+				{
+					DriverStation::ReportError("Synchronization bits not found");
+				}
+				step++;
+			break;
+			// Message Type
+			case 2:
+				command = currentByte;
+				switch (command)
+				{
+					case 0:
+					case 1:
+					break;
+					default:
+						DriverStation::ReportError("Invalid command");
+						endOfTransmission = true;
+				}
+				step++;
+			break;
+			// Payload Length (MSB)
+			case 3:
+				payloadLength = ((uint16_t)currentByte) << 8;
+				step++;
+			break;
+			// Payload Length (LSB)
+			case 4:
+				payloadLength |= currentByte;
+				// Verify Payload Length isn't rediculously large
+				if (payloadLength >= 2048)
+				{
+					DriverStation::ReportError("Payload too large");
+					endOfTransmission = true;
+				}
+				else
+				{
+					samples.clear();
+				}
+				step++;
+			break;
+			// Payload Data
+			case 5:
+				if (command == 0)
+				{
+					if (!(payloadBytesRead & 1))
+					{
+						msbSample = currentByte;
+					}
+					else
+					{
+						lsbSample = currentByte;
+						samples.push_back((((uint16_t)msbSample) << 8) | lsbSample);
+					}
+				}
 
+				if (payloadLength <= payloadBytesRead)
+				{
+					step++;
+				}
+				payloadBytesRead++;
+			break;
+			// Checksum
+			case 6:
+				checksum = currentByte;
+				SmartDashboard::PutNumber("Sample 0", samples[0]);
+				File.open("/home/lvuser/distancelog.txt", std::fstream::app);
+				File << samples[0]<<"\n";
+				File.close();
+				if (CalcChecksum(&messageBuffer[0],5+payloadLength) != checksum)
+				{
+					DriverStation::ReportError("Invalid checksum");
+				}
+				endOfTransmission = true;
+				step++;
+			break;
+			default:
+				DriverStation::ReportError("Invalid state");
+				endOfTransmission = true;
+		}
+	}
 
-
-  // verify start of command
-  if (command_buffer[0] != 0xFF)
-  {
-	  DriverStation::ReportError("No First 0xFF");
-	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
-	  for (int i = 0; i < messageBuffer.size(); i++)
-	  {
-		  File << messageBuffer[i];
-	  }
-	  File.close();
-      return;
-  }
-
-  Read(1);
-  if (command_buffer[1] != 0xFF)
-  {
-	  DriverStation::ReportError("No Second 0xFF");
-	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
-	  for (int i = 0; i < messageBuffer.size(); i++)
-	  {
-		  File << messageBuffer[i];
-	  }
-	  File.close();
-      return;
-  }
-
-  DriverStation::ReportError("Both 0xFF");
-  // store message for checksum
-  messageBuffer.push_back(0xff);
-  messageBuffer.push_back(0xff);
-
-  // read rest of header
-  Read(3);
-  // store rest of header for checksum
-  messageBuffer.insert(messageBuffer.end(), command_buffer, command_buffer + 3);
-
-  // get command id
-  char command = command_buffer[0];
-  if (command != 0 && command != 1)
-	  return;
-  // get MSB of message length
-  uint16_t payload_length = command_buffer[1]<<8;
-  // get LSB of message length
-  payload_length += command_buffer[2];
-  DriverStation::ReportError(std::to_string(payload_length));
-
-  // read in message data
-  if (payload_length > 0)
-  {
-      Read(payload_length);
-      messageBuffer.insert(messageBuffer.end(), command_buffer, command_buffer + payload_length);
-  }
-
-  // read checksum
-  char checksum[2];
-  Read(1);
-  messageBuffer.push_back(checksum[0]);
-  // verify checksum matches calculated checksum for message
-  if (true || checksum[0] == CalcChecksum(&messageBuffer[0],5+payload_length))
-  {
-      switch(command)
-      {
-          case 0:
-            samples.clear();
-            // scan data is in message buffer
-            for (int i = 0; i < (payload_length/2); i++)
-            {
-                uint16_t range_reading = command_buffer[i*2] + (command_buffer[(i*2)+1]<<8);
-                samples.push_back(range_reading);
-            }
-            DriverStation::ReportError("GotData");
-        	SmartDashboard::PutNumber("Sample 0", samples[0]);
-          break;
-      }
-  }
-  bool firstrun = true;
-  if (firstrun)
-  {
-	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
-	  for (int i = 0; i < messageBuffer.size(); i++)
-	  {
-		  File << messageBuffer[i];
-	  }
-	  File.close();
-  }
+	// Log Received Data
+	File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
+	for (int i = 0; i < messageBuffer.size(); i++)
+	{
+		File << messageBuffer[i];
+	}
+	File.close();
 }
 
 
