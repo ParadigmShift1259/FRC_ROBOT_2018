@@ -10,6 +10,7 @@
 Lidar::Lidar()
 {
 	serial = new SerialPort(115200, SerialPort::Port::kUSB, 8, SerialPort::Parity::kParity_None, SerialPort::StopBits::kStopBits_One);
+	serial->SetReadBufferSize(65535);
 }
 
 
@@ -62,54 +63,69 @@ char Lidar::CalcChecksum(const char *data, const uint16_t length)
 void Lidar::ReadSensor()
 {
   std::vector<char> messageBuffer;
-  serial->Read(command_buffer, 1);
+  Read(1);
+
+
+
   // verify start of command
   if (command_buffer[0] != 0xFF)
   {
+	  DriverStation::ReportError("No First 0xFF");
+	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
+	  for (int i = 0; i < messageBuffer.size(); i++)
+	  {
+		  File << messageBuffer[i];
+	  }
+	  File.close();
       return;
   }
-  else
-  {
-	  DriverStation::ReportError("No First 0xFF");
-  }
-  serial->Read(command_buffer, 1);
+
+  Read(1);
   if (command_buffer[1] != 0xFF)
   {
+	  DriverStation::ReportError("No Second 0xFF");
+	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
+	  for (int i = 0; i < messageBuffer.size(); i++)
+	  {
+		  File << messageBuffer[i];
+	  }
+	  File.close();
       return;
   }
-  else
-  {
-	  DriverStation::ReportError("No Second 0xFF");
-  }
+
   DriverStation::ReportError("Both 0xFF");
   // store message for checksum
   messageBuffer.push_back(0xff);
   messageBuffer.push_back(0xff);
 
   // read rest of header
-  serial->Read(command_buffer, 3);
+  Read(3);
   // store rest of header for checksum
   messageBuffer.insert(messageBuffer.end(), command_buffer, command_buffer + 3);
 
   // get command id
   char command = command_buffer[0];
+  if (command != 0 && command != 1)
+	  return;
   // get MSB of message length
   uint16_t payload_length = command_buffer[1]<<8;
   // get LSB of message length
   payload_length += command_buffer[2];
+  DriverStation::ReportError(std::to_string(payload_length));
 
   // read in message data
   if (payload_length > 0)
   {
-      serial->Read(command_buffer, payload_length);
+      Read(payload_length);
       messageBuffer.insert(messageBuffer.end(), command_buffer, command_buffer + payload_length);
   }
 
   // read checksum
   char checksum[2];
-  serial->Read(checksum, 1);
-  // verify checksum matches calulated checksum for message
-  if (checksum[0] == CalcChecksum(&messageBuffer[0],5+payload_length))
+  Read(1);
+  messageBuffer.push_back(checksum[0]);
+  // verify checksum matches calculated checksum for message
+  if (true || checksum[0] == CalcChecksum(&messageBuffer[0],5+payload_length))
   {
       switch(command)
       {
@@ -125,6 +141,16 @@ void Lidar::ReadSensor()
         	SmartDashboard::PutNumber("Sample 0", samples[0]);
           break;
       }
+  }
+  bool firstrun = true;
+  if (firstrun)
+  {
+	  File.open("/home/lvuser/inputpacket.txt", std::fstream::app);
+	  for (int i = 0; i < messageBuffer.size(); i++)
+	  {
+		  File << messageBuffer[i];
+	  }
+	  File.close();
   }
 }
 
@@ -207,6 +233,16 @@ void Lidar::SetMinMaxAngle(const uint16_t min, const uint16_t max)
   command_buffer[8] = CalcChecksum(command_buffer, msg_length-1);
 
   serial->Write(command_buffer, msg_length);
+}
+
+
+void Lidar::Read(const ssize_t bytesToRead)
+{
+    int bytesRead = 0;
+    while (bytesRead < bytesToRead)
+    {
+        bytesRead += serial->Read(&command_buffer[bytesRead], bytesToRead-bytesRead);
+    }
 }
 
 

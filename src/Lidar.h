@@ -3,6 +3,7 @@
 #include <WPILib.h>
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 #define MAX_LIDAR_MESSAGE_LENGTH 2048
 #define LIDAR_CMD_START 0
@@ -37,6 +38,9 @@ private:
 	char CalcChecksum(const char *data, const uint16_t length);
 	char command_buffer[MAX_LIDAR_MESSAGE_LENGTH];
 	std::vector<uint16_t> samples;
+	void Read(const ssize_t bytesToRead);
+
+	std::ofstream File;
 
 };
 

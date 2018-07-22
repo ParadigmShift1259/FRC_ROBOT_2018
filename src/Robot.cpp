@@ -84,10 +84,11 @@ void Robot::AutonomousInit()
 //	m_climber->Init();
 //	m_autonomous->Init();
 	lidar->start();
-	lidar->SetScanPeriod(360);
+	lidar->SetScanPeriod(1000);
 	lidar->SetMinMaxAngle(0, 360);
 	lidar->SetParkTrim(0);
 	lidar->SetSamplesPerScan(360);
+	lidar->SetSampleRejectionMode(false);
 }
 
 
@@ -158,7 +159,7 @@ void Robot::TeleopPeriodic()
 void Robot::DisabledInit()
 {
 	DriverStation::ReportError("DisabledInit");
-
+	lidar->stop();
 	if (m_compressor != nullptr)
 		m_compressor->Stop();
 	m_drivetrain->Stop();
@@ -172,9 +173,9 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
-	ReadChooser();
-	m_drivepid->Loop();
-	m_intake->VisionLoop();
+//	ReadChooser();
+//	m_drivepid->Loop();
+//	m_intake->VisionLoop();
 }
 
 
