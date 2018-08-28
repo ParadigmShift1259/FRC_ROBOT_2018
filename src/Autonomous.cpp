@@ -112,6 +112,8 @@ void Autonomous::Stop()
 
 
 
+
+
 // old straight code
 bool Autonomous::RampStraight(double targetdistance, double acceltime, double autopower, double deceldistance)
 {

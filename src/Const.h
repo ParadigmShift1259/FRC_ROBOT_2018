@@ -55,14 +55,16 @@
 #define DT_DEFAULT_DIRECTION 1.0
 // Inverts
 #define INVERT_LEFT -1.0
-#define INVERT_RIGHT 1.0		// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
+#define INVERT_RIGHT 1.0			// 2017 code is 1, WPILlib DifferentialDrive is -1 (adjusted in DriveTrain::Drive())
 // Talons ports
-#define CAN_LEFT_PORT 2
-#define CAN_SECOND_LEFT_PORT 0
-#define CAN_RIGHT_PORT 1
-#define CAN_SECOND_RIGHT_PORT 3
+#define CAN_LEFT_PORT_1 2			// 2
+#define CAN_LEFT_PORT_2 0			// 0
+#define CAN_LEFT_PORT_3 -1
+#define CAN_RIGHT_PORT_1 1			// 1
+#define CAN_RIGHT_PORT_2 3			// 3
+#define CAN_RIGHT_PORT_3 -1
 // Shifter
-#define PCM_SHIFT_PORT_LOW 0
+#define PCM_SHIFT_PORT_LOW -1		// 0
 #define PCM_SHIFT_MODULE 0
 #define CHILD_PROOF_SPEED 0.75
 #define FLIP_HIGH_GEAR true
@@ -77,6 +79,10 @@
 #define LOWSPEED_MODIFIER_X 0.75
 #define LOWSPEED_MODIFIER_Y 0.25
 // Encoders
+#define ENC_LEFT_1 FeedbackDevice::QuadEncoder
+#define ENC_LEFT_2 FeedbackDevice::None
+#define ENC_RIGHT_1	FeedbackDevice::QuadEncoder
+#define ENC_RIGHT_2	FeedbackDevice::None
 #define CODES_PER_REV 4416.0
 #define CODES_PER_INCH 234.979
 #define WHEEL_DIAMETER 6.0
@@ -88,12 +94,12 @@
 
 
 // Lifter
-#define CAN_LIFTER_MOTOR 6
-#define PCM_LIFTER_MODULE 0
-#define PCM_LIFTER_SOLENOID 2
+#define CAN_LIFTER_MOTOR 6			// 6
+#define PCM_LIFTER_MODULE 0			// 0
+#define PCM_LIFTER_SOLENOID 2		// 2
 #define LIF_RAISESPEED -1.0
-#define LIF_LOWERSPEED 1.0//0.75
-#define LIF_LIFTERMAX 24800//24050
+#define LIF_LOWERSPEED 1.0			// 0.75
+#define LIF_LIFTERMAX 24800			// 24050
 #define LIF_LIFTERMIN 300								/// minimum cutoff
 #define LIF_LIFSMIDGE (LIF_LIFTERMAX * 0.07)			/// 7% of max height
 #define LIF_LIFTERMINSPD (LIF_LIFTERMAX * 0.1)			/// 5% of max height
@@ -103,11 +109,11 @@
 
 
 // Intake
-#define CAN_INTAKE_LEFTMOTOR 4
-#define CAN_INTAKE_RIGHTMOTOR 5
-#define PCM_INTAKE_MODULE 0
-#define PCM_INTAKE_SOLENOID 1
-#define DIO_INTAKE_CUBESENSOR 0
+#define CAN_INTAKE_LEFTMOTOR 4		// 4
+#define CAN_INTAKE_RIGHTMOTOR 5		// 5
+#define PCM_INTAKE_MODULE 0			// 0
+#define PCM_INTAKE_SOLENOID 1		// 1
+#define DIO_INTAKE_CUBESENSOR 0		// 0
 #define INT_INGESTSPEED 0.5
 #define INT_EJECTHIGH -0.5
 #define INT_EJECTMED -0.375
@@ -117,7 +123,7 @@
 
 
 // Climber
-#define CAN_CLIMBER_MOTOR 7
+#define CAN_CLIMBER_MOTOR 7			// 7
 
 
 // Autonomous

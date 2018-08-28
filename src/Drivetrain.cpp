@@ -13,21 +13,25 @@
 using namespace std;
 
 
-DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_TalonSRX *leftfollow, WPI_TalonSRX *rightlead, WPI_TalonSRX *rightfollow)
+DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *left1, WPI_TalonSRX *left2, WPI_TalonSRX *left3, WPI_TalonSRX *right1, WPI_TalonSRX *right2, WPI_TalonSRX *right3)
 {
 	m_inputs = inputs;
 
 	m_mode = kFollower;
 
-	m_lefttalonleadowner = false;
-	m_lefttalonfollowowner = false;
-	m_righttalonleadowner = false;
-	m_righttalonfollowowner = false;
+	m_lefttalon1owner = false;
+	m_lefttalon2owner = false;
+	m_lefttalon3owner = false;
+	m_righttalon1owner = false;
+	m_righttalon2owner = false;
+	m_righttalon3owner = false;
 
-	m_lefttalonlead = leftlead;
-	m_lefttalonfollow = leftfollow;
-	m_righttalonlead = rightlead;
-	m_righttalonfollow = rightfollow;
+	m_lefttalon1 = left1;
+	m_lefttalon2 = left2;
+	m_lefttalon3 = left3;
+	m_righttalon1 = right1;
+	m_righttalon2 = right2;
+	m_righttalon3 = right3;
 
 	m_leftscgroup = nullptr;
 	m_rightscgroup = nullptr;
@@ -70,14 +74,18 @@ DriveTrain::DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead, WPI_Talon
 
 DriveTrain::~DriveTrain()
 {
-	if ((m_lefttalonlead != nullptr) && m_lefttalonleadowner)
-		delete m_lefttalonlead;
-	if ((m_lefttalonfollow != nullptr) && m_lefttalonfollowowner)
-		delete m_lefttalonfollow;
-	if ((m_righttalonlead != nullptr) && m_righttalonleadowner)
-		delete m_righttalonlead;
-	if ((m_righttalonfollow != nullptr) && m_righttalonfollowowner)
-		delete m_righttalonfollow;
+	if ((m_lefttalon1 != nullptr) && m_lefttalon1owner)
+		delete m_lefttalon1;
+	if ((m_lefttalon2 != nullptr) && m_lefttalon2owner)
+		delete m_lefttalon2;
+	if ((m_lefttalon3 != nullptr) && m_lefttalon3owner)
+		delete m_lefttalon3;
+	if ((m_righttalon1 != nullptr) && m_righttalon1owner)
+		delete m_righttalon1;
+	if ((m_righttalon2 != nullptr) && m_righttalon2owner)
+		delete m_righttalon2;
+	if ((m_righttalon3 != nullptr) && m_righttalon3owner)
+		delete m_righttalon3;
 	if (m_shifter != nullptr)
 		delete m_shifter;
 	delete m_timerramp;
@@ -88,64 +96,121 @@ void DriveTrain::Init(DriveMode mode)
 {
 	m_mode = mode;
 
-	if (m_lefttalonlead == nullptr)
+	if ((m_lefttalon1 == nullptr) && (CAN_LEFT_PORT_1 != -1))
 	{
-		m_lefttalonlead = new WPI_TalonSRX(CAN_LEFT_PORT);
-		m_lefttalonleadowner = true;
+		m_lefttalon1 = new WPI_TalonSRX(CAN_LEFT_PORT_1);
+		m_lefttalon1owner = true;
 	}
-	if (m_lefttalonfollow == nullptr)
+	if ((m_lefttalon2 == nullptr) && (CAN_LEFT_PORT_2 != -1))
 	{
-		m_lefttalonfollow = new WPI_TalonSRX(CAN_SECOND_LEFT_PORT);
-		m_lefttalonfollowowner = true;
+		m_lefttalon2 = new WPI_TalonSRX(CAN_LEFT_PORT_2);
+		m_lefttalon2owner = true;
 	}
-	if (m_righttalonlead == nullptr)
+	if ((m_lefttalon3 == nullptr) && (CAN_LEFT_PORT_3 != -1))
 	{
-		m_righttalonlead = new WPI_TalonSRX(CAN_RIGHT_PORT);
-		m_righttalonleadowner = true;
+		m_lefttalon3 = new WPI_TalonSRX(CAN_LEFT_PORT_3);
+		m_lefttalon3owner = true;
 	}
-	if (m_righttalonfollow == nullptr)
+	if ((m_righttalon1 == nullptr) && (CAN_RIGHT_PORT_1 != -1))
 	{
-		m_righttalonfollow = new WPI_TalonSRX(CAN_SECOND_RIGHT_PORT);
-		m_righttalonfollowowner = true;
+		m_righttalon1 = new WPI_TalonSRX(CAN_RIGHT_PORT_1);
+		m_righttalon1owner = true;
 	}
+	if ((m_righttalon2 == nullptr) && (CAN_RIGHT_PORT_2 != -1))
+	{
+		m_righttalon2 = new WPI_TalonSRX(CAN_RIGHT_PORT_2);
+		m_righttalon2owner = true;
+	}
+	if ((m_righttalon3 == nullptr) && (CAN_RIGHT_PORT_3 != -1))
+	{
+		m_righttalon3 = new WPI_TalonSRX(CAN_RIGHT_PORT_3);
+		m_righttalon3owner = true;
+	}
+
+	if ((m_lefttalon1 == nullptr) || (m_lefttalon2 == nullptr) || (m_righttalon1 == nullptr) || (m_righttalon2 == nullptr))
+		m_mode = kNone;
 
 	switch (m_mode)
 	{
 	case DriveMode::kFollower:
-		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_lefttalonfollow->Set(ControlMode::Follower, CAN_LEFT_PORT);
-		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_righttalonfollow->Set(ControlMode::Follower, CAN_RIGHT_PORT);
+		m_lefttalon1->Set(ControlMode::PercentOutput, 0);
+		m_lefttalon2->Set(ControlMode::Follower, CAN_LEFT_PORT_1);
+		if (m_lefttalon3 != nullptr)
+			m_lefttalon3->Set(ControlMode::Follower, CAN_LEFT_PORT_1);
+		m_righttalon1->Set(ControlMode::PercentOutput, 0);
+		m_righttalon2->Set(ControlMode::Follower, CAN_RIGHT_PORT_1);
+		if (m_righttalon3 != nullptr)
+			m_righttalon3->Set(ControlMode::Follower, CAN_RIGHT_PORT_1);
 		break;
 
 	case DriveMode::kTank:
 	case DriveMode::kArcade:
 	case DriveMode::kCurvature:
-		m_leftscgroup = new SpeedControllerGroup(*m_lefttalonlead, *m_lefttalonfollow);
-		m_rightscgroup = new SpeedControllerGroup(*m_righttalonlead, *m_righttalonfollow);
-		m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup); 			// @suppress("No break at end of case")
+		if ((m_lefttalon3 == nullptr) || (m_righttalon3 == nullptr))
+		{
+			m_leftscgroup = new SpeedControllerGroup(*m_lefttalon1, *m_lefttalon2);
+			m_rightscgroup = new SpeedControllerGroup(*m_righttalon1, *m_righttalon2);
+			m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup);
+		}
+		else
+		{
+			m_leftscgroup = new SpeedControllerGroup(*m_lefttalon1, *m_lefttalon2, *m_lefttalon3);
+			m_rightscgroup = new SpeedControllerGroup(*m_righttalon1, *m_righttalon2, *m_righttalon3);
+			m_differentialdrive = new DifferentialDrive(*m_leftscgroup, *m_rightscgroup);
+		} 																						// @suppress("No break at end of case")
 
 	case DriveMode::kDiscrete:
-		m_lefttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_lefttalonfollow->Set(ControlMode::PercentOutput, 0);
-		m_righttalonlead->Set(ControlMode::PercentOutput, 0);
-		m_righttalonfollow->Set(ControlMode::PercentOutput, 0);
+		m_lefttalon1->Set(ControlMode::PercentOutput, 0);
+		m_lefttalon2->Set(ControlMode::PercentOutput, 0);
+		if (m_lefttalon3 != nullptr)
+			m_lefttalon3->Set(ControlMode::PercentOutput, 0);
+		m_righttalon1->Set(ControlMode::PercentOutput, 0);
+		m_righttalon2->Set(ControlMode::PercentOutput, 0);
+		if (m_righttalon3 != nullptr)
+			m_righttalon3->Set(ControlMode::PercentOutput, 0);
+		break;
+
+	case DriveMode::kNone:
 		break;
 	}
 
-	m_lefttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	m_lefttalonlead->SetSensorPhase(false);
-	//m_lefttalonlead->SetSelectedSensorPosition(0, 0, 1000);
-	m_lefttalonlead->SetNeutralMode(NeutralMode::Brake);
+	if (m_lefttalon1 != nullptr)
+	{
+		m_lefttalon1->ConfigSelectedFeedbackSensor(ENC_LEFT_1, 0, 0);
+		m_lefttalon1->SetSensorPhase(false);
+		m_lefttalon1->SetNeutralMode(NeutralMode::Brake);
+	}
 
-	m_righttalonlead->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 0);
-	m_righttalonlead->SetSensorPhase(false);
-	//m_righttalonlead->SetSelectedSensorPosition(0, 0, 1000);
-	m_righttalonlead->SetNeutralMode(NeutralMode::Brake);
+	if (m_righttalon1 != nullptr)
+	{
+		m_righttalon1->ConfigSelectedFeedbackSensor(ENC_RIGHT_1, 0, 0);
+		m_righttalon1->SetSensorPhase(false);
+		m_righttalon1->SetNeutralMode(NeutralMode::Brake);
+	}
 
-	m_lefttalonfollow->SetNeutralMode(NeutralMode::Brake);
+	if (m_lefttalon2 != nullptr)
+	{
+		m_lefttalon2->ConfigSelectedFeedbackSensor(ENC_LEFT_2, 0, 0);
+		m_lefttalon2->SetSensorPhase(false);
+		m_lefttalon2->SetNeutralMode(NeutralMode::Brake);
+	}
 
-	m_righttalonfollow->SetNeutralMode(NeutralMode::Brake);
+	if (m_righttalon2 != nullptr)
+	{
+		m_righttalon2->ConfigSelectedFeedbackSensor(ENC_RIGHT_2, 0, 0);
+		m_righttalon2->SetSensorPhase(false);
+		m_righttalon2->SetNeutralMode(NeutralMode::Brake);
+	}
+
+	if (m_lefttalon3 != nullptr)
+	{
+		m_lefttalon3->SetNeutralMode(NeutralMode::Brake);
+	}
+
+	if (m_righttalon3 != nullptr)
+	{
+		m_righttalon3->SetNeutralMode(NeutralMode::Brake);
+	}
 
 	m_leftpow = 0;
 	m_rightpow = 0;
@@ -286,25 +351,35 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 		m_leftpow = m_previousy * Y_SCALING - (m_previousx * X_SCALING);
 		m_rightpow = m_previousy * Y_SCALING + (m_previousx * X_SCALING);
 	}
-	m_leftspeed = m_lefttalonlead->GetSelectedSensorVelocity(0);
-	m_rightspeed = m_righttalonlead->GetSelectedSensorVelocity(0);
-	m_leftposition = m_lefttalonlead->GetSelectedSensorPosition(0);
-	m_rightposition = m_righttalonlead->GetSelectedSensorPosition(0);
+	if (m_lefttalon1 != nullptr)
+	{
+		m_leftspeed = m_lefttalon1->GetSelectedSensorVelocity(0);
+		m_leftposition = m_lefttalon1->GetSelectedSensorPosition(0);
+	}
+	if (m_righttalon1 != nullptr)
+	{
+		m_rightspeed = m_righttalon1->GetSelectedSensorVelocity(0);
+		m_rightposition = m_righttalon1->GetSelectedSensorPosition(0);
+	}
 
 	switch (m_mode)
 	{
 	case DriveMode::kFollower:
 		// can talon follower mode
-		m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_lefttalon1->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_righttalon1->Set(m_invertright * m_coasting * RightMotor(maxpower));
 		break;
 
 	case DriveMode::kDiscrete:
 		// can talon discrete mode
-		m_lefttalonlead->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-		m_lefttalonfollow->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
-		m_righttalonlead->Set(m_invertright * m_coasting * RightMotor(maxpower));
-		m_righttalonfollow->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_lefttalon1->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_lefttalon2->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		if (m_lefttalon3 != nullptr)
+			m_lefttalon3->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
+		m_righttalon1->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		m_righttalon2->Set(m_invertright * m_coasting * RightMotor(maxpower));
+		if (m_righttalon3 != nullptr)
+			m_righttalon3->Set(m_invertleft * m_coasting * LeftMotor(maxpower));
 		break;
 
 	case DriveMode::kTank:
@@ -332,6 +407,9 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 		tempspin = abs(tempforward) < DEADZONE_Y;
 		m_differentialdrive->CurvatureDrive(tempforward, temprotate, tempspin);
 		break;
+
+	case DriveMode::kNone:
+		break;
 	}
 
 	SmartDashboard::PutNumber("DT11_turningramp", m_previousx); 			//Left Motors are forward=negative
@@ -349,17 +427,9 @@ void DriveTrain::Drive(double x, double y, bool ramp)
 // sets the motors to coasting mode, shifts, and then sets them back to break mode
 void DriveTrain::Shift()
 {
-	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
-	//m_righttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Coast);
 	m_ishighgear = !m_ishighgear;
 	if (m_shifter != nullptr)
 		m_shifter->Set(FLIP_HIGH_GEAR ^ m_ishighgear);
-	//m_lefttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_lefttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_righttalonlead->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
-	//m_righttalonfollow->SetNeutralMode(CANSpeedController::NeutralMode::kNeutralMode_Brake);
 	m_shift = false;
 }
 
@@ -448,56 +518,133 @@ double DriveTrain::RightMotor(double &maxpower)
 }
 
 
-double DriveTrain::GetLeftDistance()
+double DriveTrain::GetLeftPosition(int encoder)
 {
-	double distance = GetLeftPosition();
+	switch (encoder)
+	{
+	case 0:
+		if (m_lefttalon1 != nullptr)
+			return m_lefttalon1->GetSelectedSensorPosition(0);
+		else
+			return 0;
+	case 1:
+		if (m_lefttalon2 != nullptr)
+			return m_lefttalon2->GetSelectedSensorPosition(0);
+		else
+			return 0;
+	}
+	return 0;
+}
+
+
+double DriveTrain::GetRightPosition(int encoder)
+{
+	switch (encoder)
+	{
+	case 0:
+		if (m_righttalon1 != nullptr)
+			return m_righttalon1->GetSelectedSensorPosition(0);
+		else
+			return 0;
+	case 1:
+		if (m_righttalon2 != nullptr)
+			return m_righttalon2->GetSelectedSensorPosition(0);
+		else
+			return 0;
+	}
+	return 0;
+}
+
+
+double DriveTrain::GetLeftVelocity(int encoder)
+{
+	switch (encoder)
+	{
+	case 0:
+		if (m_lefttalon1 != nullptr)
+			return m_lefttalon1->GetSelectedSensorVelocity(0);
+		else
+			return 0;
+	case 1:
+		if (m_lefttalon2 != nullptr)
+			return m_lefttalon2->GetSelectedSensorVelocity(0);
+		else
+			return 0;
+	}
+	return 0;
+}
+
+
+double DriveTrain::GetRightVelocity(int encoder)
+{
+	switch (encoder)
+	{
+	case 0:
+		if (m_righttalon1 != nullptr)
+			return m_righttalon1->GetSelectedSensorVelocity(0);
+		else
+			return 0;
+	case 1:
+		if (m_righttalon2 != nullptr)
+			return m_righttalon2->GetSelectedSensorVelocity(0);
+		else
+			return 0;
+	}
+	return 0;
+}
+
+
+double DriveTrain::GetLeftDistance(int encoder)
+{
+	double distance = GetLeftPosition(encoder);
 	distance = (distance / CODES_PER_REV) * WHEEL_DIAMETER * 3.1415926535;
 	return distance;
 }
 
 
-double DriveTrain::GetRightDistance()
+double DriveTrain::GetRightDistance(int encoder)
 {
-	double distance = GetRightPosition();
+	double distance = GetRightPosition(encoder);
 	distance = (distance / CODES_PER_REV) * WHEEL_DIAMETER * 3.1415926535;
 	return distance;
 }
 
 
-double DriveTrain::GetMaxDistance()
+double DriveTrain::GetMaxDistance(int encoder)
 {
-	double maxleft = GetLeftDistance();
-	double maxright = GetRightDistance();
+	double maxleft = GetLeftDistance(encoder);
+	double maxright = GetRightDistance(encoder);
 	return abs(maxleft) > abs(maxright) ? maxleft : -maxright;
 }
 
 
-double DriveTrain::GetAverageMaxDistance()
+double DriveTrain::GetAverageMaxDistance(int encoder)
 {
-	double maxleft = GetLeftDistance();
-	double maxright = GetRightDistance();
+	double maxleft = GetLeftDistance(encoder);
+	double maxright = GetRightDistance(encoder);
 	return (abs(maxleft) + abs(maxright)) / 2;
 }
 
 
-double DriveTrain::GetMaxVelocity()
+double DriveTrain::GetMaxVelocity(int encoder)
 {
-	double maxleft = m_lefttalonlead->GetSelectedSensorVelocity(0);
-	double maxright = m_righttalonlead->GetSelectedSensorVelocity(0);
+	double maxleft = GetLeftVelocity(encoder);
+	double maxright = GetRightVelocity(encoder);
 	return abs(abs(maxleft) > abs(maxright) ? maxleft : -maxright);
 }
 
 
-void DriveTrain::ResetDeltaDistance()
+void DriveTrain::ResetDeltaDistance(int encoder)
 {
-	m_prevleftdistance = GetLeftDistance();
-	m_prevrightdistance = GetRightDistance();
+	m_prevleftdistance = GetLeftDistance(encoder);
+	m_prevrightdistance = GetRightDistance(encoder);
 }
 
 
-double DriveTrain::GetMaxDeltaDistance()
+double DriveTrain::GetMaxDeltaDistance(int encoder)
 {
-	double maxleft = GetLeftDistance()- m_prevleftdistance;
-	double maxright = GetRightDistance() - m_prevrightdistance;
+	double maxleft = GetLeftDistance(encoder)- m_prevleftdistance;
+	double maxright = GetRightDistance(encoder) - m_prevrightdistance;
 	return abs(maxleft) > abs(maxright) ? maxleft : -maxright;
 }
+

@@ -180,10 +180,10 @@ double DrivePID::ReturnPIDInput()
 {
 	if (m_feedback == kEncoder)
 	{
-		double m_leftpos = m_drivetrain->LeftTalonLead()->GetSelectedSensorPosition(0);
+		double m_leftpos = m_drivetrain->LeftTalon1()->GetSelectedSensorPosition(0);
 		m_leftpos = m_leftpos / CODES_PER_REV;
 
-		double m_rightpos = m_drivetrain->RightTalonLead()->GetSelectedSensorPosition(0);
+		double m_rightpos = m_drivetrain->RightTalon1()->GetSelectedSensorPosition(0);
 		m_rightpos = m_rightpos / CODES_PER_REV;
 
 		double retval = (360 / (2 * 3.1415926535)) * (m_leftpos + m_rightpos) * WHEEL_DIAMETER * 3.1415926535 / WHEEL_TRACK;

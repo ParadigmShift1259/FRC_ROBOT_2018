@@ -18,9 +18,9 @@ class DriveTrain
 {
 public:
 	// Drivetrain modes
-	enum DriveMode { kFollower, kDiscrete, kTank, kArcade, kCurvature };
+	enum DriveMode { kNone, kFollower, kDiscrete, kTank, kArcade, kCurvature };
 
-	DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *leftlead = nullptr, WPI_TalonSRX *leftfollow = nullptr, WPI_TalonSRX *rightlead = nullptr, WPI_TalonSRX *rightfollow = nullptr);
+	DriveTrain(OperatorInputs *inputs, WPI_TalonSRX *left1 = nullptr, WPI_TalonSRX *left2 = nullptr, WPI_TalonSRX *left3 = nullptr, WPI_TalonSRX *right1 = nullptr, WPI_TalonSRX *right2 = nullptr, WPI_TalonSRX *right3 = nullptr);
 	~DriveTrain();
 	void Init(DriveMode mode = kFollower);
 	void Loop();
@@ -38,34 +38,40 @@ public:
 	void setRamp(double newValue) {m_rampmax = newValue;}
 	bool getIsHighGear() {return m_ishighgear;}
 
-	double GetLeftPosition() {return m_lefttalonlead->GetSelectedSensorPosition(0);}
-	double GetRightPosition() {return m_righttalonlead->GetSelectedSensorPosition(0);}
-//	void ResetLeftPosition() {m_lefttalonlead->SetSelectedSensorPosition(0,0,1000);}
-//	void ResetRightPosition() {m_righttalonlead->SetSelectedSensorPosition(0,0,1000);}
-	double GetMaxVelocity();
-	double GetLeftDistance();
-	double GetRightDistance();
-	double GetMaxDistance();
-	double GetAverageMaxDistance();
-	void ResetDeltaDistance();
-	double GetMaxDeltaDistance();
+	double GetLeftPosition(int encoder = 0);
+	double GetRightPosition(int encoder = 0);
+	double GetLeftVelocity(int encoder = 0);
+	double GetRightVelocity(int encoder = 0);
+	double GetMaxVelocity(int encoder = 0);
+	double GetLeftDistance(int encoder = 0);
+	double GetRightDistance(int encoder = 0);
+	double GetMaxDistance(int encoder = 0);
+	double GetAverageMaxDistance(int encoder = 0);
+	void ResetDeltaDistance(int encoder = 0);
+	double GetMaxDeltaDistance(int encoder = 0);
 
-	WPI_TalonSRX *LeftTalonLead() {return m_lefttalonlead;}
-	WPI_TalonSRX *RightTalonLead() {return m_righttalonlead;}
-	WPI_TalonSRX *LeftTalonFollow() {return m_lefttalonfollow;}
-	WPI_TalonSRX *RightTalonFollow() {return m_righttalonfollow;}
+	WPI_TalonSRX *LeftTalon1() {return m_lefttalon1;}
+	WPI_TalonSRX *RightTalon1() {return m_righttalon1;}
+	WPI_TalonSRX *LeftTalon2() {return m_lefttalon2;}
+	WPI_TalonSRX *RIghtTalon2() {return m_righttalon2;}
+	WPI_TalonSRX *LeftTalon3() {return m_lefttalon3;}
+	WPI_TalonSRX *RIghtTalon3() {return m_righttalon3;}
 
 protected:
 	DriveMode m_mode;
 	OperatorInputs *m_inputs;
-	WPI_TalonSRX *m_lefttalonlead;
-	WPI_TalonSRX *m_lefttalonfollow;
-	WPI_TalonSRX *m_righttalonlead;
-	WPI_TalonSRX *m_righttalonfollow;
-	bool m_lefttalonleadowner;
-	bool m_lefttalonfollowowner;
-	bool m_righttalonleadowner;
-	bool m_righttalonfollowowner;
+	WPI_TalonSRX *m_lefttalon1;
+	WPI_TalonSRX *m_lefttalon2;
+	WPI_TalonSRX *m_lefttalon3;
+	WPI_TalonSRX *m_righttalon1;
+	WPI_TalonSRX *m_righttalon2;
+	WPI_TalonSRX *m_righttalon3;
+	bool m_lefttalon1owner;
+	bool m_lefttalon2owner;
+	bool m_lefttalon3owner;
+	bool m_righttalon1owner;
+	bool m_righttalon2owner;
+	bool m_righttalon3owner;
 	SpeedControllerGroup *m_leftscgroup;
 	SpeedControllerGroup *m_rightscgroup;
 	DifferentialDrive *m_differentialdrive;
